@@ -6,10 +6,6 @@
  * Met à disposition un ensemble de méthodes pour valoriser les options des listes de Tag
  * Ref: https://gist.github.com/iqbalrony/7ee129379965082fb6c62cf5db372752
  *
- * Méthodes 'get_all_meta_post'     Requête SQL sur les metadatas
- *          'get_all_posts_url'     Liste des URLs des articles/pages
- *          'get_all_chart_url'     Liste des URLs des fichiers TXT des medias
- *
  * @since 1.6.0
  * @since 1.6.2 Ajout du Dynamic Tags 'Eac_External_Image_Url'
  * @since 1.6.3 Suppression du Dynamic Tags 'Shortcode media'
@@ -26,6 +22,7 @@
  *              Deprecated register_tags
  *              Deprecated register_tag
  * @since 1.9.9 Chargement du traits pour le custom control 'eac-select2'
+ * @since 2.0.2 Suppression des actions et fonctions depréciées
  */
 
 namespace EACCustomWidgets\Includes\Elementor\DynamicTags;
@@ -63,9 +60,11 @@ class Eac_Dynamic_Tags {
 		'post-custom-field-keys'   => 'Eac_Post_Custom_Field_Keys',
 		'post-custom-field-values' => 'Eac_Post_Custom_Field_Values',
 		'post-elementor-tmpl'      => 'Eac_Elementor_Template',
+		'post-title'               => 'Eac_Post_Title',
 		'post-excerpt'             => 'Eac_Post_Excerpt',
 		'featured-image'           => 'Eac_Featured_Image',
 		'user-info'                => 'Eac_User_Info',
+		'page-title'               => 'Eac_Page_Title',
 		'site-url'                 => 'Eac_Site_URL',
 		'site-server'              => 'Eac_Server_Var',
 		'site-title'               => 'Eac_Site_Title',
@@ -76,10 +75,11 @@ class Eac_Dynamic_Tags {
 		'author-info'              => 'Eac_Author_Info',
 		'author-name'              => 'Eac_Author_Name',
 		'author-picture'           => 'Eac_Author_Picture',
-		'author-social-network'    => 'Eac_Author_Social_network',
+		'author-social-network'    => 'Eac_Author_Social_Network',
 		'featured-image-data'      => 'Eac_Featured_Image_Data',
 		'user-picture'             => 'Eac_User_Picture',
-		'shortcode-image'          => 'Eac_Shortcode_Image',
+		'shortcode'                => 'Eac_Shortcode_Tag',
+		'lightbox'                 => 'Eac_Lightbox_Tag',
 	);
 
 	/**
@@ -90,16 +90,13 @@ class Eac_Dynamic_Tags {
 	 * @access public
 	 * @since 1.9.8 register vs register_tags
 	 * @since 1.9.9 charge le trait
+	 * @since 2.0.2 action register_tags depréciée
 	 */
 	public function __construct() {
 		// Charge le trait 'page/post'
 		require_once self::TAG_DIR_TRAITS . 'page-post-trait.php';
 
-		if ( version_compare( ELEMENTOR_VERSION, '3.5.0', '<' ) ) {
-			add_action( 'elementor/dynamic_tags/register_tags', array( $this, 'register_tags' ) );
-		} else {
-			add_action( 'elementor/dynamic_tags/register', array( $this, 'register_tags' ) );
-		}
+		add_action( 'elementor/dynamic_tags/register', array( $this, 'register_tags' ) );
 	}
 
 	/**
@@ -107,16 +104,18 @@ class Eac_Dynamic_Tags {
 	 *
 	 * @since 1.6.0
 	 * @since 1.9.8 register vs register_tag
+	 * @since 2.0.2 fonction register_tag depréciée
 	 */
 	public function register_tags( $dynamic_tags ) {
 		// Enregistre les nouveaux groupes avant d'enregistrer les Tags
+		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-action', array( 'title' => esc_html__( 'Actions', 'eac-components' ) ) );
 		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-author-groupe', array( 'title' => esc_html__( 'Auteur', 'eac-components' ) ) );
 		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-post', array( 'title' => esc_html__( 'Article', 'eac-components' ) ) );
 		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-site-groupe', array( 'title' => esc_html__( 'Site', 'eac-components' ) ) );
 		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-url', array( 'title' => esc_html__( 'URLs', 'eac-components' ) ) );
 
-		foreach ( $this->tags_list as $file => $className ) {
-			$full_class_name = self::TAG_NAMESPACE . $className;
+		foreach ( $this->tags_list as $file => $class_name ) {
+			$full_class_name = self::TAG_NAMESPACE . $class_name;
 			$full_file      = self::TAG_DIR . $file . '.php';
 
 			if ( ! file_exists( $full_file ) ) {
@@ -127,11 +126,7 @@ class Eac_Dynamic_Tags {
 			require_once $full_file;
 
 			if ( class_exists( $full_class_name ) ) {
-				if ( version_compare( ELEMENTOR_VERSION, '3.5.0', '<' ) ) {
-					$dynamic_tags->register_tag( new $full_class_name() );
-				} else {
-					$dynamic_tags->register( new $full_class_name() );
-				}
+				$dynamic_tags->register( new $full_class_name() );
 			}
 		}
 	}
@@ -151,13 +146,16 @@ class Eac_Dynamic_Tags {
 				AND p.ID = pm.post_id
 				AND p.post_title != ''
 				AND p.post_status = 'publish'
-				AND pm.meta_key NOT LIKE 'sdm_%'
-				AND pm.meta_key NOT LIKE 'rank_%'
-				AND pm.meta_key NOT LIKE '\\_%'
+				AND pm.meta_key NOT LIKE %s
+				AND pm.meta_key NOT LIKE %s
+				AND pm.meta_key NOT LIKE %s
 				AND pm.meta_value IS NOT NULL
 				AND pm.meta_value != ''
 				ORDER BY pm.meta_key",
-				$posttype
+				$posttype,
+				'sdm_%',
+				'rank_%',
+				'\\_%'
 			)
 		);
 

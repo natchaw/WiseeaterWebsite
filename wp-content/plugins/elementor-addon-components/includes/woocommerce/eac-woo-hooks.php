@@ -80,7 +80,7 @@ class Eac_Woo_Filters {
 
 		$this->options = get_option( $this->options_shop_name );
 
-		/** @since 2.00.1 Ancien format de l'option */
+		/** @since 2.0.1 Ancien format de l'option */
 		if ( $this->options && isset( $this->options['catalog']['active'] ) ) {
 			$this->catalog = true === $this->options['catalog']['active'] ? true : false;
 		} elseif ( $this->options && isset( $this->options['catalog'] ) ) {
@@ -98,7 +98,7 @@ class Eac_Woo_Filters {
 
 		$this->request_quote = $this->options && isset( $this->options['catalog']['request_quote'] ) && $this->options['catalog']['request_quote'];
 
-		$this->redirect_url = $this->options && ! empty( $this->options['product-page']['shop']['url'] ) ? esc_url( $this->options['product-page']['shop']['url'] ) : '';
+		$this->redirect_url = $this->options && ! empty( $this->options['product-page']['shop']['url'] ) ? $this->options['product-page']['shop']['url'] : '';
 
 		$this->redirect_metas = $this->options && isset( $this->options['product-page']['metas'] ) && $this->options['product-page']['metas'];
 
@@ -309,7 +309,7 @@ class Eac_Woo_Filters {
 		}
 
 		if ( ! empty( $url ) ) {
-			wp_safe_redirect( $url );
+			wp_safe_redirect( esc_url( $url ) );
 			exit();
 		}
 	}
@@ -365,7 +365,7 @@ class Eac_Woo_Filters {
 			foreach ( $cat_ids as $cat_id ) {
 				$term = get_term( $cat_id, 'product_cat' );
 				if ( ! is_wp_error( $term ) && ! empty( $term ) ) {
-					$links[] = '<a href="' . $url . '?filter=' . urlencode( $term->slug ) . '" rel="tag">' . esc_attr( ucfirst( $term->name ) ) . '</a>';
+					$links[] = '<a href="' . esc_url( $url ) . '?filter=' . rawurlencode( $term->slug ) . '" rel="tag">' . esc_html( ucfirst( $term->name ) ) . '</a>';
 				}
 			}
 
@@ -402,7 +402,7 @@ class Eac_Woo_Filters {
 			foreach ( $tag_ids as $tag_id ) {
 				$term = get_term( $tag_id, 'product_tag' );
 				if ( ! is_wp_error( $term ) && ! empty( $term ) ) {
-					$links[] = '<a href="' . $url . '?filter=' . urlencode( $term->slug ) . '" rel="tag">' . esc_attr( ucfirst( $term->name ) ) . '</a>';
+					$links[] = '<a href="' . esc_url( $url ) . '?filter=' . rawurlencode( $term->slug ) . '" rel="tag">' . esc_html( ucfirst( $term->name ) ) . '</a>';
 				}
 			}
 
@@ -447,7 +447,7 @@ class Eac_Woo_Filters {
 					$term = get_term( $term_array['term_id'], $taxonomy );
 
 					// Ajoute le slug de la catégorie au paramètre 'filter' de l'URL
-					$crumbs[ $key ][1] = $url . '?filter=' . urlencode( $term->slug );
+					$crumbs[ $key ][1] = esc_url( $url ) . '?filter=' . rawurlencode( $term->slug );
 					// $crumbs[$key][1] = $url;
 				}
 			}
@@ -464,9 +464,9 @@ class Eac_Woo_Filters {
 	 * @return L'url du bouton
 	 */
 	public function cart_buttons_redirect_url( $shop_url ) {
-		$url = $this->redirect_buttons && ! empty( $this->redirect_url ) ? $this->redirect_url : esc_url( $shop_url );
+		$url = $this->redirect_buttons && ! empty( $this->redirect_url ) ? $this->redirect_url : $shop_url;
 
-		return $url;
+		return esc_url( $url );
 	}
 
 	/**
@@ -482,10 +482,8 @@ class Eac_Woo_Filters {
 		switch ( $product_type ) {
 			case 'simple':
 				return esc_html__( 'Ajouter au panier!!', 'eac-components' );
-				break;
 			case 'variable':
 				return esc_html__( 'Select the variations, yo!', 'eac-components' );
-				break;
 			default:
 				return $button_text;
 		}

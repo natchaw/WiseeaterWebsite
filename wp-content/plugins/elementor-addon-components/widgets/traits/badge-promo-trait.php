@@ -30,6 +30,7 @@ trait Badge_Promo_Trait {
 					),
 				),
 				'default' => 'no',
+				'toggle'  => false,
 			)
 		);
 

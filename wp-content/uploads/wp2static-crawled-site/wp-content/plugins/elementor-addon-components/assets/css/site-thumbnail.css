@@ -1,4 +1,3 @@
-
 /**
  *
  * https://medium.com/@jamesfuthey/simulating-the-creation-of-website-thumbnail-screenshots-using-iframes-7145269891db
@@ -18,13 +17,13 @@
 
 /** Ajout d'un span pour le lien et pour masquer les liens de la page importer si le lien général n'est pas actif */
 .eac-site-thumbnail .site-thumbnail__wrapper-overlay {
-	display: inline-block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 9;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9;
 }
 
 .eac-site-thumbnail .thumbnail-caption {
@@ -47,6 +46,7 @@
   position: relative;
   background: #f9f9f9;
 }
+
 /* Image Icon for the Background */
 .thumbnail-container::before {
   position: absolute;
@@ -54,6 +54,7 @@
   top: calc(50% - 18px);
   opacity: 0.2;
   display: block;
+  zoom: 2;
   -ms-zoom: 2;
   -o-transform: scale(2);
   -moz-transform: scale(2);
@@ -64,10 +65,11 @@
 
 /* This is a masking container for the zoomed iframe element */
 .thumbnail {
-	display: block;
+  display: block;
 }
 
 .thumbnail {
+  zoom: 0.25;
   -ms-zoom: 0.25;
   -moz-transform: scale(0.25);
   -moz-transform-origin: 0 0;
@@ -78,12 +80,14 @@
   transform: scale(0.25);
   transform-origin: 0 0;
 }
+
 /* This is our screen sizing */
 .thumbnail,
 .thumbnail iframe {
   width: 1440px;
   height: 900px;
 }
+
 /* This facilitates the fade-in transition instead of flicker. It also helps us maintain the illusion that this is an image, since some webpages will have a preloading animation or wait for some images to download */
 .thumbnail iframe {
   opacity: 0;

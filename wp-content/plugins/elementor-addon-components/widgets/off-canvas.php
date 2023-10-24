@@ -196,6 +196,7 @@ class Off_Canvas_Widget extends Widget_Base {
 							'icon'  => 'eicon-h-align-right',
 						),
 					),
+					'toggle'  => false,
 				)
 			);
 
@@ -226,9 +227,8 @@ class Off_Canvas_Widget extends Widget_Base {
 							'label'       => esc_html__( 'Titre', 'eac-components' ),
 							'type'        => Controls_Manager::TEXT,
 							'dynamic'     => array( 'active' => true ),
-							'default'     => esc_html__( "Texte de l'entête", 'eac-components' ),
-							'placeholder' => esc_html__( "Texte de l'entête", 'eac-components' ),
-							// 'label_block' =>  true,
+							'default'     => esc_html__( 'Texte entête', 'eac-components' ),
+							'placeholder' => esc_html__( 'Texte entête', 'eac-components' ),
 						)
 					);
 
@@ -247,7 +247,6 @@ class Off_Canvas_Widget extends Widget_Base {
 								'tmpl_page' => esc_html__( 'Elementor modèle de page', 'eac-components' ),
 								'widget'    => esc_html__( 'Widget', 'eac-components' ),
 							),
-							// 'label_block' =>  true,
 							'separator'   => 'before',
 						)
 					);
@@ -302,7 +301,6 @@ class Off_Canvas_Widget extends Widget_Base {
 							'type'        => Controls_Manager::SELECT,
 							'options'     => Eac_Tools_Util::get_menus_list(),
 							// 'default'      => array_keys($menus)[0],
-							// 'save_default' => true,
 							'description' => sprintf( __( 'Aller à <a href="%s" target="_blank" rel="noopener noreferrer">Apparence/Menus</a> pour gérer vos menus.', 'eac-components' ), admin_url( 'nav-menus.php' ) ),
 							'condition'   => array( 'oc_content_type' => 'menu' ),
 						)
@@ -361,7 +359,6 @@ class Off_Canvas_Widget extends Widget_Base {
 							'default'   => esc_html__( 'Ouvrir la barre latérale', 'eac-components' ),
 							'type'      => Controls_Manager::TEXT,
 							'dynamic'   => array( 'active' => true ),
-							// 'label_block' => true,
 							'condition' => array( 'oc_trigger_type' => 'button' ),
 						)
 					);
@@ -559,7 +556,6 @@ class Off_Canvas_Widget extends Widget_Base {
 		);
 
 			/**
-			 * @since 1.8.7 Application des breakpoints
 			 * @since 1.9.6 Ajout de l'unité '%'
 			 */
 			$this->add_responsive_control(
@@ -569,8 +565,16 @@ class Off_Canvas_Widget extends Widget_Base {
 					'type'        => Controls_Manager::SLIDER,
 					'size_units'  => array( 'px', '%' ),
 					'default'     => array(
-						'size' => 350,
-						'unit' => 'px',
+						'size' => 50,
+						'unit' => '%',
+					),
+					'tablet_default' => array(
+						'size' => 50,
+						'unit' => '%',
+					),
+					'mobile_default' => array(
+						'size' => 100,
+						'unit' => '%',
 					),
 					'range'       => array(
 						'px' => array(
@@ -1017,15 +1021,6 @@ class Off_Canvas_Widget extends Widget_Base {
 			);
 
 			$this->add_group_control(
-				Group_Control_Box_Shadow::get_type(),
-				array(
-					'name'     => 'oc_button_shadow',
-					'label'    => esc_html__( 'Ombre', 'eac-components' ),
-					'selector' => '{{WRAPPER}} .oc-offcanvas__wrapper-btn',
-				)
-			);
-
-			$this->add_group_control(
 				Group_Control_Border::get_type(),
 				array(
 					'name'      => 'oc_button_border',
@@ -1052,7 +1047,15 @@ class Off_Canvas_Widget extends Widget_Base {
 					'selectors'          => array(
 						'{{WRAPPER}} .oc-offcanvas__wrapper-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					),
-					'separator'          => 'before',
+				)
+			);
+
+			$this->add_group_control(
+				Group_Control_Box_Shadow::get_type(),
+				array(
+					'name'     => 'oc_button_shadow',
+					'label'    => esc_html__( 'Ombre', 'eac-components' ),
+					'selector' => '{{WRAPPER}} .oc-offcanvas__wrapper-btn',
 				)
 			);
 
@@ -1114,9 +1117,7 @@ class Off_Canvas_Widget extends Widget_Base {
 	protected function render() {
 		?>
 		<div class="eac-off-canvas">
-			<?php
-			$this->render_offcanvas();
-			?>
+			<?php $this->render_offcanvas(); ?>
 		</div>
 		<?php
 	}
@@ -1138,11 +1139,11 @@ class Off_Canvas_Widget extends Widget_Base {
 		$menu           = $settings['oc_content_menu'];
 		$texte          = $settings['oc_content_text'];
 		$widget_classes = $settings['oc_content_widget'];
-		$tmpl_sec       = $settings['oc_content_section'];
-		$tmpl_page      = $settings['oc_content_page'];
+		$tmplsec        = $settings['oc_content_section'];
+		$tmplpage       = $settings['oc_content_page'];
 
 		// Quelques tests
-		if ( ( 'widget' === $content && empty( $widget_classes ) ) || ( 'texte' === $content && empty( $texte ) ) || ( 'menu' === $content && empty( $menu ) ) || ( 'form' === $content && empty( $short_code || ( 'tmpl_sec' === $content && empty( $tmpl_sec ) ) || ( 'tmpl_page' === $content && empty( $tmpl_page ) ) ) ) ) {
+		if ( ( 'widget' === $content && empty( $widget_classes ) ) || ( 'texte' === $content && empty( $texte ) ) || ( 'menu' === $content && empty( $menu ) ) || ( 'form' === $content && empty( $short_code ) ) || ( 'tmpl_sec' === $content && empty( $tmplsec ) ) || ( 'tmpl_page' === $content && empty( $tmplpage ) ) ) {
 			return;
 		}
 
@@ -1166,11 +1167,11 @@ class Off_Canvas_Widget extends Widget_Base {
 		$icon_button = false;
 
 		// Le bouton est collant
-		$sticky_button = 'button' === $trigger && $settings['oc_icon_sticky'] === 'yes' ? 'sticky-button-' . $settings['oc_content_position'] : '';
+		$sticky_button = 'button' === $trigger && 'yes' === $settings['oc_icon_sticky'] ? 'sticky-button-' . $settings['oc_content_position'] : '';
 
 		// Le déclencheur est un bouton
 		if ( 'button' === $trigger ) {
-			if ( $settings['oc_icon_activated'] === 'yes' && ! empty( $settings['oc_display_icon_button'] ) ) {
+			if ( 'yes' === $settings['oc_icon_activated'] && ! empty( $settings['oc_display_icon_button'] ) ) {
 				$icon_button = true;
 			}
 			$this->add_render_attribute( 'trigger', 'type', 'button' );
@@ -1186,63 +1187,71 @@ class Off_Canvas_Widget extends Widget_Base {
 		$this->add_render_attribute( 'oc_wrapper', 'id', $id );
 		$this->add_render_attribute( 'oc_wrapper', 'data-settings', $this->get_settings_json() );
 		?>
-		
-		<div <?php echo $this->get_render_attribute_string( 'oc_wrapper' ); ?>>
-			<?php if ( 'button' === $trigger ) : ?>
-				<button <?php echo $this->get_render_attribute_string( 'trigger' ); ?>>
+
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'oc_wrapper' ) ); ?>>
+			<?php if ( 'button' === $trigger ) { ?>
+				<button <?php echo wp_kses_post( $this->get_render_attribute_string( 'trigger' ) ); ?>>
 				<?php
-				if ( $icon_button && $settings['oc_position_icon_button'] === 'before' ) {
+				if ( 'before' === $icon_button && $settings['oc_position_icon_button'] ) {
 					Icons_Manager::render_icon( $settings['oc_display_icon_button'], array( 'aria-hidden' => 'true' ) );
 				}
 					echo sanitize_text_field( $settings['oc_display_text_button'] );
-				if ( $icon_button && $settings['oc_position_icon_button'] === 'after' ) {
+				if ( 'after' === $icon_button && $settings['oc_position_icon_button'] ) {
 					Icons_Manager::render_icon( $settings['oc_display_icon_button'], array( 'aria-hidden' => 'true' ) );
 				}
 				?>
 				</button>
-			<?php elseif ( 'text' === $trigger ) : ?>
-				<div <?php echo $this->get_render_attribute_string( 'trigger' ); ?>>
+			<?php } elseif ( 'text' === $trigger ) { ?>
+				<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'trigger' ) ); ?>>
 					<span><?php echo sanitize_text_field( $settings['oc_display_text'] ); ?></span>
 				</div>
-			<?php endif; ?>
+			<?php } ?>
 		</div>
-		
-		<?php if ( $has_overlay ) : ?>
+
+		<?php if ( $has_overlay ) { ?>
 			<div class="oc-offcanvas__wrapper-overlay"></div>
-		<?php endif; ?>
-		
-		<div id="offcanvas_<?php echo $id; ?>" class="oc-offcanvas__wrapper-canvas oc-offcanvas__canvas-<?php echo $settings['oc_content_position']; ?> elementor-<?php echo $main_id; ?>">
-			<div class="elementor-element elementor-element-<?php echo $id; ?>">
+		<?php }
+		ob_start();
+		?>
+
+		<div id="offcanvas_<?php echo esc_attr( $id ); ?>" style="display: none;" class="oc-offcanvas__wrapper-canvas oc-offcanvas__canvas-<?php echo esc_attr( $settings['oc_content_position'] ); ?> elementor-<?php echo esc_attr( $main_id ); ?>">
+			<div class="elementor-element elementor-element-<?php echo esc_attr( $id ); ?>">
 				<div class="oc-offcanvas__canvas-header">
 					<div class="oc-offcanvas__canvas-close"><span>X</span></div>
-					<div class="oc-offcanvas__canvas-title"><h2><?php echo htmlspecialchars_decode( $settings['oc_content_title'], ENT_QUOTES ); ?></h2></div>
+					<div class="oc-offcanvas__canvas-title"><h2><?php echo sanitize_text_field( $settings['oc_content_title'] ); ?></h2></div>
 				</div>
 				<div class="oc-offcanvas__canvas-content">
-					<?php
-					if ( 'texte' === $content ) {
-						?>
+					<?php if ( 'texte' === $content ) { ?>
 						<div class="oc-offcanvas__content-text"><?php echo wp_kses_post( $texte ); ?></div>
-						<?php
-					} elseif ( 'tmpl_sec' === $content ) {
-						$tmpl_sec = apply_filters( 'wpml_object_id', $tmpl_sec, 'elementor_library', true );
-						echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmpl_sec, true );
+					<?php } elseif ( 'tmpl_sec' === $content ) {
+						// @since 1.9.1 Évite la récursivité
+						if ( get_the_ID() === (int) $tmplsec ) {
+							esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
+						} else {
+							$tmplsec = apply_filters( 'wpml_object_id', $tmplsec, 'elementor_library', true );
+							echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplsec, true );
+						}
 					} elseif ( 'tmpl_page' === $content ) {
-						$tmpl_page = apply_filters( 'wpml_object_id', $tmpl_page, 'elementor_library', true );
-						echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmpl_page, true );
+						// @since 1.9.1 Évite la récursivité
+						if ( get_the_ID() === (int) $tmplpage ) {
+							esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
+						} else {
+							$tmplpage = apply_filters( 'wpml_object_id', $tmplpage, 'elementor_library', true );
+							echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplpage, true );
+						}
 					} elseif ( 'form' === $content ) {
 						echo do_shortcode( shortcode_unautop( $short_code ) );
 					} elseif ( 'menu' === $content ) {
 						$args = array(
 							'menu'            => $menu,
 							'container_class' => 'oc-offcanvas__menu-wrapper',
-							'depth'           => sanitize_text_field( $settings['oc_content_menu_level'] ),
+							'depth'           => absint( sanitize_text_field( $settings['oc_content_menu_level'] ) ),
 						);
 
 						// Affiche le menu
 						wp_nav_menu( $args );
 
 					} else {
-						ob_start();
 						foreach ( $widget_classes as $widget_class ) {
 							$args                    = array(
 								'before_title' => '<h3 class="widgettitle">',
@@ -1285,15 +1294,15 @@ class Off_Canvas_Widget extends Widget_Base {
 								dynamic_sidebar( $classname );
 							}
 						}
-						$output = ob_get_contents();
-						ob_end_clean();
-						echo $output;
 					}
 					?>
 				</div>
 			</div>
 		</div>
+
 		<?php
+		$content = ob_get_clean();
+		echo $content; // phpcs:disable WordPress.Security.EscapeOutput
 	}
 
 	/**
@@ -1303,7 +1312,7 @@ class Off_Canvas_Widget extends Widget_Base {
 	 * Convert on JSON format
 	 * Modification de la règles 'data_filtre'
 	 *
-	 * @uses         json_encode()
+	 * @uses         wp_json_encode()
 	 *
 	 * @return   JSON oject
 	 *
@@ -1320,10 +1329,8 @@ class Off_Canvas_Widget extends Widget_Base {
 			'data_position'  => $module_settings['oc_content_position'],
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}
-
 }

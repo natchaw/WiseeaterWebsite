@@ -363,5 +363,4 @@ class Lecteur_Audio_Widget extends Widget_Base {
 	}
 
 	protected function content_template() {}
-
 }

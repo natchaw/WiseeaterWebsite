@@ -17,7 +17,7 @@ use Elementor\Controls_Manager;
 use Elementor\Core\DynamicTags\Data_Tag;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
 
-class Eac_Product_Gallery_images extends Data_Tag {
+class Eac_Product_Gallery_Images extends Data_Tag {
 	use Eac_Product_Dynamic_Woo;
 
 	public function get_name() {

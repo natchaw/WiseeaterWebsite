@@ -43,7 +43,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 		$menu_item_image_sizes     = $menu_meta['image']['sizes'];
 	}
 
-	$url_logo = '<img class="eac-form-menu-logo" src="' . EAC_ADDONS_URL . 'admin/images/EAC-logo.png' . '" />';
+	$url_logo = '<img class="eac-form-menu-logo" src="' . EAC_ADDONS_URL . 'admin/images/EAC-logo.png" />';
 }
 ?>
 <div class="eac-form-menu">
@@ -51,7 +51,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 	<div class="eac-form_menu-post-title"></div>
 	<form action="" method="POST" id="eac-form_menu-settings" name="eac-form_menu-settings">
 		<input type="hidden" class="menu-item_id" name="menu-item_id" value="<?php echo esc_attr( $menu_item_id ); ?>" />
-		
+
 		<fieldset class="field_title-wrapper">
 		<legend><?php esc_html_e( 'Badge', 'eac-components' ); ?></legend>
 			<div class="field_badge-wrapper">
@@ -69,7 +69,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 				</p>
 			</div>
 		</fieldset>
-		
+
 		<fieldset class="field_title-wrapper">
 		<legend><?php esc_html_e( 'Icône', 'eac-components' ); ?></legend>
 			<div class="field_icon-wrapper">
@@ -79,7 +79,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 				</p>
 			</div>
 		</fieldset>
-		
+
 		<fieldset class="field_title-wrapper">
 		<legend><?php esc_html_e( 'Miniature', 'eac-components' ); ?></legend>
 			<div class="field_thumbnail-wrapper">
@@ -92,25 +92,25 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 						<select name="menu-item_thumbnail-sizes" id="menu-item_thumbnail-sizes">
 							<option value="20" 
 							<?php
-							if ( $menu_item_thumbnail_sizes == 20 ) {
+							if ( 20 === $menu_item_thumbnail_sizes ) {
 								echo ' selected'; }
 							?>
 							>20x20</option>
 							<option value="30" 
 							<?php
-							if ( $menu_item_thumbnail_sizes == 30 ) {
+							if ( 30 === $menu_item_thumbnail_sizes ) {
 								echo ' selected'; }
 							?>
 							>30x30</option>
 							<option value="40" 
 							<?php
-							if ( $menu_item_thumbnail_sizes == 40 ) {
+							if ( 40 === $menu_item_thumbnail_sizes ) {
 								echo ' selected'; }
 							?>
 							>40x40</option>
 							<option value="50" 
 							<?php
-							if ( $menu_item_thumbnail_sizes == 50 ) {
+							if ( 50 === $menu_item_thumbnail_sizes ) {
 								echo ' selected'; }
 							?>
 							>50x50</option>
@@ -119,7 +119,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 				</p>
 			</div>
 		</fieldset>
-		
+
 		<fieldset class="field_title-wrapper">
 		<legend><?php esc_html_e( 'Image', 'eac-components' ); ?></legend>
 			<div class="field_image-wrapper">
@@ -142,25 +142,25 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 						<select name="menu-item_image-sizes" id="menu-item_image-sizes">
 							<option value="20" 
 							<?php
-							if ( $menu_item_image_sizes == 20 ) {
+							if ( 20 === $menu_item_image_sizes ) {
 								echo ' selected'; }
 							?>
 							>20x20</option>
 							<option value="30" 
 							<?php
-							if ( $menu_item_image_sizes == 30 ) {
+							if ( 30 === $menu_item_image_sizes ) {
 								echo ' selected'; }
 							?>
 							>30x30</option>
 							<option value="40" 
 							<?php
-							if ( $menu_item_image_sizes == 40 ) {
+							if ( 40 === $menu_item_image_sizes ) {
 								echo ' selected'; }
 							?>
 							>40x40</option>
 							<option value="50" 
 							<?php
-							if ( $menu_item_image_sizes == 50 ) {
+							if ( 50 === $menu_item_image_sizes ) {
 								echo ' selected'; }
 							?>
 							>50x50</option>
@@ -169,7 +169,7 @@ if ( isset( $_REQUEST['item_id'] ) ) {
 				</p>
 			</div>
 		</fieldset>
-		
+
 		<div class="eac-saving-menu">
 			<input id="eac-menu-submit" type="submit" value="<?php esc_html_e( 'Enregistrer les modifications', 'eac-components' ); ?>">
 			<div id="eac-menu-saved"></div>

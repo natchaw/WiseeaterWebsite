@@ -72,7 +72,7 @@ class Eac_Product_Excerpt extends Tag {
 		if ( ! $product ) {
 			return '';    }
 
-		$texte = $settings_len === 'long' ? $product->get_description() : $product->get_short_description();
+		$texte = 'long' === $settings_len ? $product->get_description() : $product->get_short_description();
 		echo wp_kses_post( $texte );
 	}
 }

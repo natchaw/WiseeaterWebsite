@@ -102,6 +102,7 @@ function wpr_addons_templates_kit_page() {
             // Loop
             foreach ($sorted_kits as $kit_id => $data) {
                 echo '<div class="grid-item" data-kit-id="'. esc_attr($kit_id) .'" data-tags="'. esc_attr($data['tags']) .'" data-plugins="'. esc_attr($data['plugins']) .'" data-pages="'. esc_attr($data['pages']) .'" data-price="'. esc_attr($data['price']) .'">';
+                    echo '' !== $data['label'] ? '<span class="label label-'. esc_attr($data['label']) .'">'. esc_html($data['label']) .'</span>' : '';
                     echo '<div class="image-wrap">';
                         echo '<img src="'. esc_url('https://royal-elementor-addons.com/library/templates-kit/'. $kit_id .'/home.jpg') .'">';
                         echo '<div class="image-overlay"><span class="dashicons dashicons-search"></span></div>';
@@ -165,7 +166,7 @@ function wpr_addons_templates_kit_page() {
         <img src="<?php echo esc_url(WPR_ADDONS_ASSETS_URL .'img/not-found.png'); ?>">
         <h1><?php esc_html_e('No Search Results Found.', 'wpr-addons'); ?></h1>
         <p><?php esc_html_e('Cant find a Templates Kit you are looking for?', 'wpr-addons'); ?></p>
-        <a href="https://royal-elementor-addons.com/library/request-new-kit-red.html" target="_blank"><?php esc_html_e('Request Templates Kit.', 'wpr-addons'); ?></a>
+        <a href="https://royal-elementor-addons.com/library/request-new-kit-red.html" target="_blank"><?php esc_html_e('Request Templates Kit', 'wpr-addons'); ?></a>
     </div>
 
 </div>
@@ -774,7 +775,7 @@ function wpr_search_query_results() {
 }
 
 /**
-** Search Query Results
+** Imported Kits
 */
 function wpr_track_imported_kit( $kit ) {
     // Freemius OptIn
@@ -784,7 +785,7 @@ function wpr_track_imported_kit( $kit ) {
     
     wp_remote_post( 'http://reastats.kinsta.cloud/wp-json/templates-kit-import/data', [
         'body' => [
-            'imported_kit' => $kit
+            'imported_kit' => $kit . ' *'. WPR_ADDONS_VERSION .'*'
         ]
     ] );
 }

@@ -79,7 +79,7 @@ class Simple_File_Viewer_Control extends Base_Data_Control {
 		?>
 		<div class="eac-viewer_control-field elementor-control-field">
 			<label for="<?php echo esc_attr( $control_uid ); ?>" class="elementor-control-title">{{{ data.label }}}</label>
-			
+
 			<div class="elementor-control-input-wrapper">
 				<div>
 					<a href="#" class="eac-select-file elementor-button elementor-button-success tooltip-target" data-tooltip="Select file" id="select-file-<?php echo esc_attr( $control_uid ); ?>">
@@ -88,7 +88,7 @@ class Simple_File_Viewer_Control extends Base_Data_Control {
 						<i class="eicon-upload"></i>
 					</a>
 				</div>
-				
+
 				<# if (!!data.controlValue) { #>
 					<div>
 						<a href="#" class="eac-remove-file elementor-button elementor-button-danger tooltip-target" data-tooltip="Remove file"id="select-file-<?php echo esc_attr( $control_uid ); ?>-remove">
@@ -96,7 +96,7 @@ class Simple_File_Viewer_Control extends Base_Data_Control {
 						</a>
 					</div>
 				<# } #>
-				
+
 				<input type="hidden" class="eac-selected-file-url" id="<?php echo esc_attr( $control_uid ); ?>" data-setting="{{ data.name }}" placeholder="{{ data.placeholder }}">
 			</div>
 			<# if (data.description) { #><div class="elementor-control-field-description">{{{ data.description }}}</div><# } #>

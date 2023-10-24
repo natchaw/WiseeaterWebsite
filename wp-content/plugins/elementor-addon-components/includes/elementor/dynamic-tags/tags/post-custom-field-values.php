@@ -91,11 +91,12 @@ class Eac_Post_Custom_Field_Values extends Data_Tag {
 		}
 
 		if ( empty( $key ) ) {
-			return ''; } elseif ( is_array( $key ) ) {
-			return implode( '|', $key ); } // @since 1.7.5
-			else {
-				return $key;
-			}
+			return '';
+		} elseif ( is_array( $key ) ) {
+			return implode( '|', $key );
+		} else {
+			return $key;
+		}
 	}
 
 	private function get_custom_keys_array( $type = 'post' ) {
@@ -107,7 +108,8 @@ class Eac_Post_Custom_Field_Values extends Data_Tag {
 		if ( ! empty( $metadatas ) ) {
 			foreach ( $metadatas as $metadata ) {
 				if ( ! is_serialized( $metadata->meta_value ) ) {
-					$value = $cut_value = $metadata->meta_value;
+					$value = $metadata->meta_value;
+					$cut_value = $metadata->meta_value;
 					// On n'affiche pas tous les caractères
 					if ( mb_strlen( $value, 'UTF-8' ) > self::FIELD_LENGTH ) {
 						$cut_value = mb_substr( $value, 0, self::FIELD_LENGTH, 'UTF-8' ) . '...';

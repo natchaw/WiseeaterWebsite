@@ -111,13 +111,13 @@ class EAC_Admin_Settings {
 	public function admin_page_scripts() {
 
 		/** Le style de la page de configuration du plugin */
-		wp_enqueue_style( 'eac-admin', EAC_Plugin::instance()->get_register_style_url( 'eac-admin', true ), array(), EAC_ADDONS_VERSION );
+		wp_enqueue_style( 'eac-admin', EAC_Plugin::instance()->get_register_style_url( 'eac-admin', true ), array(), '1.0.0' );
 
 		/** @since 1.8.7 */
 		wp_enqueue_style( 'wp-jquery-ui-dialog' );
 
 		/** Le script de la page de configuration du plugin */
-		wp_enqueue_script( 'eac-admin', EAC_Plugin::instance()->get_register_script_url( 'eac-admin', true ), array( 'jquery', 'jquery-ui-dialog' ), EAC_ADDONS_VERSION, true );
+		wp_enqueue_script( 'eac-admin', EAC_Plugin::instance()->get_register_script_url( 'eac-admin', true ), array( 'jquery', 'jquery-ui-dialog' ), '1.0.0', true );
 	}
 
 	/**
@@ -198,7 +198,7 @@ class EAC_Admin_Settings {
 			wp_send_json_error( esc_html__( 'Vous ne pouvez pas modifier les réglages', 'eac-components' ) );
 		}
 
-		// Les champs 'fields' sélectionnés 'on' sont serialiés dans 'eac-admin.js'
+		// Les champs 'fields' sélectionnés 'on' sont serialisés dans 'eac-admin.js'
 		if ( isset( $_POST['fields'] ) ) {
 			parse_str( $_POST['fields'], $settings_on );
 		} else {
@@ -243,7 +243,7 @@ class EAC_Admin_Settings {
 			wp_send_json_error( esc_html__( 'Vous ne pouvez pas modifier les réglages', 'eac-components' ) );
 		}
 
-		// Les champs 'fields' sélectionnés 'on' sont serializés dans 'eac-admin.js'
+		// Les champs 'fields' sélectionnés 'on' sont serialisés dans 'eac-admin.js'
 		if ( isset( $_POST['fields'] ) ) {
 			parse_str( $_POST['fields'], $settings_on );
 		} else {
@@ -288,7 +288,7 @@ class EAC_Admin_Settings {
 			wp_send_json_error( esc_html__( 'Vous ne pouvez pas modifier les réglages', 'eac-components' ) );
 		}
 
-		/** Les champs 'fields' sont serializés dans 'eac-admin.js' */
+		/** Les champs 'fields' sont serialisés dans 'eac-admin.js' */
 		if ( isset( $_POST['fields'] ) ) {
 			parse_str( $_POST['fields'], $settings_on );
 		} else {

@@ -10,6 +10,8 @@
  * @since 1.9.1
  * @since 1.9.2 Ajout des attributs "noopener noreferrer" pour les liens ouverts dans un autre onglet
  * @since 2.0.0 Amélioration le chargement des images
+ * @since 2.0.2 Ajout de l'attribut 'loading' aux images
+ *              Ajout des attributs d'édition en ligne
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -45,7 +47,7 @@ class Team_Members_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_style( 'eac-team-members', EAC_Plugin::instance()->get_register_style_url( 'team-members' ), array( 'eac' ), '1.9.1' );
+		wp_register_style( 'eac-team-members', EAC_Plugin::instance()->get_register_style_url( 'team-members' ), array( 'eac' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -221,6 +223,7 @@ class Team_Members_Widget extends Widget_Base {
 							'type'        => Controls_Manager::TEXTAREA,
 							'default'     => esc_html__( "Le faux-texte en imprimerie, est un texte sans signification, qui sert à calibrer le contenu d'une page...", 'eac-components' ),
 							'label_block' => true,
+							//'render_type' => 'ui',
 						)
 					);
 
@@ -243,7 +246,6 @@ class Team_Members_Widget extends Widget_Base {
 								'active'     => true,
 								'categories' => array(
 									TagsModule::URL_CATEGORY,
-									// TagsModule::TEXT_CATEGORY,
 								),
 							),
 							'label_block' => true,
@@ -260,7 +262,6 @@ class Team_Members_Widget extends Widget_Base {
 								'active'     => true,
 								'categories' => array(
 									TagsModule::URL_CATEGORY,
-									// TagsModule::TEXT_CATEGORY,
 								),
 							),
 							'label_block' => true,
@@ -565,6 +566,8 @@ class Team_Members_Widget extends Widget_Base {
 						'skin-4' => 'Skin 4',
 						'skin-5' => 'Skin 5',
 						'skin-6' => 'Skin 6',
+						'skin-7' => 'Skin 7',
+						'skin-8' => 'Skin 8',
 					),
 					'prefix_class' => 'team-members_global-',
 				)
@@ -573,56 +576,54 @@ class Team_Members_Widget extends Widget_Base {
 			$this->add_responsive_control(
 				'tm_overlay_height',
 				array(
-					'label'          => esc_html__( "Hauteur de l'overlay (%)", 'eac-components' ),
-					'type'           => Controls_Manager::SLIDER,
-					'size_units'     => array( '%' ),
-					'default'        => array(
-						'size' => 75,
+					'label'      => esc_html__( "Hauteur de l'overlay (%)", 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
 						'unit' => '%',
+						'size' => 80,
 					),
-					'tablet_default' => array(
-						'size' => 75,
-						'unit' => '%',
-					),
-					'mobile_default' => array(
-						'size' => 75,
-						'unit' => '%',
-					),
-					'range'          => array(
+					'range'      => array(
 						'%' => array(
 							'min'  => 0,
 							'max'  => 100,
 							'step' => 5,
 						),
 					),
-					'selectors'      => array(
+					'selectors'  => array(
 						'{{WRAPPER}}.team-members_global-skin-2 .team-member_content:hover .team-member_wrapper-info' => 'transform: translateY(calc(100% - {{SIZE}}%)) !important;',
 					),
-					'condition'      => array( 'tm_settings_member_style' => 'skin-2' ),
+					'condition'  => array( 'tm_settings_member_style' => 'skin-2' ),
 				)
 			);
 
 			$columns_device_args = array();
 		foreach ( $active_breakpoints as $breakpoint_name => $breakpoint_instance ) {
-			// if (! in_array($breakpoint_name, [Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN, Breakpoints_manager::BREAKPOINT_KEY_LAPTOP])) {
-			if ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE ) {
-				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-			} elseif ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA ) {
+			if ( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_LAPTOP === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET_EXTRA === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA === $breakpoint_name ) {
 				$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
-			} else {
-				$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
 			}
-				// }
 		}
 
 			$this->add_responsive_control(
 				'tm_columns',
 				array(
-					'label'        => esc_html__( 'Nombre de colonnes', 'eac-components' ),
-					'description'  => esc_html__( 'Disposition', 'eac-components' ),
-					'type'         => Controls_Manager::SELECT,
-					'default'      => '3',
-					'device_args'  => $columns_device_args,
+					'label'          => esc_html__( 'Nombre de colonnes', 'eac-components' ),
+					'description'    => esc_html__( 'Disposition', 'eac-components' ),
+					'type'           => Controls_Manager::SELECT,
+					'default'        => '3',
+					'tablet_default' => '2',
+					'mobile_default' => '1',
+					//'device_args'  => $columns_device_args,
 					'options'      => array(
 						'1' => '1',
 						'2' => '2',
@@ -663,112 +664,78 @@ class Team_Members_Widget extends Widget_Base {
 					'return_value' => 'round',
 					'default'      => 'round',
 					'prefix_class' => 'team-members_image-',
-					'condition'    => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4' ) ),
+					'condition'    => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4', 'skin-7', 'skin-8' ) ),
 				)
 			);
 
 			$this->add_responsive_control(
 				'tm_image_width',
 				array(
-					'label'          => esc_html__( "Largeur de l'image", 'eac-components' ),
-					'type'           => Controls_Manager::SLIDER,
-					'size_units'     => array( 'px' ),
-					'default'        => array(
+					'label'      => esc_html__( "Largeur de l'image", 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( 'px' ),
+					'default'    => array(
+						'unit' => 'px',
 						'size' => 150,
-						'unit' => 'px',
 					),
-					'laptop_default' => array(
-						'size' => 150,
-						'unit' => 'px',
-					),
-					'tablet_default' => array(
-						'size' => 120,
-						'unit' => 'px',
-					),
-					'mobile_default' => array(
-						'size' => 100,
-						'unit' => 'px',
-					),
-					'range'          => array(
+					'range'      => array(
 						'px' => array(
 							'min'  => 50,
 							'max'  => 300,
 							'step' => 10,
 						),
 					),
-					'selectors'      => array(
+					'selectors'  => array(
 						'{{WRAPPER}}.team-members_global-skin-3 .team-member_content .team-member_image' => 'width:{{SIZE}}{{UNIT}} !important; height:{{SIZE}}{{UNIT}} !important;',
 						'{{WRAPPER}}.team-members_global-skin-4 .team-member_content .team-member_image' => 'width:{{SIZE}}{{UNIT}} !important; height:{{SIZE}}{{UNIT}} !important;',
+						'{{WRAPPER}}.team-members_global-skin-7 .team-member_content .team-member_image' => 'width:{{SIZE}}{{UNIT}} !important; height:{{SIZE}}{{UNIT}} !important;',
+						'{{WRAPPER}}.team-members_global-skin-8 .team-member_content .team-member_image' => 'width:{{SIZE}}{{UNIT}} !important; height:{{SIZE}}{{UNIT}} !important;',
 					),
-					'condition'      => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4' ) ),
+					'condition'  => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4', 'skin-7', 'skin-8' ) ),
 				)
 			);
 
 			$this->add_responsive_control(
 				'tm_image_height',
 				array(
-					'label'          => esc_html__( "Hauteur de l'image", 'eac-components' ),
-					'type'           => Controls_Manager::SLIDER,
-					'size_units'     => array( 'px' ),
-					'default'        => array(
+					'label'      => esc_html__( "Hauteur de l'image", 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( 'px' ),
+					'default'    => array(
+						'unit' => 'px',
 						'size' => 250,
-						'unit' => 'px',
 					),
-					'laptop_default' => array(
-						'size' => 250,
-						'unit' => 'px',
-					),
-					'tablet_default' => array(
-						'size' => 200,
-						'unit' => 'px',
-					),
-					'mobile_default' => array(
-						'size' => 200,
-						'unit' => 'px',
-					),
-					'range'          => array(
+					'range'      => array(
 						'px' => array(
 							'min'  => 0,
 							'max'  => 500,
 							'step' => 10,
 						),
 					),
-					'selectors'      => array( '{{WRAPPER}} .team-member_image' => 'height: {{SIZE}}{{UNIT}};' ),
-					'condition'      => array( 'tm_settings_member_style!' => array( 'skin-3', 'skin-4' ) ),
+					'selectors'  => array( '{{WRAPPER}} .team-member_image' => 'height: {{SIZE}}{{UNIT}};' ),
+					'condition'  => array( 'tm_settings_member_style!' => array( 'skin-3', 'skin-4', 'skin-7', 'skin-8' ) ),
 				)
 			);
 
 			$this->add_responsive_control(
 				'tm_image_position_y',
 				array(
-					'label'          => esc_html__( 'Position verticale (%)', 'eac-components' ),
-					'type'           => Controls_Manager::SLIDER,
-					'size_units'     => array( '%' ),
-					'default'        => array(
-						'size' => 50,
+					'label'      => esc_html__( 'Position verticale (%)', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
 						'unit' => '%',
-					),
-					'laptop_default' => array(
 						'size' => 50,
-						'unit' => '%',
 					),
-					'tablet_default' => array(
-						'size' => 50,
-						'unit' => '%',
-					),
-					'mobile_default' => array(
-						'size' => 50,
-						'unit' => '%',
-					),
-					'range'          => array(
+					'range'      => array(
 						'%' => array(
 							'min'  => 0,
 							'max'  => 100,
 							'step' => 5,
 						),
 					),
-					'selectors'      => array( '{{WRAPPER}} .team-member_content img' => 'object-position: 50% {{SIZE}}%;' ),
-					'condition'      => array( 'tm_settings_member_style!' => array( 'skin-3', 'skin-4' ) ),
+					'selectors'  => array( '{{WRAPPER}} .team-member_content img' => 'object-position: 50% {{SIZE}}%;' ),
+					'condition'  => array( 'tm_settings_member_style!' => array( 'skin-3', 'skin-4', 'skin-7', 'skin-8' ) ),
 				)
 			);
 
@@ -777,6 +744,39 @@ class Team_Members_Widget extends Widget_Base {
 				array(
 					'label' => esc_html__( 'Animation', 'eac-components' ),
 					'type'  => Controls_Manager::HOVER_ANIMATION,
+				)
+			);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'tm_settings_social',
+			array(
+				'label' => esc_html__( 'Réseaux sociaux', 'eac-components' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
+			)
+		);
+
+			$this->add_responsive_control(
+				'tm_settings_social_width',
+				array(
+					'label'      => esc_html__( 'Largeur du conteneur', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
+						'unit' => '%',
+						'size' => 100,
+					),
+					'range'      => array(
+						'%' => array(
+							'min'  => 20,
+							'max'  => 100,
+							'step' => 10,
+						),
+					),
+					'selectors'  => array(
+						'{{WRAPPER}} .dynamic-tags_social-container' => 'width:{{SIZE}}%;',
+					),
 				)
 			);
 
@@ -850,7 +850,7 @@ class Team_Members_Widget extends Widget_Base {
 			array(
 				'label'     => esc_html__( 'Image', 'eac-components' ),
 				'tab'       => Controls_Manager::TAB_STYLE,
-				'condition' => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4' ) ),
+				'condition' => array( 'tm_settings_member_style' => array( 'skin-3', 'skin-4', 'skin-7', 'skin-8' ) ),
 			)
 		);
 
@@ -862,10 +862,10 @@ class Team_Members_Widget extends Widget_Base {
 						'border' => array( 'default' => 'solid' ),
 						'width'  => array(
 							'default' => array(
-								'top'      => 10,
-								'right'    => 10,
-								'bottom'   => 10,
-								'left'     => 10,
+								'top'      => 5,
+								'right'    => 5,
+								'bottom'   => 5,
+								'left'     => 5,
 								'isLinked' => true,
 							),
 						),
@@ -874,7 +874,9 @@ class Team_Members_Widget extends Widget_Base {
 					'separator'      => 'before',
 					'selector'       => '
 						{{WRAPPER}}.team-members_global-skin-3 .team-member_content .team-member_image img,
-						{{WRAPPER}}.team-members_global-skin-4 .team-member_content .team-member_image img',
+						{{WRAPPER}}.team-members_global-skin-4 .team-member_content .team-member_image img,
+						{{WRAPPER}}.team-members_global-skin-7 .team-member_content .team-member_image img,
+						{{WRAPPER}}.team-members_global-skin-8 .team-member_content .team-member_image img',
 				)
 			);
 
@@ -896,7 +898,7 @@ class Team_Members_Widget extends Widget_Base {
 					'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
 					'default'   => '#000000',
 					'selectors' => array(
-						'{{WRAPPER}} .team-member_name' => 'color: {{VALUE}};',
+						'{{WRAPPER}} .team-member_name .team-members_name-content' => 'color: {{VALUE}};',
 						'{{WRAPPER}} .team-member_name:after' => 'border-color: {{VALUE}};',
 					),
 				)
@@ -905,10 +907,18 @@ class Team_Members_Widget extends Widget_Base {
 			$this->add_group_control(
 				Group_Control_Typography::get_type(),
 				array(
-					'name'     => 'tm_name_typography',
-					'label'    => esc_html__( 'Typographie', 'eac-components' ),
-					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
-					'selector' => '{{WRAPPER}} .team-member_name',
+					'name'           => 'tm_name_typography',
+					'label'          => esc_html__( 'Typographie', 'eac-components' ),
+					'global'         => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
+					'fields_options' => array(
+						'font_size' => array(
+							'default' => array(
+								'unit' => 'em',
+								'size' => 1.8,
+							),
+						),
+					),
+					'selector'       => '{{WRAPPER}} .team-member_name .team-members_name-content',
 				)
 			);
 
@@ -927,19 +937,27 @@ class Team_Members_Widget extends Widget_Base {
 				array(
 					'label'     => esc_html__( 'Couleur', 'eac-components' ),
 					'type'      => Controls_Manager::COLOR,
-					'global'    => array( 'default' => Global_Colors::COLOR_SECONDARY ),
+					'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
 					'default'   => '#000000',
-					'selectors' => array( '{{WRAPPER}} .team-member_title' => 'color: {{VALUE}};' ),
+					'selectors' => array( '{{WRAPPER}} .team-member_title .team-members_title-content' => 'color: {{VALUE}};' ),
 				)
 			);
 
 			$this->add_group_control(
 				Group_Control_Typography::get_type(),
 				array(
-					'name'     => 'tm_job_typography',
-					'label'    => esc_html__( 'Typographie', 'eac-components' ),
-					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
-					'selector' => '{{WRAPPER}} .team-member_title',
+					'name'           => 'tm_job_typography',
+					'label'          => esc_html__( 'Typographie', 'eac-components' ),
+					'global'         => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
+					'fields_options' => array(
+						'font_size' => array(
+							'default' => array(
+								'unit' => 'em',
+								'size' => 1.2,
+							),
+						),
+					),
+					'selector'       => '{{WRAPPER}} .team-member_title .team-members_title-content',
 				)
 			);
 
@@ -969,7 +987,7 @@ class Team_Members_Widget extends Widget_Base {
 				array(
 					'name'     => 'tm_biography_typography',
 					'label'    => esc_html__( 'Typographie', 'eac-components' ),
-					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
+					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_SECONDARY ),
 					'selector' => '{{WRAPPER}} .team-member_biography p',
 				)
 			);
@@ -979,7 +997,7 @@ class Team_Members_Widget extends Widget_Base {
 		$this->start_controls_section(
 			'tm_icon_section_style',
 			array(
-				'label' => esc_html__( 'Pictogrammes', 'eac-components' ),
+				'label' => esc_html__( 'Réseaux sociaux', 'eac-components' ),
 				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
@@ -988,25 +1006,59 @@ class Team_Members_Widget extends Widget_Base {
 				Group_Control_Typography::get_type(),
 				array(
 					'name'           => 'tm_icon_typography',
-					'label'          => esc_html__( 'Dimension', 'eac-components' ),
+					'label'          => esc_html__( 'Typographie', 'eac-components' ),
 					'global'         => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
 					'fields_options' => array(
 						'font_size' => array(
-							'default'        => array(
-								'size' => 1.3,
+							'default' => array(
 								'unit' => 'em',
-							),
-							'tablet_default' => array(
-								'size' => 1.2,
-								'unit' => 'em',
-							),
-							'mobile_default' => array(
-								'size' => 1,
-								'unit' => 'em',
+								'size' => 1.5,
 							),
 						),
 					),
-					'selector'       => '{{WRAPPER}} .dynamic-tags_social-container',
+					'selector'       => '{{WRAPPER}} .dynamic-tags_social-container .dynamic-tags_social-icon',
+				)
+			);
+
+			$this->add_control(
+				'tm_style_social_bgcolor',
+				array(
+					'label'     => esc_html__( 'Couleur du fond', 'eac-components' ),
+					'type'      => Controls_Manager::COLOR,
+					'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
+					'selectors' => array( '{{WRAPPER}} .dynamic-tags_social-container' => 'background-color: {{VALUE}};' ),
+				)
+			);
+
+			$this->add_responsive_control(
+				'tm_style_social_padding',
+				array(
+					'label'     => esc_html__( 'Marges internes', 'eac-components' ),
+					'type'      => Controls_Manager::DIMENSIONS,
+					'selectors' => array(
+						'{{WRAPPER}} .dynamic-tags_social-container' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					),
+					'separator' => 'before',
+				)
+			);
+
+			$this->add_group_control(
+				Group_Control_Border::get_type(),
+				array(
+					'name'     => 'tm_style_social_border',
+					'selector' => '{{WRAPPER}} .dynamic-tags_social-container',
+				)
+			);
+
+			$this->add_control(
+				'tm_style_social_radius',
+				array(
+					'label'      => esc_html__( 'Rayon de la bordure', 'eac-components' ),
+					'type'       => Controls_Manager::DIMENSIONS,
+					'size_units' => array( 'px', '%' ),
+					'selectors'  => array(
+						'{{WRAPPER}} .dynamic-tags_social-container' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					),
 				)
 			);
 
@@ -1029,7 +1081,7 @@ class Team_Members_Widget extends Widget_Base {
 
 		?>
 		<div class="eac-team-members">
-			<div <?php echo $this->get_render_attribute_string( 'container_wrapper' ); ?>>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'container_wrapper' ) ); ?>>
 				<?php $this->render_members(); ?>
 			</div>
 		</div>
@@ -1042,6 +1094,7 @@ class Team_Members_Widget extends Widget_Base {
 	 * Written in PHP and used to generate the final HTML.
 	 *
 	 * @access protected
+	 * @since 2.0.2 Ajout des attributs d'édition en ligne des noms, titres et biographies
 	 */
 	protected function render_members() {
 		$settings = $this->get_settings_for_display();
@@ -1064,10 +1117,21 @@ class Team_Members_Widget extends Widget_Base {
 		// Boucle sur tous les items
 		ob_start();
 		foreach ( $settings['tm_member_list'] as $index => $item ) {
+			$member_name_setting_key = $this->get_repeater_setting_key( 'tm_member_name', 'tm_member_list', $index );
+			$this->add_render_attribute( $member_name_setting_key, 'class', 'team-member_name' );
+			$this->add_inline_editing_attributes( $member_name_setting_key, 'advanced' );
+
+			$member_title_setting_key = $this->get_repeater_setting_key( 'tm_member_title', 'tm_member_list', $index );
+			$this->add_render_attribute( $member_title_setting_key, 'class', 'team-member_title' );
+			$this->add_inline_editing_attributes( $member_title_setting_key, 'advanced' );
+
+			$member_bio_setting_key = $this->get_repeater_setting_key( 'tm_member_biography', 'tm_member_list', $index );
+			$this->add_inline_editing_attributes( $member_bio_setting_key, 'basic' );
+
 			$image_data  = '';
 			$image_url   = '';
-			$image_alt   = esc_html__( 'Image externe', 'eac-components' );
-			$image_title = esc_html__( 'Image externe', 'eac-components' );
+			$image_alt   = '';
+			$image_title = '';
 			$name_tag    = '';
 			$title_tag   = '';
 
@@ -1087,19 +1151,22 @@ class Team_Members_Widget extends Widget_Base {
 				 * L'image vient de la librarie des médias
 				 *
 				 * @since 2.0.0 Suppression du paramètre 'ver' de l'image
+				 * @since 2.0.2 ajout de l'attribut 'loading' à l'image
 				 */
 				if ( ! empty( $item['tm_member_image']['id'] ) ) {
 					$image_data  = Group_Control_Image_Size::get_attachment_image_src( $item['tm_member_image']['id'], 'tm_image_size', $settings );
-					$image_url   = sprintf( '%s', esc_url( $image_data ) );
+					$image_url   = $image_data;
 					$image_alt   = Control_Media::get_image_alt( $item['tm_member_image'] );
 					$image_title = Control_Media::get_image_title( $item['tm_member_image'] );
 				} else { // Image avec Url externe sans paramètre version
-					$image_url = esc_url( $item['tm_member_image']['url'] );
+					$image_url = $item['tm_member_image']['url'];
 				}
 
-				$this->add_render_attribute( 'tm_image', 'src', $image_url );
-				$this->add_render_attribute( 'tm_image', 'alt', $image_alt );
-				$this->add_render_attribute( 'tm_image', 'title', $image_title );
+				$this->add_render_attribute( 'tm_image', 'src', esc_url( $image_url ) );
+				$this->add_render_attribute( 'tm_image', 'alt', esc_html( $image_alt ) );
+				$this->add_render_attribute( 'tm_image', 'title', esc_html( $image_title ) );
+				$this->add_render_attribute( 'tm_image', 'loading', 'lazy' );
+
 				if ( $settings['tm_image_animation'] ) {
 					$this->add_render_attribute( 'tm_image', 'class', 'eac-image-loaded elementor-animation-' . $settings['tm_image_animation'] );
 				} else {
@@ -1107,43 +1174,44 @@ class Team_Members_Widget extends Widget_Base {
 				}
 
 				?>
-				<div <?php echo $this->get_render_attribute_string( 'content_wrapper' ); ?>>
+				<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'content_wrapper' ) ); ?>>
 					<div class="team-member_image">
-						<img <?php echo $this->get_render_attribute_string( 'tm_image' ); ?> />
+						<img <?php echo wp_kses_post( $this->get_render_attribute_string( 'tm_image' ) ); ?> />
 					</div>
 					<div class="team-member_wrapper-info">
 						<div class="team-member_info-content">
 							<?php if ( ! empty( $name_tag ) ) : ?>
-								<div class="team-member_name">
+								<div <?php echo wp_kses_post( $this->get_render_attribute_string( $member_name_setting_key ) ); ?>>
 									<?php echo $name_tag; ?>
 								</div>
 							<?php endif; ?>
 							<?php if ( ! empty( $title_tag ) ) : ?>
-								<div class="team-member_title">
+								<div <?php echo wp_kses_post( $this->get_render_attribute_string( $member_title_setting_key ) ); ?>>
 									<?php echo $title_tag; ?>
 								</div>
 							<?php endif; ?>
 							<?php if ( ! empty( $item['tm_member_biography'] ) ) : ?>
 								<div class="team-member_biography">
-									<p><?php echo nl2br( sanitize_textarea_field( $item['tm_member_biography'] ) ); ?></p>
+									<p <?php echo wp_kses_post( $this->get_render_attribute_string( $member_bio_setting_key ) ); ?>><?php echo wp_kses_post( nl2br( sanitize_textarea_field( $item['tm_member_biography'] ) ) ); ?></p>
 								</div>
 							<?php endif; ?>
 							<?php $this->get_social_medias( $item ); ?>
 						</div>
 					</div>
 				</div>
-				
+
 				<?php
 			}
 			$this->set_render_attribute( 'tm_image', 'class', null );
 			$this->set_render_attribute( 'tm_image', 'src', null );
 			$this->set_render_attribute( 'tm_image', 'alt', null );
 			$this->set_render_attribute( 'tm_image', 'title', null );
+			$this->set_render_attribute( 'tm_image', 'loading', null );
 			$this->set_render_attribute( 'wrapper_info', 'class', null );
 		}
 		$output = ob_get_contents();
 		ob_end_clean();
-		echo $output;
+		echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1181,15 +1249,15 @@ class Team_Members_Widget extends Widget_Base {
 
 		/** @since 1.9.2 Ajout des attributs 'noopener noreferrer' */
 		foreach ( $social_medias as $site => $icon ) {
-			if ( empty( $repeater_item['tm_member_name'] ) || empty( $repeater_item[ 'tm_member_social_' . $site ] ) || $repeater_item[ 'tm_member_social_' . $site ] === '#' ) {
+			if ( empty( $repeater_item['tm_member_name'] ) || empty( $repeater_item[ 'tm_member_social_' . $site ] ) || '#' === $repeater_item[ 'tm_member_social_' . $site ] ) {
 				continue; }
 
-			if ( $site === 'email' ) {
-				$value .= '<a href="mailto:' . esc_html( antispambot( $repeater_item[ 'tm_member_social_' . $site ] ), 1 ) . '" rel="nofollow">';
+			if ( 'email' === $site ) {
+				$value .= '<a href="' . esc_url( 'mailto:' . antispambot( sanitize_email( $repeater_item[ 'tm_member_social_' . $site ] ) ) ) . '" rel="nofollow">';
 			} else {
-				$value .= '<a href="' . $repeater_item[ 'tm_member_social_' . $site ] . '" target="_blank" rel="nofollow noopener noreferrer">';
+				$value .= '<a href="' . esc_url( $repeater_item[ 'tm_member_social_' . $site ] ) . '" target="_blank" rel="nofollow noopener noreferrer">';
 			}
-			$value .= '<span class="dynamic-tags_social-icon ' . $site . '"' . ' title="' . ucfirst( $site ) . '">';
+			$value .= '<span class="dynamic-tags_social-icon ' . esc_attr( $site ) . '" title="' . esc_attr( ucfirst( $site ) ) . '">';
 			$value .= '<i class="' . $icon . '"></i>';
 			$value .= '</span></a>';
 		}

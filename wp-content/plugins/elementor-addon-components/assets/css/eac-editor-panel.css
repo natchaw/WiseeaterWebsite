@@ -1,8 +1,8 @@
-
 /** CSS du panel de l'éditeur */
 
 /** Les tabs du contenu grille de produits  */
-span[class*=" eicon-"], span[class^="eicon"] {
+span[class*=" eicon-"],
+span[class^="eicon"] {
 	font-size: initial;
 	line-height: 24px;
 	vertical-align: middle;
@@ -11,22 +11,22 @@ span[class*=" eicon-"], span[class^="eicon"] {
 /** La boîte warning */
 .eac-editor-panel_warning {
 	font-size: 13px;
-    line-height: 1.4em;
-    background-color: #f3f0ca;
-    color: #886726;
-    padding: 10px;
-    border-radius: 3px;
+	line-height: 1.4em;
+	background-color: #f3f0ca;
+	color: #886726;
+	padding: 10px;
+	border-radius: 3px;
 	border: none;
 }
 
 /** La boîte info */
 .eac-editor-panel_info {
 	font-size: 13px;
-    line-height: 1.4em;
-    background-color: #A1CAE2;
-    color: #FFFFFF;
-    padding: 10px;
-    border-radius: 3px;
+	line-height: 1.4em;
+	background-color: #A1CAE2;
+	color: #FFFFFF;
+	padding: 10px;
+	border-radius: 3px;
 	border: none;
 }
 
@@ -55,7 +55,8 @@ span[class*=" eicon-"], span[class^="eicon"] {
 [data-collapse_id="eac_custom_element_lottie"]:after,
 [data-collapse_id="eac_custom_element_effect"]:after,
 .elementor-control-eac_element_link .elementor-control-title:after,
-[data-collapse_id="eac_custom_element_bg_images"]:after {
+[data-collapse_id="eac_custom_element_bg_images"]:after,
+[data-collapse_id="eac_custom_element_kb_slideshow"]:after {
 	content: "EAC";
 	position: absolute;
 	right: 9px;
@@ -106,11 +107,11 @@ span[class*=" eicon-"], span[class^="eicon"] {
 	display: block;
 }
 
-.eac-viewer_control-field .elementor-control-input-wrapper > div:first-of-type {
+.eac-viewer_control-field .elementor-control-input-wrapper>div:first-of-type {
 	flex-grow: 1;
 }
 
-.eac-viewer_control-field .elementor-control-input-wrapper > div:last-of-type {
+.eac-viewer_control-field .elementor-control-input-wrapper>div:last-of-type {
 	flex-shrink: 1;
 }
 
@@ -122,4 +123,3 @@ span[class*=" eicon-"], span[class^="eicon"] {
 .eac-select2_control-field .select2-selection__clear {
 	margin-right: 5px !important;
 }
-

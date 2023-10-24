@@ -70,6 +70,7 @@ trait Button_Add_To_Cart_Trait {
 					),
 				),
 				'default'   => 'before',
+				'toggle'    => false,
 				'condition' => array( 'button_add_cart_picto' => 'yes' ),
 			)
 		);
@@ -145,15 +146,6 @@ trait Button_Add_To_Cart_Trait {
 		);
 
 		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'button_cart_shadow',
-				'label'    => esc_html__( 'Ombre', 'eac-components' ),
-				'selector' => '{{WRAPPER}} .shop-product__button-cart',
-			)
-		);
-
-		$this->add_group_control(
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'button_cart_border',
@@ -171,6 +163,15 @@ trait Button_Add_To_Cart_Trait {
 				'selectors'          => array(
 					'{{WRAPPER}} .shop-product__button-cart' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'button_cart_shadow',
+				'label'    => esc_html__( 'Ombre', 'eac-components' ),
+				'selector' => '{{WRAPPER}} .shop-product__button-cart',
 			)
 		);
 	}

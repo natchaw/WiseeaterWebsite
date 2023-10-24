@@ -32,7 +32,7 @@ class Wpr_Product_Title extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product-title', 'product', 'title' ];//tmp
+		return [ 'woocommerce', 'product-title', 'product', 'title' ];
 	}
 
 

@@ -48,7 +48,7 @@ class Author_Infobox_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_style( 'eac-author-infobox', EAC_Plugin::instance()->get_register_style_url( 'author-infobox' ), array( 'eac' ), '1.9.1' );
+		wp_register_style( 'eac-author-infobox', EAC_Plugin::instance()->get_register_style_url( 'author-infobox' ), array( 'eac' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -246,25 +246,30 @@ class Author_Infobox_Widget extends Widget_Base {
 				)
 			);
 
-			$this->add_control(
+			$this->add_responsive_control(
 				'aib_settings_box_width',
 				array(
 					'label'       => esc_html__( 'Largeur du conteneur', 'eac-components' ),
 					'type'        => Controls_Manager::SLIDER,
-					'size_units'  => array( 'px' ),
+					'size_units'  => array( 'px', '%' ),
 					'default'     => array(
-						'unit' => 'px',
-						'size' => 1140,
+						'unit' => '%',
+						'size' => 100,
 					),
 					'range'       => array(
 						'px' => array(
-							'min'  => 300,
+							'min'  => 200,
 							'max'  => 1500,
 							'step' => 50,
 						),
+						'%'  => array(
+							'min'  => 10,
+							'max'  => 100,
+							'step' => 10,
+						),
 					),
 					'label_block' => true,
-					'selectors'   => array( '{{WRAPPER}} .author-infobox_content' => 'max-width: {{SIZE}}{{UNIT}}; width: 100%;' ),
+					'selectors'   => array( '{{WRAPPER}} .author-infobox_content' => 'width: {{SIZE}}{{UNIT}};' ),
 					'separator'   => 'before',
 				)
 			);
@@ -385,7 +390,7 @@ class Author_Infobox_Widget extends Widget_Base {
 				array(
 					'label'       => esc_html__( 'Réseaux sociaux', 'eac-components' ),
 					'type'        => Controls_Manager::TEXT,
-					'description' => esc_html__( "Dynamique tag 'Author/Author social networks'", 'eac-components' ),
+					'description' => esc_html__( "Balises dynamiques 'Auteur/Auteur réseaux sociaux'", 'eac-components' ),
 					'dynamic'     => array(
 						'active' => true,
 					),
@@ -400,6 +405,78 @@ class Author_Infobox_Widget extends Widget_Base {
 					'type'            => Controls_Manager::RAW_HTML,
 					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 					'raw'             => __( "<a href='https://elementor-addon-components.com/elementor-dynamic-social-medias/' target='_blank' rel='noopener noreferrer'>Suivez ce lien</a> pour ajouter des réseaux sociaux aux profils utilisateurs.", 'eac-components' ),
+				)
+			);
+
+			$this->add_responsive_control(
+				'aib_settings_social_width',
+				array(
+					'label'      => esc_html__( 'Largeur du conteneur', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
+						'unit' => '%',
+						'size' => 100,
+					),
+					'range'      => array(
+						'%' => array(
+							'min'  => 20,
+							'max'  => 100,
+							'step' => 10,
+						),
+					),
+					'selectors'  => array(
+						'{{WRAPPER}} .author-infobox_social' => 'width: {{SIZE}}%;',
+					),
+				)
+			);
+
+		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'aib_settings_avatar_content',
+			array(
+				'label' => esc_html( 'Avatar' ),
+				'tab'   => Controls_Manager::TAB_CONTENT,
+			)
+		);
+
+			$this->add_control(
+				'aib_image_style_shape',
+				array(
+					'label'        => esc_html__( 'Image ronde', 'eac-components' ),
+					'type'         => Controls_Manager::SWITCHER,
+					'label_on'     => esc_html__( 'oui', 'eac-components' ),
+					'label_off'    => esc_html__( 'non', 'eac-components' ),
+					'return_value' => 'round',
+					'default'      => 'round',
+					'prefix_class' => 'author-infobox_image-',
+				)
+			);
+
+			$this->add_responsive_control(
+				'aib_image_style_width',
+				array(
+					'label'      => esc_html__( "Largeur de l'image", 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( 'px' ),
+					'default'    => array(
+						'unit' => 'px',
+						'size' => 120,
+					),
+					'range'      => array(
+						'px' => array(
+							'min'  => 50,
+							'max'  => 250,
+							'step' => 10,
+						),
+					),
+					'selectors'  => array(
+						'{{WRAPPER}}.author-infobox_global-skin-1 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
+						'{{WRAPPER}}.author-infobox_global-skin-2 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
+						'{{WRAPPER}}.author-infobox_global-skin-3 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
+						'{{WRAPPER}}.author-infobox_global-skin-4 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
+					),
 				)
 			);
 
@@ -533,53 +610,6 @@ class Author_Infobox_Widget extends Widget_Base {
 			)
 		);
 
-			$this->add_control(
-				'aib_image_style_shape',
-				array(
-					'label'        => esc_html__( 'Image ronde', 'eac-components' ),
-					'type'         => Controls_Manager::SWITCHER,
-					'label_on'     => esc_html__( 'oui', 'eac-components' ),
-					'label_off'    => esc_html__( 'non', 'eac-components' ),
-					'return_value' => 'round',
-					'default'      => 'round',
-					'prefix_class' => 'author-infobox_image-',
-				)
-			);
-
-			$this->add_responsive_control(
-				'aib_image_style_width',
-				array(
-					'label'          => esc_html__( "Largeur de l'image", 'eac-components' ),
-					'type'           => Controls_Manager::SLIDER,
-					'size_units'     => array( 'px' ),
-					'default'        => array(
-						'size' => 120,
-						'unit' => 'px',
-					),
-					'tablet_default' => array(
-						'size' => 120,
-						'unit' => 'px',
-					),
-					'mobile_default' => array(
-						'size' => 100,
-						'unit' => 'px',
-					),
-					'range'          => array(
-						'px' => array(
-							'min'  => 50,
-							'max'  => 250,
-							'step' => 10,
-						),
-					),
-					'selectors'      => array(
-						'{{WRAPPER}}.author-infobox_global-skin-1 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
-						'{{WRAPPER}}.author-infobox_global-skin-2 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
-						'{{WRAPPER}}.author-infobox_global-skin-3 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
-						'{{WRAPPER}}.author-infobox_global-skin-4 .author-infobox_content .author-infobox_image img' => 'width:{{SIZE}}{{UNIT}}; height:{{SIZE}}{{UNIT}};',
-					),
-				)
-			);
-
 			$this->add_group_control(
 				Group_Control_Border::get_type(),
 				array(
@@ -588,16 +618,15 @@ class Author_Infobox_Widget extends Widget_Base {
 						'border' => array( 'default' => 'solid' ),
 						'width'  => array(
 							'default' => array(
-								'top'      => 7,
-								'right'    => 7,
-								'bottom'   => 7,
-								'left'     => 7,
+								'top'      => 5,
+								'right'    => 5,
+								'bottom'   => 5,
+								'left'     => 5,
 								'isLinked' => true,
 							),
 						),
 						'color'  => array( 'default' => '#FFC72F' ),
 					),
-					'separator'      => 'before',
 					'selector'       => '{{WRAPPER}}.author-infobox_global-skin-1 .author-infobox_content .author-infobox_image img,
 					{{WRAPPER}}.author-infobox_global-skin-2 .author-infobox_content .author-infobox_image img,
 					{{WRAPPER}}.author-infobox_global-skin-3 .author-infobox_content .author-infobox_image img,
@@ -635,7 +664,7 @@ class Author_Infobox_Widget extends Widget_Base {
 					'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
 					'default'   => '#000000',
 					'selectors' => array(
-						'{{WRAPPER}} .author-infobox_name' => 'color: {{VALUE}};',
+						'{{WRAPPER}} .author-infobox_name .author-infobox_name-content' => 'color: {{VALUE}};',
 						'{{WRAPPER}} .author-infobox_name:after' => 'border-color: {{VALUE}};',
 					),
 				)
@@ -647,6 +676,14 @@ class Author_Infobox_Widget extends Widget_Base {
 					'name'     => 'aib_name_typography',
 					'label'    => esc_html__( 'Typographie', 'eac-components' ),
 					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
+					'fields_options' => array(
+						'font_size' => array(
+							'default' => array(
+								'unit' => 'em',
+								'size' => 1.8,
+							),
+						),
+					),
 					'selector' => '{{WRAPPER}} .author-infobox_name .author-infobox_name-content',
 				)
 			);
@@ -679,6 +716,14 @@ class Author_Infobox_Widget extends Widget_Base {
 					'name'     => 'aib_job_typography',
 					'label'    => esc_html__( 'Typographie', 'eac-components' ),
 					'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
+					'fields_options' => array(
+						'font_size' => array(
+							'default' => array(
+								'unit' => 'em',
+								'size' => 1.2,
+							),
+						),
+					),
 					'selector' => '{{WRAPPER}} .author-infobox_role .author-infobox_role-content',
 				)
 			);
@@ -720,7 +765,7 @@ class Author_Infobox_Widget extends Widget_Base {
 		$this->start_controls_section(
 			'aib_icon_section_style',
 			array(
-				'label'     => esc_html__( 'Pictogrammes', 'eac-components' ),
+				'label'     => esc_html__( 'Réseaux sociaux', 'eac-components' ),
 				'tab'       => Controls_Manager::TAB_STYLE,
 				'condition' => array( 'aib_content_social' => 'yes' ),
 			)
@@ -730,25 +775,17 @@ class Author_Infobox_Widget extends Widget_Base {
 				Group_Control_Typography::get_type(),
 				array(
 					'name'           => 'aib_icon_typography',
-					'label'          => esc_html__( 'Dimension', 'eac-components' ),
+					'label'          => esc_html__( 'Typographie', 'eac-components' ),
 					'global'         => array( 'default' => Global_Typography::TYPOGRAPHY_PRIMARY ),
 					'fields_options' => array(
 						'font_size' => array(
-							'default'        => array(
-								'size' => 1.3,
+							'default' => array(
 								'unit' => 'em',
-							),
-							'tablet_default' => array(
-								'size' => 1.2,
-								'unit' => 'em',
-							),
-							'mobile_default' => array(
-								'size' => 1,
-								'unit' => 'em',
+								'size' => 1.5,
 							),
 						),
 					),
-					'selector'       => '{{WRAPPER}} .author-infobox_social .dynamic-tags_social-container',
+					'selector'       => '{{WRAPPER}} .dynamic-tags_social-container .dynamic-tags_social-icon',
 				)
 			);
 
@@ -759,6 +796,38 @@ class Author_Infobox_Widget extends Widget_Base {
 					'type'      => Controls_Manager::COLOR,
 					'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
 					'selectors' => array( '{{WRAPPER}} .dynamic-tags_social-container' => 'background-color: {{VALUE}};' ),
+				)
+			);
+
+			$this->add_responsive_control(
+				'aib_style_social_padding',
+				array(
+					'label'     => esc_html__( 'Marges internes', 'eac-components' ),
+					'type'      => Controls_Manager::DIMENSIONS,
+					'selectors' => array(
+						'{{WRAPPER}} .dynamic-tags_social-container' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					),
+					'separator' => 'before',
+				)
+			);
+
+			$this->add_group_control(
+				Group_Control_Border::get_type(),
+				array(
+					'name'     => 'aib_style_social_border',
+					'selector' => '{{WRAPPER}} .dynamic-tags_social-container',
+				)
+			);
+
+			$this->add_control(
+				'aib_style_social_radius',
+				array(
+					'label'      => esc_html__( 'Rayon de la bordure', 'eac-components' ),
+					'type'       => Controls_Manager::DIMENSIONS,
+					'size_units' => array( 'px', '%' ),
+					'selectors'  => array(
+						'{{WRAPPER}} .dynamic-tags_social-container' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					),
 				)
 			);
 
@@ -777,11 +846,11 @@ class Author_Infobox_Widget extends Widget_Base {
 
 		// Le wrapper du container
 		$this->add_render_attribute( 'container_wrapper', 'class', 'author-infobox_container' );
-		$this->add_render_attribute( 'container_wrapper', 'id', $id );
+		$this->add_render_attribute( 'container_wrapper', 'id', esc_attr( $id ) );
 
 		?>
 		<div class="eac-author-infobox">
-			<div <?php echo $this->get_render_attribute_string( 'container_wrapper' ); ?>>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'container_wrapper' ) ); ?>>
 				<?php $this->render_infobox(); ?>
 			</div>
 		</div>
@@ -800,15 +869,15 @@ class Author_Infobox_Widget extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		// Global $authordata n'est pas instancié
-		if ( ! is_object( $authordata ) || ! isset( $authordata->ID ) ) {
+		if ( ! isset( $authordata->ID ) ) {
 			return;
 		}
 
-		$name   = '';
-		$prefix = $settings['aib_content_prefix_name'] === 'yes' ? esc_html__( 'À propos de ', 'eac-components' ) : '';
-		$role   = '';
-		$bio    = '';
-		$avatar = '';
+		$name       = '';
+		$prefix     = 'yes' === $settings['aib_content_prefix_name'] ? esc_html__( 'À propos de ', 'eac-components' ) : '';
+		$role       = '';
+		$bio        = '';
+		$avatar_url = '';
 
 		// Formate le nom avec son tag
 		$name_tag   = $settings['aib_settings_name_tag'];
@@ -824,11 +893,11 @@ class Author_Infobox_Widget extends Widget_Base {
 		$this->add_render_attribute( 'content_wrapper', 'class', 'author-infobox_content' );
 
 		// L'avatar du user
-		$avatar = esc_url( get_avatar_url( $authordata->ID, array( 'size' => 150 ) ) );
+		$avatar_url = get_avatar_url( $authordata->ID, array( 'size' => 150 ) );
 
-		$has_role   = $settings['aib_content_role'] === 'yes' ? true : false;
-		$has_bio    = $settings['aib_content_bio'] === 'yes' ? true : false;
-		$has_social = $settings['aib_content_social'] === 'yes' && ! empty( $settings['aib_settings_social_network'] ) && $settings['aib_settings_social_network'] !== '#' ? true : false;
+		$has_role   = 'yes' === $settings['aib_content_role'] ? true : false;
+		$has_bio    = 'yes' === $settings['aib_content_bio'] ? true : false;
+		$has_social = 'yes' === $settings['aib_content_social'] && ! empty( $settings['aib_settings_social_network'] ) && '#' !== $settings['aib_settings_social_network'] ? true : false;
 
 		// Le nom complet du user
 		if ( ! empty( get_the_author_meta( 'display_name', $authordata->ID ) ) ) {
@@ -837,21 +906,21 @@ class Author_Infobox_Widget extends Widget_Base {
 
 		// Le/les rôles du user
 		if ( $has_role ) {
-			$userInfo = new \WP_User( get_the_author_meta( 'ID', $authordata->ID ) );
-			if ( ! empty( $userInfo->roles ) && is_array( $userInfo->roles ) ) {
-				$title = implode( ', ', $userInfo->roles );
+			$user_info = new \WP_User( get_the_author_meta( 'ID', $authordata->ID ) );
+			if ( ! empty( $user_info->roles ) && is_array( $user_info->roles ) ) {
+				$title = implode( ', ', $user_info->roles );
 				$role  = $open_title . $title . $close_title;
 			}
 		}
 
 		// La description/biographie du user
 		if ( $has_bio ) {
-			$bio = nl2br( esc_html( get_the_author_meta( 'description', $authordata->ID ) ) );
+			$bio = get_the_author_meta( 'description', $authordata->ID );
 		}
 
 		// Le bouton 'Voir les archives'
 		$nicename     = esc_html( get_the_author_meta( 'user_nicename', $authordata->ID ) );
-		$has_readmore = $settings['aib_content_readmore'] === 'yes' ? true : false;
+		$has_readmore = 'yes' === $settings['aib_content_readmore'] ? true : false;
 
 		$id      = get_the_ID();
 		$main_id = get_the_ID();
@@ -865,13 +934,13 @@ class Author_Infobox_Widget extends Widget_Base {
 		 *
 		 * @since 1.9.2 ID du post = ID du template
 		 */
-		if ( $settings['aib_is_a_template'] === true && $id == $main_id ) {
-			if ( $settings['aib_settings_integrate_display'] === 'yes' ) {
+		if ( true === $settings['aib_is_a_template'] && $id === $main_id ) {
+			if ( 'yes' === $settings['aib_settings_integrate_display'] ) {
 				$args = array(
-					'post_id'   => '',        // ID du modèle Elementor
+					'post_id'   => '',      // ID du modèle Elementor
 					'post_type' => '',      // Le post_type qui peut afficher le contenu du template
-					'position'  => '',       // La position du contenu du template
-					'post_ids'  => array(),   // La liste des IDs qui peuvent afficher le contenu du template. Format: [index::id] = title
+					'position'  => '',      // La position du contenu du template
+					'post_ids'  => array(), // La liste des IDs qui peuvent afficher le contenu du template. Format: [index::id] = title
 				);
 
 				$args['post_id']   = get_post()->ID;
@@ -893,14 +962,14 @@ class Author_Infobox_Widget extends Widget_Base {
 		}
 
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'content_wrapper' ); ?>>
-				
-			<?php if ( ! empty( $avatar ) ) : ?>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'content_wrapper' ) ); ?>>
+
+			<?php if ( ! empty( $avatar_url ) ) : ?>
 				<div class="author-infobox_image">
-					<img class="eac-image-loaded avatar photo" src="<?php echo $avatar; ?>" alt="Author avatar photo"/>
+					<img class="eac-image-loaded avatar photo" src="<?php echo esc_url( $avatar_url ); ?>" alt="Author avatar photo"/>
 				</div>
 			<?php endif; ?>
-				
+
 			<div class="author-infobox_wrapper-info">
 				<div class="author-infobox_info-content">
 					<?php if ( ! empty( $name ) ) : ?>
@@ -915,12 +984,12 @@ class Author_Infobox_Widget extends Widget_Base {
 					<?php endif; ?>
 					<?php if ( ! empty( $bio ) ) : ?>
 						<div class="author-infobox_biography">
-							<p><?php echo $bio; ?></p>
+							<p><?php echo nl2br( esc_html( $bio ) ); ?></p>
 						</div>
 					<?php endif; ?>
 					<?php if ( $has_social ) : ?>
 						<div class="author-infobox_social">
-							<?php echo $settings['aib_settings_social_network']; ?>
+							<?php echo wp_kses_post( $settings['aib_settings_social_network'] ); ?>
 						</div>
 					<?php endif; ?>
 					<?php if ( $has_readmore ) : ?>

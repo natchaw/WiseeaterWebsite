@@ -29,7 +29,7 @@ class Wpr_Product_Stock extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'royal', 'product-stock', 'product', 'stock' ];//tmp
+		return [ 'woocommerce', 'royal', 'product-stock', 'product', 'stock' ];
 	}
 
 	protected function register_controls() {

@@ -88,15 +88,15 @@ class Eac_Author_Info extends Tag {
 			return;
 		}
 
-		if ( $key === 'meta' ) {
+		if ( 'meta' === $key ) {
 			$meta = $this->get_settings( 'author_info_meta_key' );
 			if ( ! empty( $meta ) ) {
 				$value = get_the_author_meta( $meta );
 			}
-		} elseif ( $key === 'role' ) { // @since 1.6.1
-			$userInfo = new \WP_User( get_the_author_meta( 'ID' ) );
-			if ( ! empty( $userInfo->roles ) && is_array( $userInfo->roles ) ) {
-				$value = implode( ', ', $userInfo->roles );
+		} elseif ( 'role' === $key ) { // @since 1.6.1
+			$user_info = new \WP_User( get_the_author_meta( 'ID' ) );
+			if ( ! empty( $user_info->roles ) && is_array( $user_info->roles ) ) {
+				$value = implode( ', ', $user_info->roles );
 			}
 		} else {
 			$value = get_the_author_meta( $key );
@@ -116,11 +116,11 @@ class Eac_Author_Info extends Tag {
 		$user_meta_fields = Eac_Tools_Util::get_supported_user_meta_fields();
 
 		// @since 1.9.1 Global $authordata n'est pas instancié
-		if ( ! is_object( $authordata ) || ! isset( $authordata->ID ) ) {
+		if ( ! isset( $authordata->ID ) ) {
 			return $list;
 		}
 
-		/*
+		/**
 		if (! isset($authordata->ID)) { // La variable globale n'est pas définie
 			$post = get_post();
 			$authordata = get_userdata($post->post_author);
@@ -134,7 +134,7 @@ class Eac_Author_Info extends Tag {
 		);
 
 		foreach ( $authormetas as $key => $vals ) {
-			if ( ! is_serialized( $vals ) && $vals !== '' && $key[0] !== '_' && in_array( $key, $user_meta_fields ) ) {
+			if ( ! is_serialized( $vals ) && '' !== $vals && '_' !== $key[0] && in_array( $key, $user_meta_fields, true ) ) {
 				if ( mb_strlen( $vals, 'UTF-8' ) > self::VALS_LENGTH ) {
 						$list[ $key ] = $key . '::' . mb_substr( $vals, 0, self::VALS_LENGTH, 'UTF-8' ) . '...';
 				} else {

@@ -300,7 +300,6 @@ class Table_Of_Contents_Widget extends Widget_Base {
 				)
 			);
 
-			/** @since 1.8.7 Application des breakpoints */
 			$this->add_responsive_control(
 				'toc_content_width',
 				array(
@@ -478,7 +477,7 @@ class Table_Of_Contents_Widget extends Widget_Base {
 		$this->add_render_attribute( 'wrapper', 'class', 'eac-table-of-content' );
 		$this->add_render_attribute( 'wrapper', 'data-settings', $this->get_settings_json() );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'wrapper' ) ); ?>>
 			<div id="toctoc">
 				<div id="toctoc-head">
 					<span id="toctoc-title"><?php echo sanitize_text_field( $settings['toc_header_title'] ); ?></span>
@@ -495,7 +494,7 @@ class Table_Of_Contents_Widget extends Widget_Base {
 	 * Retrieve fields values to pass at the widget container
 	 * Convert on JSON format
 	 *
-	 * @uses         json_encode()
+	 * @uses         wp_json_encode()
 	 *
 	 * @return   JSON oject
 	 *
@@ -504,22 +503,20 @@ class Table_Of_Contents_Widget extends Widget_Base {
 	 */
 	protected function get_settings_json() {
 		$module_settings = $this->get_settings_for_display();
-		$numbering       = $module_settings['toc_content_anchor_trailer'] === 'yes' ? true : false;
+		$numbering       = 'yes' === $module_settings['toc_content_anchor_trailer'] ? true : false;
 
 		$settings = array(
-			'data_opened'      => $module_settings['toc_content_toggle'] === 'yes' ? false : true,
+			'data_opened'      => 'yes' === $module_settings['toc_content_toggle'] ? false : true,
 			'data_target'      => $module_settings['toc_content_target'],
 			'data_fontawesome' => ! empty( $module_settings['toc_content_picto']['value'] ) ? $module_settings['toc_content_picto']['value'] : '',
 			'data_title'       => ! empty( $module_settings['toc_content_heading'] ) ? implode( ',', $module_settings['toc_content_heading'] ) : 'h2',
-			'data_trailer'     => $module_settings['toc_content_anchor_auto'] === 'yes' ? true : $numbering,
-			'data_anchor'      => $module_settings['toc_content_anchor_auto'] === 'yes' ? true : false,
+			'data_trailer'     => 'yes' === $module_settings['toc_content_anchor_auto'] ? true : $numbering,
+			'data_anchor'      => 'yes' === $module_settings['toc_content_anchor_auto'] ? true : false,
 			'data_topmargin'   => 0, // $module_settings['toc_content_margin_top']['size'],
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}
-
 }

@@ -78,11 +78,12 @@ class Eac_Product_Field_Keys extends Data_Tag {
 		}
 
 		if ( empty( $key ) ) {
-			return ''; } elseif ( is_array( $key ) ) {
-			return implode( '|', $key ); } // @since 1.7.5
-			else {
-				return $key;
-			}
+			return '';
+		} elseif ( is_array( $key ) ) {
+			return implode( '|', $key );
+		} else {
+			return $key;
+		}
 	}
 
 	private function get_keys_array( $posttype = 'product' ) {

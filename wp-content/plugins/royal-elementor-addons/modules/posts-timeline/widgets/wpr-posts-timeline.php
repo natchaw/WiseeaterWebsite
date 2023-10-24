@@ -238,7 +238,7 @@ class Wpr_Posts_Timeline extends Widget_Base {
 				'label' => __( 'Date Format', 'wpr-addons' ),
 				'type' => \Elementor\Controls_Manager::SELECT,
 				'default' => 'F j, Y',
-				'options'=>[
+				'options'=> [
 					'F j, Y' => esc_html__(date('F j, Y')),
 					'Y-m-d' => esc_html__(date('Y-m-d')),
 					'Y, M, D' => esc_html__(date('Y, M, D')),

@@ -47,6 +47,7 @@ window.addEventListener("load", function(event) {
  * @since 1.9.5	Ajout de deux variables 'osmImageUrl' et 'osmTilesUrl'
  *				Génération dynamique des tuiles et des markers
  *				Chargement et affichage des marqueurs importés au format geoJSON
+ * @since 2.0.2 Fix Safari click marqueur inopérant
  */
 ;(function($, elementor) {
 
@@ -134,13 +135,18 @@ window.addEventListener("load", function(event) {
 					}
 				});
 				
-				// Création de la carte
+				/**
+				 * Création de la carte
+				 * @since 2.0.2 Safari click marqueurs ne fonctionne pas OSM 1.7.1.
+				 * Passe l'option 'tap' à false
+				 */
 				var map = L.map(settings.data_id, {
 					center: [mapData.lat, mapData.lng],
 					layers: baseLayers[settings.data_layer], // Les tuiles par défaut
 					closePopupOnClick: settings.data_clickpopup,
 					zoom: settings.data_zoom,
 					zoomControl: !settings.data_zoompos,
+					tap: false,
 				});
 
 				// Ajout du control des tuiles (tiles) et des surcouches (overlays)

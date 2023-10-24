@@ -46,7 +46,6 @@ class Eac_Post_Stats extends Tag {
 		$this->add_control(
 			'select_stats',
 			array(
-				// 'label'   => esc_html__('Select...', 'eac-components'),
 				'type'    => Controls_Manager::SELECT,
 				'default' => '',
 				'options' => array(

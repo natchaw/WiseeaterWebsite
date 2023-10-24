@@ -32,7 +32,7 @@ class Wpr_Product_Notice extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product notice', 'product', 'notice', 'woocommerce notice', 'message', 'woocommerce message' ];//tmp
+		return [ 'woocommerce', 'product notice', 'product', 'notice', 'woocommerce notice', 'message', 'woocommerce message' ];
 	}
 
 	public function get_script_depends() {

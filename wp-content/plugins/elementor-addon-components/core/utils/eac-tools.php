@@ -493,7 +493,7 @@ class Eac_Tools_Util {
 		$path       = EAC_ADDONS_PATH . $relative_path;
 		if ( $dir = opendir( $path ) ) {
 			while ( $file = readdir( $dir ) ) {
-				if ( $file != '.' && $file != '..' ) {
+				if ( '.' !== $file && '..' !== $file ) {
 					if ( ! is_dir( $path . '/' . $file ) ) {
 						$filetype = wp_check_filetype( basename( $file ), null );
 						if ( $filetype['type'] === $mimes ) {
@@ -541,7 +541,7 @@ class Eac_Tools_Util {
 		if ( ! empty( $posts ) && ! is_wp_error( $posts ) ) {
 			foreach ( $posts as $index => $value ) {
 				// Ajoute l'index du tableau pour conserver le tri sur le titre
-				$post_list[ $index . '::' . $value->ID ] = esc_html( $value->post_title );
+				$post_list[ $index . '::' . $value->ID ] = $value->post_title;
 			}
 		}
 
@@ -577,7 +577,7 @@ class Eac_Tools_Util {
 
 		if ( ! empty( $data ) && ! is_wp_error( $data ) ) {
 			foreach ( $data as $key ) {
-				$post_list[ $key->ID ] = esc_html( $key->post_title );
+				$post_list[ $key->ID ] = $key->post_title;
 			}
 			ksort( $post_list );
 		}
@@ -603,7 +603,7 @@ class Eac_Tools_Util {
 
 		// Boucle sur les Wigets standards
 		foreach ( $wp_widget_factory->widgets as $key => $widget ) {
-			if ( in_array( $key, $widgets ) ) {
+			if ( in_array( $key, $widgets, true ) ) {
 				// $options[$key . "::" . $widget->widget_options['description']] = $widget->name;
 				$options[ $key ] = $widget->name;
 			}
@@ -616,9 +616,9 @@ class Eac_Tools_Util {
 		foreach ( $sidebars as $sidebar_id => $sidebar_widgets ) {
 			if ( 'wp_inactive_widgets' !== $sidebar_id && is_array( $sidebar_widgets ) && ! empty( $sidebar_widgets ) ) {
 				$sidebar_name                                  = isset( $wp_registered_sidebars[ $sidebar_id ]['name'] ) ? $wp_registered_sidebars[ $sidebar_id ]['name'] : 'No name';
-				$options[ $sidebar_id . '::' . $sidebar_name ] = 'Sidebar' . '::' . $sidebar_name;
+				$options[ $sidebar_id . '::' . $sidebar_name ] = 'Sidebar::' . $sidebar_name;
 
-				/*
+				/**
 				foreach ($sidebar_widgets as $widget) {
 					$name = $wp_registered_widgets[$widget]['callback'][0]->name;
 					$option_name = $wp_registered_widgets[$widget]['callback'][0]->option_name;
@@ -630,7 +630,8 @@ class Eac_Tools_Util {
 					$title = ! empty($data['title']) ? $data['title'] : 'Empty title';
 					//console_log($title."::".$widget."::".$name."::".$option_name."::".$id_base);
 					//console_log($wp_registered_widgets[$widget]);
-				}*/
+				}
+				*/
 			}
 		}
 
@@ -655,14 +656,15 @@ class Eac_Tools_Util {
 		foreach ( $locations as $key => $location_name ) {
 			if ( isset( $menus[ $key ] ) && (int) $menus[ $key ] > 0 ) {
 				$options[ $key ] = $locations[ $key ];
-				/*
+				/**
 				$menu_object = wp_get_nav_menu_object($menus[$key]);
 				if ($menu_object) {
 					$slug =  $menu_object->slug;
 					$name = $menu_object->name;
 					//$options[$key . "::" . $slug] = $locations[$key] . "::" . $name;
 					$options[$key] = $locations[$key];
-				}*/
+				}
+				*/
 			}
 		}
 		return $options;
@@ -885,8 +887,8 @@ class Eac_Tools_Util {
 		$post_types = get_post_types( '', 'objects' );
 
 		foreach ( $post_types as $post_type ) {
-			if ( is_array( $posttypes ) && ! in_array( esc_attr( $post_type->name ), $posttypes ) ) {
-				$options[ esc_attr( $post_type->name ) ] = esc_attr( $post_type->name ) . '::' . esc_attr( $post_type->label );
+			if ( is_array( $posttypes ) && ! in_array( $post_type->name, $posttypes, true ) ) {
+				$options[ $post_type->name ] = $post_type->name . '::' . $post_type->label;
 			}
 		}
 		ksort( $options );
@@ -903,7 +905,7 @@ class Eac_Tools_Util {
 		$post_types = get_post_types( '', 'objects' );
 
 		foreach ( $post_types as $post_type ) {
-			$options[ esc_attr( $post_type->name ) ] = esc_attr( $post_type->name ) . '::' . esc_attr( $post_type->label );
+			$options[ $post_type->name ] = $post_type->name . '::' . $post_type->label;
 		}
 		return $options;
 	}
@@ -924,7 +926,7 @@ class Eac_Tools_Util {
 		$the_post_type = $the_post->post_type;
 
 		/* Intégration du type produit */
-		if ( $the_post_type === 'product' ) {
+		if ( 'product' === $the_post_type ) {
 			$product     = wc_get_product( $post_id );
 			$the_excerpt = $product->get_description() ? $product->get_description() : $product->get_short_description();
 		} elseif ( $the_post ) {
@@ -933,25 +935,26 @@ class Eac_Tools_Util {
 			return "Error... 'get_post_excerpt'";
 		}
 
-		if ( strlen( $the_excerpt ) == 0 ) {
+		if ( 0 === strlen( $the_excerpt ) ) {
 			return;
 		}
 
 		// On supprime tous les tags html ou shortcode du résumé
-		$the_excerpt = strip_tags( strip_shortcodes( $the_excerpt ) );
+		$the_excerpt = wp_strip_all_tags( strip_shortcodes( $the_excerpt ) );
 
 		/** 1.9.8  */
 		return wp_trim_words( $the_excerpt, $excerpt_length, '[...]' );
 
-		/*
+		/**
 		$words = explode(' ', $the_excerpt, $excerpt_length + 1);
 		if (count($words) > $excerpt_length) {
-			 array_pop($words);
-			 $the_excerpt = implode(' ', $words);
-			 $the_excerpt .= '[...]';	 // Aucun espace avant
+			array_pop($words);
+			$the_excerpt = implode(' ', $words);
+			$the_excerpt .= '[...]';     // Aucun espace avant
 		}
 
-		return $the_excerpt;*/
+		return $the_excerpt;
+		*/
 	}
 
 	/**
@@ -1013,8 +1016,8 @@ class Eac_Tools_Util {
 
 		// Boucle sur les taxonomies
 		foreach ( $taxonomies as $taxonomy ) {
-			if ( is_array( $filtered_taxo ) && ! in_array( esc_attr( $taxonomy->name ), $filtered_taxo ) ) {
-				$taxos[] = esc_attr( $taxonomy->name );
+			if ( is_array( $filtered_taxo ) && ! in_array( $taxonomy->name, $filtered_taxo, true ) ) {
+				$taxos[] = $taxonomy->name;
 			}
 		}
 
@@ -1030,7 +1033,7 @@ class Eac_Tools_Util {
 
 				if ( ! is_wp_error( $terms ) && count( $terms ) > 0 ) {
 					foreach ( $terms as $term ) {
-						$all_terms[ $taxo . '::' . $term->slug ] = $taxo . '::' . esc_attr( $term->name );
+						$all_terms[ $taxo . '::' . $term->slug ] = $taxo . '::' . $term->name;
 					}
 				}
 			}
@@ -1047,16 +1050,17 @@ class Eac_Tools_Util {
 		$options  = array();
 		$products = array(
 			'product' => esc_html__( 'Produits', 'eac-components' ),
-			/*
+			/**
 			'product_variation' => esc_html__('Variations', 'eac-components'),
 			'shop_coupon' => esc_html__('Codes promo', 'eac-components'),
 			'shop_order' => esc_html__('Commandes', 'eac-components'),
 			'shop_order_placehold' => esc_html__('Articles', 'eac-components'),
-			'shop_order_refund' => esc_html__('Remboursements', 'eac-components'),*/
+			'shop_order_refund' => esc_html__('Remboursements', 'eac-components'),
+			*/
 		);
 
 		foreach ( $products as $key => $val ) {
-			$options[ esc_attr( $key ) ] = esc_attr( $key ) . '::' . esc_attr( $val );
+			$options[ $key ] = $key . '::' . $val;
 		}
 		return $options;
 	}
@@ -1073,7 +1077,7 @@ class Eac_Tools_Util {
 		$taxonomies = get_taxonomies( array( 'object_type' => array( 'product' ) ), 'objects' );
 
 		foreach ( $taxonomies as $taxonomy ) {
-			$options[ esc_attr( $taxonomy->name ) ] = esc_attr( $taxonomy->name ) . '::' . esc_attr( $taxonomy->label );
+			$options[ $taxonomy->name ] = $taxonomy->name . '::' . $taxonomy->label;
 		}
 		return $options;
 	}
@@ -1092,7 +1096,7 @@ class Eac_Tools_Util {
 
 		/** Boucle sur les taxonomies */
 		foreach ( $taxonomies as $taxonomy ) {
-			$taxos[] = esc_attr( $taxonomy->name );
+			$taxos[] = $taxonomy->name;
 		}
 
 		/** Boucle sur les terms d'une taxonomie */
@@ -1107,7 +1111,7 @@ class Eac_Tools_Util {
 
 				if ( ! is_wp_error( $terms ) && count( $terms ) > 0 ) {
 					foreach ( $terms as $term ) {
-						$all_terms[ $taxo . '::' . $term->slug ] = $taxo . '::' . esc_attr( $term->name );
+						$all_terms[ $taxo . '::' . $term->slug ] = $taxo . '::' . $term->name;
 					}
 				}
 			}
@@ -1144,8 +1148,8 @@ class Eac_Tools_Util {
 		$taxonomies = get_taxonomies( '', 'objects' ); // Retourne un objet
 
 		foreach ( $taxonomies as $taxonomy ) {
-			if ( is_array( $filtered_taxo ) && ! in_array( esc_attr( $taxonomy->name ), $filtered_taxo ) ) {
-				$options[ esc_attr( $taxonomy->name ) ] = esc_attr( $taxonomy->name ) . '::' . esc_attr( $taxonomy->label );
+			if ( is_array( $filtered_taxo ) && ! in_array( $taxonomy->name, $filtered_taxo, true ) ) {
+				$options[ $taxonomy->name ] = $taxonomy->name . '::' . $taxonomy->label;
 			}
 		}
 		return $options;
@@ -1174,8 +1178,8 @@ class Eac_Tools_Util {
 		$taxonomies = get_taxonomies( '', 'objects' ); // Retourne un objet
 
 		foreach ( $taxonomies as $taxonomy ) {
-			if ( is_array( $filtered_taxo ) && ! in_array( esc_attr( $taxonomy->name ), $filtered_taxo ) ) {
-				$options[] = esc_attr( $taxonomy->name );
+			if ( is_array( $filtered_taxo ) && ! in_array( $taxonomy->name, $filtered_taxo, true ) ) {
+				$options[] = $taxonomy->name;
 			}
 		}
 		return $options;
@@ -1195,7 +1199,7 @@ class Eac_Tools_Util {
 		$pages        = get_pages( $args );
 
 		foreach ( $pages as $page ) {
-			$select_pages[ $page->post_title ] = esc_html( ucfirst( $page->post_title ) );
+			$select_pages[ $page->post_title ] = ucfirst( $page->post_title );
 		}
 		return $select_pages;
 	}
@@ -1214,7 +1218,7 @@ class Eac_Tools_Util {
 		$pages        = get_pages( $args );
 
 		foreach ( $pages as $page ) {
-			$select_pages[ $page->ID ] = esc_html( ucfirst( $page->post_title ) );
+			$select_pages[ $page->ID ] = ucfirst( $page->post_title );
 		}
 		return $select_pages;
 	}
@@ -1269,7 +1273,7 @@ class Eac_Tools_Util {
 
 		$$date_maj = date_create_from_format( $wp_format_entree, $ori_date );
 
-		if ( $$date_maj == false ) {
+		if ( false === $date_maj ) {
 			return $ori_date;
 		}
 

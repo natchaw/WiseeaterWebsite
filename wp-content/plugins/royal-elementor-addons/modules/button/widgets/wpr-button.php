@@ -478,6 +478,15 @@ class Wpr_Button extends Widget_Base {
 			]
 		);
 
+		$this->add_group_control(
+			Group_Control_Typography::get_type(),
+			[
+				'name' => 'button_typography',
+				'scheme' => Typography::TYPOGRAPHY_3,
+				'selector' => '{{WRAPPER}} .wpr-button-text,{{WRAPPER}} .wpr-button::after',
+			]
+		);
+
 		$this->end_controls_tab();
 
 		$this->start_controls_tab(
@@ -541,24 +550,6 @@ class Wpr_Button extends Widget_Base {
 		$this->end_controls_tab();
 
 		$this->end_controls_tabs();
-
-		$this->add_control(
-			'button_typography_divider',
-			[
-				'type' => Controls_Manager::DIVIDER,
-				'style' => 'thick',
-			]
-		);
-
-		$this->add_group_control(
-			Group_Control_Typography::get_type(),
-			[
-				'name' => 'button_typography',
-				'scheme' => Typography::TYPOGRAPHY_3,
-				'selector' => '{{WRAPPER}} .wpr-button-text,{{WRAPPER}} .wpr-button::after',
-				'separator' => 'before',
-			]
-		);
 
 		$this->add_responsive_control(
 			'button_padding',
@@ -638,8 +629,7 @@ class Wpr_Button extends Widget_Base {
 				],
 				'selectors' => [
 					'{{WRAPPER}} .wpr-button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				],
-				'separator' => 'before',
+				]
 			]
 		);
 

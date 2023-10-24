@@ -4,11 +4,11 @@
  * Description: Ajouter des composants et des fonctionnalités avancées pour la version gratuite d'Elementor
  * Plugin URI: https://elementor-addon-components.com/
  * Author: Team EAC
- * Version: 2.0.1
- * Elementor tested up to: 3.8.1
+ * Version: 2.0.2
+ * Elementor tested up to: 3.10.2
  * WC requires at least: 6.9.0
  * WC tested up to: 7.1.0
- * ACF tested up to: 6.0.3
+ * ACF tested up to: 6.0.7
  * Author URI: https://elementor-addon-components.com/
  * Text Domain: eac-components
  * Domain Path: /languages
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'EAC_DOMAIN', 'eac-components' );
 define( 'EAC_PLUGIN_NAME', 'Elementor Addon Components' );
-define( 'EAC_ADDONS_VERSION', '2.0.1' );
+define( 'EAC_ADDONS_VERSION', '2.0.2' );
 
 define( 'EAC_CUSTOM_FILE', __FILE__ );
 define( 'EAC_ADDONS_URL', plugins_url( '/', __FILE__ ) );
@@ -43,10 +43,10 @@ define( 'EAC_WIDGETS_NAMESPACE', 'EACCustomWidgets\\Widgets\\' );
 define( 'EAC_WIDGETS_PATH', EAC_ADDONS_PATH . 'widgets/' );
 define( 'EAC_WIDGETS_TRAITS_PATH', EAC_ADDONS_PATH . 'widgets/traits/' );
 
-define( 'EAC_SCRIPT_DEBUG', false );              // true = .js ou false = .min.js
-define( 'EAC_STYLE_DEBUG', false );               // true = .css ou false = .min.css
-define( 'EAC_GET_POST_ARGS_IN', false );          // get_display_for_settings de la page en entrée
-define( 'EAC_GET_POST_ARGS_OUT', false );         // arguments formatés pour WP_Query en sortie
+define( 'EAC_SCRIPT_DEBUG', false );           // true = .js ou false = .min.js
+define( 'EAC_STYLE_DEBUG', false );            // true = .css ou false = .min.css
+define( 'EAC_GET_POST_ARGS_IN', false );       // arguments $settings pour WP_Query de la page en entrée
+define( 'EAC_GET_POST_ARGS_OUT', false );      // arguments formatés pour WP_Query en sortie
 define( 'EAC_GET_META_FILTER_QUERY', false );
 
 /**
@@ -56,7 +56,8 @@ define( 'EAC_GET_META_FILTER_QUERY', false );
  */
 final class EAC_Components_Plugin {
 	/** Version Elementor */
-	const EAC_ELEMENTOR_VERSION_REQUIRED = '3.4.0';
+	const EAC_ELEMENTOR_VERSION_REQUIRED = '3.5.0';
+
 	/** Version PHP */
 	const EAC_MINIMUM_PHP_VERSION = '7.0';
 

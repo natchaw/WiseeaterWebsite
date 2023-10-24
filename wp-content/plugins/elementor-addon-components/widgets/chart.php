@@ -227,7 +227,7 @@ class Chart_Widget extends Widget_Base {
 
 		$this->end_controls_section();
 
-		 // -------------- Axe horizontal X ------------------
+		// -------------- Axe horizontal X ------------------
 
 		$this->start_controls_section(
 			'chart_settings_x',
@@ -375,6 +375,16 @@ class Chart_Widget extends Widget_Base {
 				)
 			);
 
+			$this->add_control(
+				'chart_y_axis_info',
+				array(
+					'type'            => Controls_Manager::RAW_HTML,
+					'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+					'raw'             => esc_html__( "Chaque série doit avoir autant de valeurs tel que défini pour l'axe des abscisses", 'eac-components' ),
+					'separator'       => 'before',
+				)
+			);
+
 			$repeater = new Repeater();
 
 			$repeater->add_control(
@@ -424,7 +434,6 @@ class Chart_Widget extends Widget_Base {
 						),
 					),
 					'title_field' => '{{{ chart_y_legend }}}',
-					'separator'   => 'before',
 				)
 			);
 
@@ -811,24 +820,25 @@ class Chart_Widget extends Widget_Base {
 	 */
 	protected function render() {
 		$settings = $this->get_settings_for_display();
-		/*
-		highlight_string("<?php\n\$settings =\n" . var_export(explode("=", explode(" ", str_replace(array("[","]"), '', $settings['__dynamic__']['chart_file_url']))[3])[1], true) . ";\n?>");*/
-		/*highlight_string("<?php\n\$settings =\n" . var_export($settings, true) . ";\n?>");*/
+		/**
+		 * highlight_string("<?php\n\$settings =\n" . var_export(explode("=", explode(" ", str_replace(array("[","]"), '', $settings['__dynamic__']['chart_file_url']))[3])[1], true) . ";\n?>");
+		 * highlight_string("<?php\n\$settings =\n" . var_export($settings, true) . ";\n?>");
+		 */
 
-		if ( $settings['chart_file_import'] === 'yes' && empty( $settings['chart_file_url']['url'] ) ) {
+		if ( 'yes' === $settings['chart_file_import'] && empty( $settings['chart_file_url']['url'] ) ) {
 			return;
 		}
-		if ( $settings['chart_file_import'] !== 'yes' && empty( $settings['chart_y_data_list'] ) ) {
+		if ( 'yes' !== $settings['chart_file_import'] && empty( $settings['chart_y_data_list'] ) ) {
 			return;
 		}
 		$json_data = array();
 
-		if ( $settings['chart_file_import'] === 'yes' ) {
-			$url = filter_var( $settings['chart_file_url']['url'], FILTER_SANITIZE_STRING );
+		if ( 'yes' === $settings['chart_file_import'] ) {
+			$url = filter_var( $settings['chart_file_url']['url'], FILTER_SANITIZE_URL );
 
-			if ( ! $json_source = @file_get_contents( $url ) ) {
+			if ( ! $json_source = file_get_contents( $url ) ) {
 				$error = error_get_last()['message'];
-				echo $error;
+				echo wp_kses_post( $error );
 				return;
 			}
 
@@ -844,9 +854,10 @@ class Chart_Widget extends Widget_Base {
 			// Supprime les octets BOM du fichier
 			$json_source = str_replace( "\xEF\xBB\xBF", '', $json_source );
 
-			if ( ! $json_data = json_decode( $json_source, true ) ) {
+			$json_data = json_decode( $json_source, true );
+			if ( ! $json_data ) {
 				$error = 'JSON::' . json_last_error() . '::' . json_last_error_msg() . '::' . $url;
-				echo $error . '<br>';
+				echo $error . '<br />';
 				print_r( $json_source );
 				return;
 			}
@@ -881,16 +892,16 @@ class Chart_Widget extends Widget_Base {
 		$this->add_render_attribute( 'chart_wrapper', 'data-settings', $this->get_settings_json( $container_id, $canvas_id, $download_id, $datajson ) );
 
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'chart_wrapper' ); ?>>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'chart_wrapper' ) ); ?>>
 			<div class="chart__wrapper-download">
-				<a id="<?php echo $download_id; ?>" download="eac-media_chart.png" href="" title="<?php echo esc_html__( "Enregistrer l'image", 'eac-components' ); ?>">
+				<a id="<?php echo esc_attr( $download_id ); ?>" download="eac-media_chart.png" href="" title="<?php echo esc_html__( "Enregistrer l'image", 'eac-components' ); ?>">
 					<i class="fa fa-download" aria-hidden="true"></i>
 				</a>
 			</div>
 			<div id="chart__wrapper-swap" class="chart__wrapper-swap">
 				<i class="fas fa-sync-alt" aria-hidden="true"></i>
 			</div>
-			<canvas id="<?php echo $canvas_id; ?>" aria-label="EAC Charts" role="img"></canvas>
+			<canvas id="<?php echo esc_attr( $canvas_id ); ?>" aria-label="EAC Charts" role="img"></canvas>
 		</div>
 		<?php
 	}
@@ -901,7 +912,7 @@ class Chart_Widget extends Widget_Base {
 	 * Retrieve fields values to pass at the widget container
 	 * Convert on JSON format
 	 *
-	 * @uses      json_encode()
+	 * @uses      wp_json_encode()
 	 *
 	 * @return    JSON oject
 	 *
@@ -912,26 +923,26 @@ class Chart_Widget extends Widget_Base {
 	protected function get_settings_json( $rid, $sid, $did, $data_json = array() ) {
 		$module_settings = $this->get_settings_for_display();
 
-		$arrayLabel      = array();
-		$arrayDataSeries = array();
-		$dboolean        = array();
-		$suffix_y        = 0;
-		$suffix_y2       = 0;
+		$array_label       = array();
+		$array_data_series = array();
+		$dboolean          = array();
+		$suffix_y          = 0;
+		$suffix_y2         = 0;
 
 		// Ajout d'un ligne
-		$addline   = $module_settings['chart_add_line'] === 'yes' ? 1 : 0;
-		$orderline = $addline === 1 ? $module_settings['chart_order_line'] : 0;
-		$addscale  = $addline === 1 ? $module_settings['chart_y2_addscale'] === 'yes' ? 1 : 0 : 0;
-		$samescale = $addline === 1 ? $module_settings['chart_y2_samescale'] === 'yes' ? 1 : 0 : 0;
-		$y2title   = $addline === 1 ? sanitize_text_field( $module_settings['chart_y2_title'] ) : '';
-		$y2label   = $addline === 1 ? sanitize_text_field( $module_settings['chart_y2_label'] ) : '';
-		$y2data    = $addline === 1 && ! empty( $module_settings['chart_y2_data'] ) ? sanitize_text_field( $module_settings['chart_y2_data'] ) : '';
+		$addline   = 'yes' === $module_settings['chart_add_line'] ? 1 : 0;
+		$orderline = 1 === $addline ? $module_settings['chart_order_line'] : 0;
+		$addscale  = 1 === $addline ? 'yes' === $module_settings['chart_y2_addscale'] ? 1 : 0 : 0;
+		$samescale = 1 === $addline ? 'yes' === $module_settings['chart_y2_samescale'] ? 1 : 0 : 0;
+		$y2title   = 1 === $addline ? sanitize_text_field( $module_settings['chart_y2_title'] ) : '';
+		$y2label   = 1 === $addline ? sanitize_text_field( $module_settings['chart_y2_label'] ) : '';
+		$y2data    = 1 === $addline && ! empty( $module_settings['chart_y2_data'] ) ? sanitize_text_field( $module_settings['chart_y2_data'] ) : '';
 
 		// C'est un fichier JSON. Boucle sur les données
 		if ( ! empty( $data_json ) ) {
 			foreach ( $data_json['datasets'] as $item ) {
 				// type de chart === bar et key/value 'type: line' pour l'ajout d'une ligne
-				if ( $module_settings['chart_type'] === 'bar' && isset( $item['type'] ) && $item['type'] === 'line' ) {
+				if ( 'bar' === $module_settings['chart_type'] && isset( $item['type'] ) && 'line' === $item['type'] ) {
 					$addline   = 1;
 					$orderline = 1;
 					$addscale  = isset( $data_json['options']['y_axis2']['display'] ) ? $data_json['options']['y_axis2']['display'] : 0; // Axe Y de droite
@@ -940,15 +951,15 @@ class Chart_Widget extends Widget_Base {
 					$y2label   = isset( $item['label'] ) ? esc_html( $item['label'] ) : '';
 					$y2data    = isset( $item['data'] ) ? $item['data'] : '';
 				} else {
-					array_push( $arrayLabel, esc_html( $item['label'] ) );
-					array_push( $arrayDataSeries, $item['data'] );
+					array_push( $array_label, esc_html( $item['label'] ) );
+					array_push( $array_data_series, $item['data'] );
 				}
 			}
 		} else { // Champs standards
 			foreach ( $module_settings['chart_y_data_list'] as $item ) {
 				if ( ! empty( $item['chart_y_data'] ) ) {
-					array_push( $arrayLabel, sanitize_text_field( $item['chart_y_legend'] ) );
-					array_push( $arrayDataSeries, sanitize_text_field( $item['chart_y_data'] ) );
+					array_push( $array_label, sanitize_text_field( $item['chart_y_legend'] ) );
+					array_push( $array_data_series, sanitize_text_field( $item['chart_y_data'] ) );
 				}
 			}
 		}
@@ -957,7 +968,7 @@ class Chart_Widget extends Widget_Base {
 		if ( ! empty( $data_json ) ) {
 			$suffix_y  = isset( $data_json['options']['y_axis']['suffix'] ) ? esc_html( $data_json['options']['y_axis']['suffix'] ) : 0;
 			$suffix_y2 = isset( $data_json['options']['y_axis2']['suffix'] ) ? esc_html( $data_json['options']['y_axis2']['suffix'] ) : 0;
-		} elseif ( $module_settings['chart_y_suffix'] === 'yes' || $module_settings['chart_y2_suffix'] === 'yes' ) {
+		} elseif ( 'yes' === $module_settings['chart_y_suffix'] || 'yes' === $module_settings['chart_y2_suffix'] ) {
 			$suffix_y  = ! empty( $module_settings['chart_y_suffix_carac'] ) ? sanitize_text_field( $module_settings['chart_y_suffix_carac'] ) : 0;
 			$suffix_y2 = ! empty( $module_settings['chart_y2_suffix_carac'] ) ? sanitize_text_field( $module_settings['chart_y2_suffix_carac'] ) : 0;
 		}
@@ -967,43 +978,43 @@ class Chart_Widget extends Widget_Base {
 		array_push( $dboolean, $addscale );
 		array_push( $dboolean, $samescale );
 
-		array_push( $dboolean, $module_settings['chart_content_legend'] === 'yes' ? 1 : 0 );
-		array_push( $dboolean, $module_settings['chart_grid_xaxis'] === 'yes' ? 1 : 0 );
-		array_push( $dboolean, $module_settings['chart_grid_yaxis'] === 'yes' ? 1 : 0 );
-		array_push( $dboolean, $module_settings['chart_grid_yaxis2'] === 'yes' ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_content_legend'] ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_grid_xaxis'] ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_grid_yaxis'] ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_grid_yaxis2'] ? 1 : 0 );
 
-		array_push( $dboolean, $module_settings['chart_content_value'] === 'yes' ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_content_value'] ? 1 : 0 );
 		array_push( $dboolean, $module_settings['chart_position_value'] );
-		array_push( $dboolean, $module_settings['chart_percent_value'] === 'yes' ? 1 : 0 );
+		array_push( $dboolean, 'yes' === $module_settings['chart_percent_value'] ? 1 : 0 );
 
 		// @since 1.7.5 Unparenthesized deprecated(a ? b : c) ? d : e` or `a ? b : (c ? d : e)
-		array_push( $dboolean, ( ! empty( $data_json ) && isset( $data_json['options']['stacked'] ) ? $data_json['options']['stacked'] : $module_settings['chart_stacked'] === 'yes' ) ? 1 : 0 );
-		array_push( $dboolean, ( ! empty( $data_json ) && isset( $data_json['options']['stepped'] ) ? $data_json['options']['stepped'] : $module_settings['chart_stepped'] === 'yes' ) ? 1 : 0 );
+		array_push( $dboolean, ( ! empty( $data_json ) && isset( $data_json['options']['stacked'] ) ? $data_json['options']['stacked'] : 'yes' === $module_settings['chart_stacked'] ) ? 1 : 0 );
+		array_push( $dboolean, ( ! empty( $data_json ) && isset( $data_json['options']['stepped'] ) ? $data_json['options']['stepped'] : 'yes' === $module_settings['chart_stepped'] ) ? 1 : 0 );
 
 		array_push( $dboolean, 0 ); // Y Forced 100%
 		array_push( $dboolean, $module_settings['chart_transparence_color']['size'] );
-		array_push( $dboolean, $module_settings['chart_random_color'] === 'yes' ? 1 : 0 ); // Rang 15
-		array_push( $dboolean, $module_settings['chart_palette_color'] === 'yes' ? 1 : 0 ); // @since 1.6.4
+		array_push( $dboolean, 'yes' === $module_settings['chart_random_color'] ? 1 : 0 ); // Rang 15
+		array_push( $dboolean, 'yes' === $module_settings['chart_palette_color'] ? 1 : 0 ); // @since 1.6.4
 		array_push( $dboolean, $module_settings['chart_global_fontsize']['size'] );
 
 		array_push( $dboolean, $suffix_y );
 		array_push( $dboolean, $suffix_y2 );
 
 		$settings = array(
-			'data_sid'     => $sid,
-			'data_rid'     => $rid,
-			'data_did'     => $did,
+			'data_sid'     => esc_attr( $sid ),
+			'data_rid'     => esc_attr( $rid ),
+			'data_did'     => esc_attr( $did ),
 
 			'data_type'    => $module_settings['chart_type'],
 			'data_title'   => ! empty( $data_json ) && isset( $data_json['title'] ) ? esc_html( $data_json['title'] ) : sanitize_text_field( $module_settings['chart_name'] ),
 			'data_labels'  => ! empty( $data_json ) && isset( $data_json['labels'] ) ? esc_html( $data_json['labels'] ) : sanitize_text_field( $module_settings['chart_x_data'] ),
 
 			// Plusieurs séries. Séparateur = virgule pour chaque label
-			'x_label'      => implode( ',', $arrayLabel ),
+			'x_label'      => implode( ',', $array_label ),
 			'x_title'      => ! empty( $data_json ) && isset( $data_json['options']['x_axis']['title'] ) ? esc_html( $data_json['options']['x_axis']['title'] ) : sanitize_text_field( $module_settings['chart_x_title'] ),
 
 			// Plusieurs séries de données. Séparateur = point-virgule pour chaque série de données
-			'y_data'       => implode( ';', $arrayDataSeries ),
+			'y_data'       => implode( ';', $array_data_series ),
 			'y_title'      => ! empty( $data_json ) && isset( $data_json['options']['y_axis']['title'] ) ? esc_html( $data_json['options']['y_axis']['title'] ) : sanitize_text_field( $module_settings['chart_y_title'] ),
 
 			'y2_data'      => $y2data,
@@ -1018,8 +1029,7 @@ class Chart_Widget extends Widget_Base {
 			'data_color'   => Eac_Tools_Util::get_palette_colors(), // @since 1.6.4
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}

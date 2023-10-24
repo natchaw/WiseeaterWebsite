@@ -96,9 +96,9 @@ class Ajax_Select2_Control extends Base_Data_Control {
 				</select>
 			</div>
 		</div>
-			
+
 		<# if (data.description) { #><div class="elementor-control-field-description">{{{ data.description }}}</div><# } #></div>
-		
+
 		<?php
 	}
 }

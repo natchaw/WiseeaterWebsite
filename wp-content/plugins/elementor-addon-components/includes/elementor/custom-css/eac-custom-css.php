@@ -56,7 +56,7 @@ class Eac_Custom_Css {
 	 * Remplace le control Custom CSS de la version PRO
 	 */
 	public static function add_controls_section( $element, $section_id, $args ) {
-		if ( $section_id == 'section_custom_css_pro' ) {
+		if ( 'section_custom_css_pro' === $section_id ) {
 
 			// $element->remove_control('section_custom_css_pro');
 			\Elementor\Plugin::$instance->controls_manager->remove_control_from_stack( $element->get_unique_name(), array( 'section_custom_css_pro', 'custom_css_pro' ) );

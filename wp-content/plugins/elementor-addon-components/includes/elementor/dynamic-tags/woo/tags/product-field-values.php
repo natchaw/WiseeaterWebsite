@@ -117,7 +117,8 @@ class Eac_Product_Field_Values extends Data_Tag {
 				$meta_props = Eac_Tools_Util::wc_get_meta_key_to_props( $metadata->meta_key );
 
 				if ( ! is_serialized( $metadata->meta_value ) ) {
-					$value = $cut_value = $metadata->meta_value;
+					$value     = $metadata->meta_value;
+					$cut_value = $metadata->meta_value;
 
 					// On n'affiche pas tous les caractères
 					if ( mb_strlen( $value, 'UTF-8' ) > self::FIELD_LENGTH ) {
@@ -131,7 +132,7 @@ class Eac_Product_Field_Values extends Data_Tag {
 					foreach ( unserialize( $metadata->meta_value ) as $key => $value ) {
 						$cut_value = $value;
 
-						/*
+						/**
 						if (is_array($cut_value)) {
 							error_log("::".$metadata->meta_key."::".$key."::".json_encode($value));
 						}*/

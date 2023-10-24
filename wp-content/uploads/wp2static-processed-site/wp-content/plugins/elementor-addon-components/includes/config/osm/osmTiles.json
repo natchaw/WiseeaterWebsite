@@ -22,7 +22,8 @@
 		"options": {
 			"title": "Deutschland",
 			"type": "tile",
-			"attribution": "&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors"
+			"attribution": "&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors",
+			"maxZoom": 20
 		}
 	},
 	"stamenToner": {
@@ -105,6 +106,7 @@
 		"options": {
 			"title": "Esri Imagery",
 			"type": "tile",
+			"maxZoom": 11,
 			"attribution": "Map data &copy; <a href='http://openstreetmap.org'>OpenStreetMap</a> contributors, &copy; Esri"
 		}
 	},

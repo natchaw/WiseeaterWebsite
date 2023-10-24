@@ -1,11 +1,11 @@
-
-body, html {
-  scroll-behavior: smooth;
+body,
+html {
+	scroll-behavior: smooth;
 }
 
 .eac-table-of-content {
 	display: flex;
-    justify-content: center;
+	justify-content: center;
 }
 
 #toctoc {
@@ -27,7 +27,7 @@ body, html {
 }
 
 #toctoc #toctoc-head span {
-    color: #FFFFFF;
+	color: #FFFFFF;
 }
 
 #toctoc #toctoc-head a:hover {

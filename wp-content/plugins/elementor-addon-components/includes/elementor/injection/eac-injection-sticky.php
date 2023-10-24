@@ -113,7 +113,7 @@ class Eac_Injection_Widget_Sticky {
 			return;
 		}
 
-		if ( 'section_effects' === $section_id && in_array( $element->get_type(), $this->target_elements ) ) {
+		if ( 'section_effects' === $section_id && in_array( $element->get_type(), $this->target_elements, true ) ) {
 
 			/**
 			 * @since 1.8.7 Application des breakpoints
@@ -251,7 +251,7 @@ class Eac_Injection_Widget_Sticky {
 	public function eac_render_sticky( $element ) {
 		$settings = $element->get_settings_for_display();
 
-		if ( ! in_array( $element->get_type(), $this->target_elements ) ) {
+		if ( ! in_array( $element->get_type(), $this->target_elements, true ) ) {
 			return;
 		}
 
@@ -260,11 +260,11 @@ class Eac_Injection_Widget_Sticky {
 
 			$element_settings = array(
 				'id'      => $element->get_data( 'id' ),
-				'widget'  => $element->get_name(),
-				'sticky'  => $settings['eac_element_sticky'],
-				'up'      => isset( $settings['eac_element_sticky_up'] ) ? $settings['eac_element_sticky_up'] : 50,
-				'down'    => isset( $settings['eac_element_sticky_down'] ) ? $settings['eac_element_sticky_down'] : 50,
-				'devices' => isset( $settings['eac_element_sticky_devices'] ) ? $settings['eac_element_sticky_devices'] : array( 'desktop' ),
+				'widget'  => esc_html( $element->get_name() ),
+				'sticky'  => esc_html( $settings['eac_element_sticky'] ),
+				'up'      => isset( $settings['eac_element_sticky_up'] ) ? absint( $settings['eac_element_sticky_up'] ) : 50,
+				'down'    => isset( $settings['eac_element_sticky_down'] ) ? absint( $settings['eac_element_sticky_down'] ) : 50,
+				'devices' => isset( $settings['eac_element_sticky_devices'] ) ? array_map( 'esc_attr', $settings['eac_element_sticky_devices'] ) : array( 'desktop' ),
 			);
 
 			// Elementor utilise data-settings dans les sections
@@ -272,7 +272,7 @@ class Eac_Injection_Widget_Sticky {
 				'_wrapper',
 				array(
 					'class'                    => 'eac-element_sticky-class',
-					'data-eac_settings-sticky' => json_encode( $element_settings ),
+					'data-eac_settings-sticky' => wp_json_encode( $element_settings ),
 				)
 			);
 		}

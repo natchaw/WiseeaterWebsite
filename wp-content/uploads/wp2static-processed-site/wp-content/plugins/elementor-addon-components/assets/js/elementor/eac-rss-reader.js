@@ -91,7 +91,7 @@
 					var $wrapperHeadContent = $('<div/>', { class: 'rss-item__header-content' });
 					
 					if(Profile.headLogo) {
-						$targetHeader.append('<div class="rss-item__header-img"><a href="' + Profile.headLink + '" target="_blank" rel="nofollow noopener noreferrer"><img class="eac-image-loaded" src="' + Profile.headLogo + '"></a></div>');
+						$targetHeader.append('<div class="rss-item__header-img"><a href="' + Profile.headLink + '" target="_blank" rel="nofollow noopener noreferrer"><img class="eac-image-loaded" src="' + Profile.headLogo + '" alt="' + Profile.headTitle + '"></a></div>');
 					}
 					$wrapperHeadContent.append('<span><a href="' + Profile.headLink + '" target="_blank" rel="nofollow noopener noreferrer"><h2>' + Profile.headTitle.substring(0, 27) + '...</h2></a></span>');
 					$wrapperHeadContent.append('<span>' + Profile.headDescription + '</span>');

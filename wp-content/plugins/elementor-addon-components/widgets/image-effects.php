@@ -12,6 +12,7 @@
  * @since 1.9.0 Intégration des scripts et des styles dans le constructeur de la class
  *              La section "Pictogramme style" n'est pas affichée
  * @since 1.9.2 Ajout des attributs "noopener noreferrer" pour les liens ouverts dans un autre onglet
+ * @since 2.0.2 Ajout de la taille de l'image
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -45,7 +46,7 @@ class Image_Effects_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_style( 'eac-image-effects', EAC_Plugin::instance()->get_register_style_url( 'image-effects' ), array( 'eac' ), '1.0.0' );
+		wp_register_style( 'eac-image-effects', EAC_Plugin::instance()->get_register_style_url( 'image-effects' ), array( 'eac' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -148,6 +149,16 @@ class Image_Effects_Widget extends Widget_Base {
 					'type'    => Controls_Manager::MEDIA,
 					'dynamic' => array( 'active' => true ),
 					'default' => array( 'url' => Utils::get_placeholder_image_src() ),
+				)
+			);
+
+			// @since 2.0.2 Ajout de la taille de l'image
+			$this->add_group_control(
+				Group_Control_Image_Size::get_type(),
+				array(
+					'name'    => 'ie_image_size',
+					'default' => 'medium',
+					//'exclude' => array( 'medium_large' ),
 				)
 			);
 
@@ -373,7 +384,7 @@ class Image_Effects_Widget extends Widget_Base {
 							'step' => 5,
 						),
 					),
-					'selectors'  => array( '{{WRAPPER}} .ie-protected-font-size' => 'top: {{SIZE}}%; transform: translateY(-{{SIZE}}%);' ),
+					'selectors'  => array( '{{WRAPPER}} .ie-protected-font-size' => 'top: {{SIZE}}%; left: 0; transform: translateY(-{{SIZE}}%);' ),
 				)
 			);
 
@@ -580,7 +591,7 @@ class Image_Effects_Widget extends Widget_Base {
 		$this->add_render_attribute( 'wrapper', 'class', 'view-effect ' . $settings['ie_image_animation'] );
 		?>
 		<div class="eac-image-effects">
-			<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'wrapper' ) ); ?>>
 				<?php $this->render_effects(); ?>
 			</div>
 		</div>
@@ -613,7 +624,7 @@ class Image_Effects_Widget extends Widget_Base {
 		}
 
 		// les liens
-		if ( $settings['ie_link_to'] === 'custom' ) {
+		if ( 'custom' === $settings['ie_link_to'] ) {
 			$link_url = esc_url( $settings['ie_link_url']['url'] );
 			$this->add_render_attribute( 'ie-link-to', 'href', $link_url );
 			$this->add_render_attribute( 'ie-link-to', 'class', 'info-effect' );
@@ -627,7 +638,7 @@ class Image_Effects_Widget extends Widget_Base {
 			if ( $settings['ie_link_url']['nofollow'] ) {
 				$this->add_render_attribute( 'ie-link-to', 'rel', 'nofollow' );
 			}
-		} elseif ( $settings['ie_link_to'] === 'file' ) {
+		} elseif ( 'file' === $settings['ie_link_to'] ) {
 			$link_url = $settings['ie_link_page'];
 			$this->add_render_attribute( 'ie-link-to', 'href', esc_url( get_permalink( get_page_by_title( $link_url ) ) ) );
 			$this->add_render_attribute( 'ie-link-to', 'class', 'info-effect' );
@@ -669,28 +680,26 @@ class Image_Effects_Widget extends Widget_Base {
 		$overlay_pos = 'mask-content-position ' . $settings['ie_overlay_position'];
 		?>
 		<figure>
-			<?php echo Group_Control_Image_Size::get_attachment_image_html( $settings, '', 'ie_image_content' ); ?>
+			<?php echo Group_Control_Image_Size::get_attachment_image_html( $settings, 'ie_image_size', 'ie_image_content' );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</figure>
 		<?php echo $open_title; ?><?php echo sanitize_text_field( $settings['ie_title'] ); ?><?php echo $close_title; ?>
 		<div class="mask-effect">
-			<div class="<?php echo $overlay_pos; ?>">
+			<div class="<?php echo esc_attr( $overlay_pos ); ?>">
 				<p><?php echo sanitize_textarea_field( $settings['ie_description'] ); ?></p>
 				<?php if ( $link_url ) : ?>
-					<a <?php echo $this->get_render_attribute_string( 'ie-link-to' ); ?>>
-						<i <?php echo $this->get_render_attribute_string( 'icon' ); ?>></i>
+					<a <?php echo wp_kses_post( $this->get_render_attribute_string( 'ie-link-to' ) ); ?>>
+						<i <?php echo wp_kses_post( $this->get_render_attribute_string( 'icon' ) ); ?>></i>
 					</a>
 				<?php endif; ?>
 				<?php if ( $link_lightbox ) : ?>
-					<a <?php echo $this->get_render_attribute_string( 'ie-lightbox' ); ?>>
-						<i <?php echo $this->get_render_attribute_string( 'icon-lb' ); ?>></i>
+					<a <?php echo wp_kses_post( $this->get_render_attribute_string( 'ie-lightbox' ) ); ?>>
+						<i <?php echo wp_kses_post( $this->get_render_attribute_string( 'icon-lb' ) ); ?>></i>
 					</a>
 				<?php endif; ?>
 			</div>
 		</div>
-		
 		<?php
 	}
 
 	protected function content_template() {}
-
 }

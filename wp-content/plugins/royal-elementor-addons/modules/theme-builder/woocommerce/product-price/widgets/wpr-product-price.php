@@ -31,7 +31,7 @@ class Wpr_Product_Price extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product-price', 'product', 'price' ];//tmp
+		return [ 'woocommerce', 'product-price', 'product', 'price' ];
 	}
 
 

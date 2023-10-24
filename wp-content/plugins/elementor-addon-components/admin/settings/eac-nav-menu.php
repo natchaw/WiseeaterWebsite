@@ -72,10 +72,11 @@ class Eac_Load_Nav_Menu {
 		wp_enqueue_style( 'elegant-icons', EAC_Plugin::instance()->get_register_style_url( 'elegant-icons', true ), array(), '1.3.3' );
 
 		// Les fonts awesome
-		/*
+		/**
 		if (defined('ELEMENTOR_VERSION')) {
 			wp_enqueue_style('font-awesome-5-all', plugins_url('/elementor/assets/lib/font-awesome/css/all.min.css'), false, '5.15.3');
-		} else {*/
+		} else {
+		*/
 			wp_enqueue_style( 'font-awesome-5-all', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', false, '5.15.3' );
 		// }
 
@@ -104,10 +105,11 @@ class Eac_Load_Nav_Menu {
 		}
 
 		// Les fonts awesome
-		/*
+		/**
 		if (defined('ELEMENTOR_VERSION')) {
 			wp_enqueue_style('font-awesome-5-all', plugins_url('/elementor/assets/lib/font-awesome/css/all.min.css'), false, '5.15.3');
-		} else {*/
+		} else {
+		*/
 			wp_enqueue_style( 'font-awesome-5-all', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css', false, '5.15.3' );
 		// }
 
@@ -145,7 +147,6 @@ class Eac_Load_Nav_Menu {
 	 * Ajout des classes à chaque titre du menu avant d'être affiché
 	 */
 	public function update_nav_menu_title( $title, $item, $args, $depth ) {
-		// global $wp_filter;
 
 		$menu_meta = get_post_meta( (int) $item->ID, $this->meta_item_menu, true );
 		if ( empty( $title ) || empty( $menu_meta ) ) {
@@ -154,30 +155,29 @@ class Eac_Load_Nav_Menu {
 
 		$theme = strtolower( wp_get_theme() );
 
-		// $has_walker = 'Walker_Nav_Menu_Edit' != apply_filters('wp_edit_nav_menu_walker', 'Walker_Nav_Menu_Edit');
-
-		/*
+		/**
+		$has_walker = 'Walker_Nav_Menu_Edit' != apply_filters('wp_edit_nav_menu_walker', 'Walker_Nav_Menu_Edit');
 		if (wp_strip_all_tags($title) !== $title) {
 			error_log($theme."=>".wp_strip_all_tags($title)."==>".$title);
-			error_log($theme."=>".json_encode($wp_filter['nav_menu_item_title']));
+			error_log($theme."=>".wp_json_encode($wp_filter['nav_menu_item_title']));
 			return $title;
-		}*/
+		}
+		*/
 
-		$icon       = '';
-		$meta_icon  = $menu_meta['icon'];
-		$badge      = '';
-		$meta_badge = $menu_meta['badge']['content'];
-		$thumb      = '';
-		$meta_thumb = isset( $menu_meta['thumbnail']['state'] ) ? $menu_meta['thumbnail']['state'] : $menu_meta['thumbnail'];
-		$image      = '';
-		$meta_image = $menu_meta['image']['url'];
-
-		$classes      = array( 'nav-menu_title-container depth-' . $depth . ' ' . $theme );
-		$processed    = false;
-		$has_children = false;
+		$icon           = '';
+		$meta_icon      = $menu_meta['icon'];
+		$badge          = '';
+		$meta_badge     = $menu_meta['badge']['content'];
+		$thumb          = '';
+		$meta_thumb     = isset( $menu_meta['thumbnail']['state'] ) ? $menu_meta['thumbnail']['state'] : $menu_meta['thumbnail'];
+		$image          = '';
+		$meta_image_url = $menu_meta['image']['url'];
+		$classes        = array( 'nav-menu_title-container depth-' . $depth . ' ' . $theme );
+		$processed      = false;
+		$has_children   = false;
 
 		// Pas d'icone, pas de badge, pas de miniature et pas d'image
-		if ( empty( $meta_icon ) && empty( $meta_badge ) && empty( $meta_thumb ) && empty( $meta_image ) ) {
+		if ( empty( $meta_icon ) && empty( $meta_badge ) && empty( $meta_thumb ) && empty( $meta_image_url ) ) {
 			return $title;
 		}
 
@@ -202,7 +202,7 @@ class Eac_Load_Nav_Menu {
 		$class_names = join( ' ', apply_filters( 'eac_menu_item_class', $classes ) );
 
 		// Ajout de l'image
-		if ( ! empty( $meta_image ) ) {
+		if ( ! empty( $meta_image_url ) ) {
 			$image_size = $menu_meta['image']['sizes'];
 
 			/**
@@ -213,11 +213,12 @@ class Eac_Load_Nav_Menu {
 			$image_size = apply_filters( 'eac_menu_image_size', $image_size );
 
 			if ( empty( $image_size ) || is_array( $image_size ) ) {
-				$image_size = 30; }
+				$image_size = 30;
+			}
 
-			$attachment_id = attachment_url_to_postid( $meta_image );
-			$image_alt     = $attachment_id != 0 ? get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) : 'No ALT';
-			$image         = '<img class="nav-menu_item-image" src="' . $meta_image . '" style="width: ' . $image_size . 'px; height:' . $image_size . 'px;" alt="' . $image_alt . '" />';
+			$attachment_id = attachment_url_to_postid( $meta_image_url );
+			$image_alt     = 0 !== $attachment_id ? get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) : 'No ALT';
+			$image         = '<img class="nav-menu_item-image" src="' . esc_url( $meta_image_url ) . '" style="width: ' . absint( $image_size ) . 'px; height:' . absint( $image_size ) . 'px;" alt="' . esc_attr( $image_alt ) . '" />';
 		}
 
 		// Ajout de la miniature
@@ -234,7 +235,7 @@ class Eac_Load_Nav_Menu {
 			if ( empty( $sizes ) || is_array( $sizes ) ) {
 				$thumbnail_size = array( 30, 30 );
 			} else {
-				$thumbnail_size = array( $sizes, $sizes );
+				$thumbnail_size = array( absint( $sizes ), absint( $sizes ) );
 			}
 
 			$thumb = get_the_post_thumbnail( $item->object_id, $thumbnail_size, array( 'class' => 'nav-menu_item-thumb' ) );
@@ -242,7 +243,7 @@ class Eac_Load_Nav_Menu {
 
 		// Ajout de l'icone
 		if ( ! empty( $meta_icon ) ) {
-			$icon = '<span class="nav-menu_item-icon"><i class="' . $meta_icon . '"  aria-hidden="true"></i></span>';
+			$icon = '<span class="nav-menu_item-icon"><i class="' . esc_attr( $meta_icon ) . '"  aria-hidden="true"></i></span>';
 		}
 
 		// Ajout du badge
@@ -309,11 +310,11 @@ class Eac_Load_Nav_Menu {
 			),
 		);
 
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], $this->menu_nonce ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), $this->menu_nonce ) ) {
 			wp_send_json_error( esc_html__( "Les réglages n'ont pu être entegistrés (nonce)", 'eac-components' ) );
 		}
 
-		// Les champs 'fields' sont serializés dans 'eac-nav-menu.js'
+		// Les champs 'fields' sont serialisés dans 'eac-nav-menu.js'
 		if ( isset( $_POST['fields'] ) ) {
 			parse_str( $_POST['fields'], $settings_on );
 		} else {

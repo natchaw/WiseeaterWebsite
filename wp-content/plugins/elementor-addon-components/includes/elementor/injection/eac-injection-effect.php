@@ -71,10 +71,6 @@ class Eac_Injection_Motion_Effects {
 		add_action( 'elementor/element/after_section_end', array( $this, 'inject_section' ), 10, 3 );
 
 		add_action( 'elementor/frontend/widget/before_render', array( $this, 'render_animation' ) );
-		// add_action('elementor/frontend/column/before_render', array($this, 'render_animation'));
-		// add_action('elementor/frontend/section/before_render', array($this, 'render_animation'));
-		/** @since 1.9.6 */
-		// add_action('elementor/frontend/container/before_render', array($this, 'render_animation'));
 
 		add_action( 'elementor/frontend/before_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
@@ -102,7 +98,7 @@ class Eac_Injection_Motion_Effects {
 			return;
 		}
 
-		if ( 'section_effects' === $section_id && in_array( $element->get_type(), $this->target_elements ) ) {
+		if ( 'section_effects' === $section_id && in_array( $element->get_type(), $this->target_elements, true ) ) {
 
 			// Les breakpoints actifs
 			$this->active_breakpoints = Plugin::$instance->breakpoints->get_active_breakpoints();
@@ -239,19 +235,19 @@ class Eac_Injection_Motion_Effects {
 		$type     = $data['elType'];
 		$settings = $element->get_settings_for_display();
 
-		if ( ! in_array( $element->get_type(), $this->target_elements ) ) {
+		if ( ! in_array( $element->get_type(), $this->target_elements, true ) ) {
 			return;
 		}
 
 		if ( isset( $settings['eac_element_motion_effect'] ) && 'yes' === $settings['eac_element_motion_effect'] && '' !== $settings['eac_element_motion_type'] ) {
 
 			$args_type = array(
-				'id'       => $element->get_id(),
-				'type'     => $settings['eac_element_motion_type'],
-				'duration' => $settings['eac_element_motion_duration'] . 's',
-				'top'      => isset( $settings['eac_element_motion_trigger']['sizes']['start'] ) ? $settings['eac_element_motion_trigger']['sizes']['start'] : '10',
-				'bottom'   => isset( $settings['eac_element_motion_trigger']['sizes']['end'] ) ? 100 - $settings['eac_element_motion_trigger']['sizes']['end'] : '10',
-				'devices'  => isset( $settings['eac_element_motion_devices'] ) ? $settings['eac_element_motion_devices'] : array( 'desktop', 'tablet' ),
+				'id'       => absint( $element->get_id() ),
+				'type'     => esc_html( $settings['eac_element_motion_type'] ),
+				'duration' => absint( $settings['eac_element_motion_duration'] ) . 's',
+				'top'      => isset( $settings['eac_element_motion_trigger']['sizes']['start'] ) ? absint( $settings['eac_element_motion_trigger']['sizes']['start'] ) : 10,
+				'bottom'   => isset( $settings['eac_element_motion_trigger']['sizes']['end'] ) ? 100 - absint( $settings['eac_element_motion_trigger']['sizes']['end'] ) : 10,
+				'devices'  => isset( $settings['eac_element_motion_devices'] ) ? array_map( 'esc_attr', $settings['eac_element_motion_devices'] ) : array( 'desktop', 'tablet' ),
 			);
 
 			$element->add_render_attribute(
@@ -259,7 +255,7 @@ class Eac_Injection_Motion_Effects {
 				array(
 					'class'                    => 'eac-element_motion-class',
 					'style'                    => 'visibility:hidden;',
-					'data-eac_settings-motion' => json_encode( $args_type ),
+					'data-eac_settings-motion' => wp_json_encode( $args_type ),
 				)
 			);
 		}

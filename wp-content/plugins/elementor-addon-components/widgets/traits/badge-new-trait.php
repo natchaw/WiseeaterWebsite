@@ -51,6 +51,7 @@ trait Badge_New_Trait {
 					),
 				),
 				'default'      => 'left',
+				'toggle'       => false,
 				'prefix_class' => 'badge-new-pos-',
 			)
 		);

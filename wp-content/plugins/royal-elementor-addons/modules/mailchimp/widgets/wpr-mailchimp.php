@@ -284,7 +284,8 @@ class Wpr_Mailchimp extends Widget_Base {
 
 		// Section: Pro Features
 		Utilities::pro_features_list_section( $this, '', Controls_Manager::RAW_HTML, 'mailchimp', [
-			'Add Extra Fields - Name, Last Name & Phone Number'
+			'Add Extra Fields - Name, Last Name & Phone Number',
+			'Clear Fields after Form Submission'
 		] );
 
 		// Styles ====================

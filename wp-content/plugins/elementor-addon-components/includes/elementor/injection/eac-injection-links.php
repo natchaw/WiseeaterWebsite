@@ -79,7 +79,6 @@ class Eac_Injection_Elements_Link {
 					'nofollow'    => true,
 				),
 				'render_type'   => 'none',
-				// 'frontend_available' => true, // data-settings de l'élément uniquement visible sur le front-end
 				'separator'     => 'before',
 			)
 		);
@@ -101,13 +100,13 @@ class Eac_Injection_Elements_Link {
 		if ( isset( $settings['eac_element_link'] ) && '' !== $settings['eac_element_link']['url'] ) {
 
 			$element_settings = array(
-				'url'         => $settings['eac_element_link']['url'],
-				'is_external' => $settings['eac_element_link']['is_external'] == true ? true : false,
-				'nofollow'    => $settings['eac_element_link']['nofollow'] == true ? true : false,
+				'url'         => esc_url( $settings['eac_element_link']['url'] ),
+				'is_external' => true === $settings['eac_element_link']['is_external'] ? true : false,
+				'nofollow'    => true === $settings['eac_element_link']['nofollow'] ? true : false,
 			);
 
 			// Elementor utilise data-settings dans les sections
-			$element->add_render_attribute( '_wrapper', array( 'data-eac_settings-link' => json_encode( $element_settings ) ) );
+			$element->add_render_attribute( '_wrapper', array( 'data-eac_settings-link' => wp_json_encode( $element_settings ) ) );
 		}
 	}
 }

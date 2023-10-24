@@ -57,14 +57,14 @@ class Eac_Author_Picture extends Data_Tag {
 		$size = $this->get_settings( 'author_picture_size' );
 
 		// @since 1.9.1 Global $authordata n'est pas instancié
-		if ( ! is_object( $authordata ) || ! isset( $authordata->ID ) ) {
+		if ( ! isset( $authordata->ID ) ) {
 			return array(
 				'url' => '',
 				'id'  => '',
 			);
 		}
 
-		/*
+		/**
 		if (! isset($authordata->ID)) { // La variable globale n'est pas définie
 			$post = get_post();
 			$authordata = get_userdata($post->post_author);

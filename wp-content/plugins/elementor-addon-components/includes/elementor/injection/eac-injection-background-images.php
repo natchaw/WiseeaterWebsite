@@ -21,10 +21,10 @@ if ( defined( 'ELEMENTOR_PRO_VERSION' ) ) {
 }
 
 use EACCustomWidgets\EAC_Plugin;
+
 use Elementor\Controls_Manager;
 use Elementor\Element_Base;
 use Elementor\Repeater;
-use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Image_Size;
 use Elementor\Group_Control_Css_Filter;
 use Elementor\Core\Schemes\Color;
@@ -420,7 +420,7 @@ class Eac_Injection_Background_Images {
 	public function render_images( $element ) {
 		$settings = $element->get_settings_for_display();
 
-		if ( ! in_array( $element->get_type(), $this->target_elements ) ) {
+		if ( ! in_array( $element->get_type(), $this->target_elements, true ) ) {
 			return;
 		}
 
@@ -429,8 +429,8 @@ class Eac_Injection_Background_Images {
 			?>
 			<script type="text/javascript">
 				jQuery(document).ready(function() {
-					jQuery('.elementor-element-<?php echo $element->get_id(); ?>')
-						.prepend('<div class="eac-background__images-wrapper" data-elem-id="<?php echo $element->get_id(); ?>"></div>');
+					jQuery('.elementor-element-<?php echo esc_attr( $element->get_id() ); ?>')
+						.prepend('<div class="eac-background__images-wrapper" data-elem-id="<?php echo esc_attr( $element->get_id() ); ?>"></div>');
 				});
 			</script>
 			<?php
@@ -456,12 +456,12 @@ class Eac_Injection_Background_Images {
 
 					if ( $url ) {
 						$position = esc_attr( $item['bgi_position'] );
-						if ( $item['bgi_position'] === 'initial' ) {
+						if ( 'initial' === $item['bgi_position'] ) {
 							$position = absint( $item['bgi_position_x']['size'] ) . '% ' . absint( $item['bgi_position_y']['size'] ) . '%';
 						}
 
 						$size = esc_attr( $item['bgi_size'] );
-						if ( $item['bgi_size'] === 'initial' ) {
+						if ( 'initial' === $item['bgi_size'] ) {
 							if ( ! empty( $item['bgi_size_width_calc'] ) && str_starts_with( $item['bgi_size_width_calc'], 'calc' ) ) {
 								$size = esc_html( $item['bgi_size_width_calc'] );
 							} else {
@@ -484,7 +484,7 @@ class Eac_Injection_Background_Images {
 						?>
 						<script type="text/javascript">
 							jQuery(document).ready(function() {
-								jQuery('.elementor-element-<?php echo $element->get_id(); ?>').prepend('<div <?php echo $element->get_render_attribute_string( $key ); ?>></div>');
+								jQuery('.elementor-element-<?php echo esc_attr( $element->get_id() ); ?>').prepend('<div <?php echo wp_kses_post( $element->get_render_attribute_string( $key ) ); ?>></div>');
 							});
 						</script>
 						<?php
@@ -507,8 +507,9 @@ class Eac_Injection_Background_Images {
 		// get_name() === 'inner-section' quand c'est une section interne
 		// get_type() === 'section' quand c'est une section interne
 
-		if ( ! in_array( $element->get_type(), $this->target_elements ) ) {
-			return $template; }
+		if ( ! in_array( $element->get_type(), $this->target_elements, true ) ) {
+			return $template;
+		}
 
 		$old_template = $template;
 		ob_start();
@@ -528,15 +529,15 @@ class Eac_Injection_Background_Images {
 						dimension: item.bgi_image_size_custom_dimension,
 						model: view.getEditModel()
 					};
-					
+
 					var image_url = elementor.imagesManager.getImageUrl(image);
-					
+
 					if (image_url) {
 						var position = item.bgi_position;
 						if (item.bgi_position === 'initial') {
 							position = item.bgi_position_x.size + '% ' + item.bgi_position_y.size + '%';
 						}
-						
+
 						var size = item.bgi_size;
 						if (item.bgi_size === 'initial') {
 							if (item.bgi_size_width_calc !== '' && item.bgi_size_width_calc.startsWith('calc')) {
@@ -545,7 +546,7 @@ class Eac_Injection_Background_Images {
 								size = item.bgi_size_width.size + item.bgi_size_width.unit;
 							}
 						}
-						
+
 						var key = 'bgi_image_' + index;
 						view.addRenderAttribute(
 							key,

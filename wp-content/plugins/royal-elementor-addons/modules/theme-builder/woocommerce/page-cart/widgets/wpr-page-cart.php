@@ -31,7 +31,7 @@ class Wpr_Page_Cart extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'royal', 'cart', 'product', 'page', 'cart page', 'page cart' ];//tmp
+		return [ 'woocommerce', 'royal', 'cart', 'product', 'page', 'cart page', 'page cart' ];
 	}
 
 	public function get_script_depends() {

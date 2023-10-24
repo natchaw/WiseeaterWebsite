@@ -21,7 +21,7 @@ use Elementor\Controls_Manager;
 use Elementor\Core\DynamicTags\Tag;
 use Elementor\Modules\DynamicTags\Module as TagsModule;
 
-class Eac_Author_Social_network extends Tag {
+class Eac_Author_Social_Network extends Tag {
 
 	public function get_name() {
 		return 'eac-addon-author-social-network';
@@ -64,15 +64,9 @@ class Eac_Author_Social_network extends Tag {
 		global $authordata;
 
 		// @since 1.9.1 Global $authordata n'est pas instancié
-		if ( ! is_object( $authordata ) || ! isset( $authordata->ID ) ) {
+		if ( ! isset( $authordata->ID ) ) {
 			return;
 		}
-
-		/*
-		if (! isset($authordata->ID)) {   // La variable globale n'est pas définie
-			$post = get_post();			// L'article courant
-			$authordata = get_userdata($post->post_author);
-		}*/
 
 		$keys = $this->get_settings( 'author_social_network' );
 		if ( empty( $keys ) ) {
@@ -83,25 +77,26 @@ class Eac_Author_Social_network extends Tag {
 
 		foreach ( $keys as $key ) {
 			$value = get_the_author_meta( $key, $authordata->ID );
+			$key = esc_attr( $key );
 
-			if ( $value !== '' ) {
+			if ( '' !== $value ) {
 				// @since 1.9.1 Protection de l'adresse e-mail contre les spams
-				if ( $key === 'email' ) {
-					$href = '<a href="mailto:' . esc_html( antispambot( $value ) ) . '" rel="nofollow">';
+				if ( 'email' === $key ) {
+					$href = '<a href="' . esc_url( 'mailto:' . antispambot( sanitize_email( $value ) ) ) . '" rel="nofollow">';
 				} else {
-					$href = '<a href="' . $value . '" rel="nofollow">';
+					$href = '<a href="' . esc_url( $value ) . '" rel="nofollow">';
 				}
 
-				$span = '<span class="dynamic-tags_social-icon ' . $key . '"' . ' title="' . ucfirst( $key ) . '">';
+				$span = '<span class="dynamic-tags_social-icon ' . $key . '" title="' . ucfirst( $key ) . '">';
 
 				// @since 1.9.1 Différentes fontes awesome
-				if ( $key === 'tiktok' ) {
+				if ( 'tiktok' === $key ) {
 					$faw = '<i class="fab fa-tiktok"></i></span></a>';
-				} elseif ( $key === 'github' ) {
+				} elseif ( 'github' === $key ) {
 					$faw = '<i class="fab fa-github"></i></span></a>';
-				} elseif ( $key === 'email' ) {
+				} elseif ( 'email' === $key ) {
 					$faw = '<i class="fa fa-envelope"></i></span></a>';
-				} elseif ( $key === 'url' ) {
+				} elseif ( 'url' === $key ) {
 					$faw = '<i class="fa fa-globe"></i></span></a>';
 				} else {
 					$faw = '<i class="fa fa-' . $key . '"></i></span></a>';

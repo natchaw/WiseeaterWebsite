@@ -12,6 +12,7 @@
  * @since 1.7.1
  * @since 1.8.7 Support des custom breakpoints
  * @since 1.9.0 Intégration des scripts et des styles dans le constructeur de la class
+ * @since 2.0.2 Ajout des attributs d'édition en ligne
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -45,7 +46,7 @@ class Html_Sitemap_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_style( 'eac-html-sitemap', EAC_Plugin::instance()->get_register_style_url( 'html-sitemap' ), array( 'eac' ), '1.7.1' );
+		wp_register_style( 'eac-html-sitemap', EAC_Plugin::instance()->get_register_style_url( 'html-sitemap' ), array( 'eac' ), EAC_ADDONS_VERSION );
 
 		// Filtre la liste 'orderby' utilisée dans les articles et la taxonomie
 		add_filter(
@@ -678,14 +679,18 @@ class Html_Sitemap_Widget extends Widget_Base {
 			// @since 1.8.7 Add default values for all active breakpoints.
 			$columns_device_args = array();
 		foreach ( $active_breakpoints as $breakpoint_name => $breakpoint_instance ) {
-			if ( ! in_array( $breakpoint_name, array( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN, Breakpoints_manager::BREAKPOINT_KEY_LAPTOP ) ) ) {
-				if ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE ) {
-					$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-				} elseif ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA ) {
-					$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-				} else {
+			if ( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_LAPTOP === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET_EXTRA === $breakpoint_name ) {
 					$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
-				}
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
 			}
 		}
 
@@ -723,7 +728,7 @@ class Html_Sitemap_Widget extends Widget_Base {
 			)
 		);
 
-			/*
+			/**
 			$this->add_control('stm_display_icon',
 				[
 					'label'             => esc_html__("Pictogrammes", 'eac-components'),
@@ -816,7 +821,6 @@ class Html_Sitemap_Widget extends Widget_Base {
 						),
 					),
 					'default'   => 'left',
-					'toggle'    => true,
 					'selectors' => array( '{{WRAPPER}} .eac-html-sitemap .sitemap-posts-title' => 'text-align: {{VALUE}};' ),
 				)
 			);
@@ -1042,14 +1046,10 @@ class Html_Sitemap_Widget extends Widget_Base {
 	 * @access protected
 	 */
 	protected function render() {
+		global $post;
 		?>
 		<div class="eac-html-sitemap">
-			<article id="post-
-			<?php
-			global $post;
-			echo $post->ID;
-			?>
-			" <?php post_class( 'site-map-article' ); ?>>
+			<article id="post-<?php echo esc_attr( $post->ID ); ?>" <?php post_class( 'site-map-article' ); ?>>
 				<?php $this->render_sitemap(); ?>
 			</article>
 		</div>
@@ -1066,19 +1066,19 @@ class Html_Sitemap_Widget extends Widget_Base {
 	protected function render_sitemap() {
 		$settings = $this->get_settings_for_display();
 
-		if ( $settings['stm_content_display_author'] === 'yes' ) {
+		if ( 'yes' === $settings['stm_content_display_author'] ) {
 			$this->eac_get_html_sitemap_authors();
 		}
-		if ( $settings['stm_content_display_page'] === 'yes' ) {
+		if ( 'yes' === $settings['stm_content_display_page'] ) {
 			$this->eac_get_html_sitemap_pages();
 		}
-		if ( $settings['stm_content_display_archive'] === 'yes' ) {
+		if ( 'yes' === $settings['stm_content_display_archive'] ) {
 			$this->eac_get_html_sitemap_archives();
 		}
-		if ( $settings['stm_content_display_taxonomy'] === 'yes' ) {
+		if ( 'yes' === $settings['stm_content_display_taxonomy'] ) {
 			$this->eac_get_html_sitemap_taxonomies();
 		}
-		if ( $settings['stm_content_display_post'] === 'yes' ) {
+		if ( 'yes' === $settings['stm_content_display_post'] ) {
 			$this->eac_get_html_sitemap_posts();
 		}
 	}
@@ -1086,21 +1086,24 @@ class Html_Sitemap_Widget extends Widget_Base {
 	/**
 	 * eac_get_html_sitemap_authors
 	 *
-	 * Description:
+	 * Description: affiche la liste des articles des auteurs
 	 *
-	 * @since 1.7.1
+	 * @since 2.0.2 Ajout de l'édition en ligne du titre
 	 */
 	protected function eac_get_html_sitemap_authors() {
 		$settings = $this->get_settings_for_display();
 		$this->add_render_attribute( 'sitemap_wrapper_author', 'class', 'sitemap-authors' );
+
+		$this->add_inline_editing_attributes( 'stm_author_titre', 'advanced' );
+		$this->add_render_attribute( 'stm_author_titre', 'class', 'sitemap-posts-title' );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'sitemap_wrapper_author' ); ?>>
-			<div class="sitemap-posts-title"><h2><?php echo sanitize_text_field( $settings['stm_author_titre'] ); ?></h2></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'sitemap_wrapper_author' ) ); ?>>
+			<div <?php echo $this->get_render_attribute_string( 'stm_author_titre' ); ?>><h2><?php echo sanitize_text_field( $settings['stm_author_titre'] ); ?></h2></div>
 			<div class="sitemap-posts-list">
 				<?php
 				$exclude     = $settings['stm_author_exclude'];
-				$optioncount = $settings['stm_author_post_count'] === 'yes' ? true : false;
-				$fullname    = $settings['stm_author_post_fullname'] === 'yes' ? true : false;
+				$optioncount = 'yes' === $settings['stm_author_post_count'] ? true : false;
+				$fullname    = 'yes' === $settings['stm_author_post_fullname'] ? true : false;
 				?>
 				<ul>
 					<?php
@@ -1121,16 +1124,19 @@ class Html_Sitemap_Widget extends Widget_Base {
 	/**
 	 * eac_get_html_sitemap_pages
 	 *
-	 * Description:
+	 * Description: affiche la liste des pages
 	 *
-	 * @since 1.7.1
+	 * @since 2.0.2 Ajout de l'édition en ligne du titre
 	 */
 	protected function eac_get_html_sitemap_pages() {
 		$settings = $this->get_settings_for_display();
 		$this->add_render_attribute( 'sitemap_wrapper_page', 'class', 'sitemap-pages' );
+
+		$this->add_inline_editing_attributes( 'stm_page_titre', 'advanced' );
+		$this->add_render_attribute( 'stm_page_titre', 'class', 'sitemap-posts-title' );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'sitemap_wrapper_page' ); ?>>
-			<div class="sitemap-posts-title"><h2><?php echo sanitize_text_field( $settings['stm_page_titre'] ); ?></h2></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'sitemap_wrapper_page' ) ); ?>>
+			<div <?php echo $this->get_render_attribute_string( 'stm_page_titre' ); ?>><h2><?php echo sanitize_text_field( $settings['stm_page_titre'] ); ?></h2></div>
 			<div class="sitemap-posts-list">
 				<?php
 				// Exclusion de page par leur ID
@@ -1154,21 +1160,24 @@ class Html_Sitemap_Widget extends Widget_Base {
 	/**
 	 * eac_get_html_sitemap_archives
 	 *
-	 * Description:
+	 * Description: affiche la liste des archives par types d'articles
 	 *
-	 * @since 1.7.1
+	 * @since 2.0.2 Ajout de l'édition en ligne du titre
 	 */
 	protected function eac_get_html_sitemap_archives() {
 		$settings = $this->get_settings_for_display();
 		$this->add_render_attribute( 'sitemap_wrapper_archive', 'class', 'sitemap-archives' );
+
+		$this->add_inline_editing_attributes( 'stm_archive_titre', 'advanced' );
+		$this->add_render_attribute( 'stm_archive_titre', 'class', 'sitemap-posts-title' );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'sitemap_wrapper_archive' ); ?>>
-			<div class="sitemap-posts-title"><h2><?php echo sanitize_text_field( $settings['stm_archive_titre'] ); ?></h2></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'sitemap_wrapper_archive' ) ); ?>>
+			<div <?php echo $this->get_render_attribute_string( 'stm_archive_titre' ); ?>><h2><?php echo sanitize_text_field( $settings['stm_archive_titre'] ); ?></h2></div>
 			<div class="sitemap-posts-list">
 				<?php
 				$post_types = $settings['stm_archive_type'];
 				$type       = $settings['stm_archive_frequence'];
-				$showcount  = $settings['stm_archive_post_count'] === 'yes' ? true : false;
+				$showcount  = 'yes' === $settings['stm_archive_post_count'] ? true : false;
 				?>
 				<ul>
 					<?php
@@ -1189,16 +1198,19 @@ class Html_Sitemap_Widget extends Widget_Base {
 	/**
 	 * eac_get_html_sitemap_taxonomies
 	 *
-	 * Description:
+	 * Description:  affiche la liste des pages par leurs taxonomies
 	 *
-	 * @since 1.7.1
+	 * @since 2.0.2 Ajout de l'édition en ligne du titre
 	 */
 	protected function eac_get_html_sitemap_taxonomies() {
 		$settings = $this->get_settings_for_display();
 		$this->add_render_attribute( 'sitemap_wrapper_taxo', 'class', 'sitemap-taxonomies' );
+
+		$this->add_inline_editing_attributes( 'stm_taxonomy_titre', 'advanced' );
+		$this->add_render_attribute( 'stm_taxonomy_titre', 'class', 'sitemap-posts-title' );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'sitemap_wrapper_taxo' ); ?>>
-			<div class="sitemap-posts-title"><h2><?php echo sanitize_text_field( $settings['stm_taxonomy_titre'] ); ?></h2></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'sitemap_wrapper_taxo' ) ); ?>>
+			<div <?php echo $this->get_render_attribute_string( 'stm_taxonomy_titre' ); ?>><h2><?php echo sanitize_text_field( $settings['stm_taxonomy_titre'] ); ?></h2></div>
 			<div class="sitemap-posts-list">
 				<ul>
 				<?php
@@ -1217,26 +1229,26 @@ class Html_Sitemap_Widget extends Widget_Base {
 				$order = $settings['stm_taxonomy_order'];
 
 				// Afficher la date
-				$has_date = $settings['stm_taxonomy_date'] === 'yes' ? true : false;
+				$has_date = 'yes' === $settings['stm_taxonomy_date'] ? true : false;
 				$la_date  = '';
 
 				// Affiche le nombre de catégories
-				$has_cat_count = $settings['stm_taxonomy_count'] === 'yes' ? true : false;
+				$has_cat_count = 'yes' === $settings['stm_taxonomy_count'] ? true : false;
 
 				// Affiche le nombre de commentaires
-				$has_comment = $settings['stm_taxonomy_comment'] === 'yes' ? true : false;
+				$has_comment = 'yes' === $settings['stm_taxonomy_comment'] ? true : false;
 				$c_count     = '';
 
 				// Ajout de nofollow aux liens
-				$has_nofollow = $settings['stm_taxonomy_nofollow'] === 'yes' ? 'rel="nofollow"' : '';
+				$has_nofollow = 'yes' === $settings['stm_taxonomy_nofollow'] ? 'rel="nofollow"' : '';
 
 				// Exclusion d'articles
-				$has_id       = $settings['stm_taxonomy_id'] === 'yes' ? true : false;
+				$has_id       = 'yes' === $settings['stm_taxonomy_id'] ? true : false;
 				$exclude_post = ! empty( $settings['stm_taxonomy_exclude_id'] ) ? explode( ',', sanitize_text_field( $settings['stm_taxonomy_exclude_id'] ) ) : '';
 
 				// Boucle sur les taxonomies
 				foreach ( $all_taxos as $taxo => $value ) {
-					if ( empty( $exclude_taxos ) || ( ! empty( $exclude_taxos ) && ! in_array( $taxo, $exclude_taxos ) ) ) {
+					if ( empty( $exclude_taxos ) || ( ! empty( $exclude_taxos ) && ! in_array( $taxo, $exclude_taxos, true ) ) ) {
 						// Les catégories de la taxonomie
 						$categories = get_categories(
 							array(
@@ -1248,7 +1260,8 @@ class Html_Sitemap_Widget extends Widget_Base {
 						// Boucle sur chaque catégorie de la taxonomie
 						foreach ( $categories as $categorie ) {
 							// Le type de post de la catégorie
-							if ( ! $post_object = get_taxonomy( $categorie->taxonomy ) ) {
+							$post_object = get_taxonomy( $categorie->taxonomy );
+							if ( ! $post_object ) {
 								continue;
 							}
 
@@ -1260,7 +1273,7 @@ class Html_Sitemap_Widget extends Widget_Base {
 
 							// Arguments de la requête
 							$args = array(
-								'post_type'      => $post_object->object_type, // $post_object->object_type[0]
+								'post_type'      => $post_object->object_type,
 								'posts_per_page' => -1,
 								'orderby'        => $orderby,
 								'order'          => $order,
@@ -1278,10 +1291,10 @@ class Html_Sitemap_Widget extends Widget_Base {
 							$posts_array = get_posts( $args );
 
 							// Il y a des posts
-							if ( count( $posts_array ) > 0 ) {
+							if ( ! is_wp_error( $posts_array ) && ! empty( $posts_array ) ) {
 								// Affiche le nom de la taxonomie
 								?>
-								<li><span><span><b><?php echo ucfirst( $taxo ); ?></b></span><a href="<?php echo esc_url( get_category_link( $categorie->cat_ID ) ); ?>" <?php echo $has_nofollow; ?>><?php echo $categorie->cat_name; ?></a><?php echo $cat_count; ?></span>
+								<li><span><span><b><?php echo esc_attr( ucfirst( $taxo ) ); ?></b></span><a href="<?php echo esc_url( get_category_link( $categorie->cat_ID ) ); ?>" <?php echo esc_attr( $has_nofollow ); ?>><?php echo esc_attr( $categorie->cat_name ); ?></a><?php echo esc_attr( $cat_count ); ?></span>
 									<ul>
 									<?php
 
@@ -1298,9 +1311,9 @@ class Html_Sitemap_Widget extends Widget_Base {
 										// Affiche la date
 										if ( $has_date ) {
 											if ( 'modified' === $orderby ) {
-												$la_date = '<span>' . get_the_modified_date( get_option( 'date_format' ) ) . '</span>';
+												$la_date = '<span>' . esc_html( get_the_modified_date( get_option( 'date_format' ) ) ) . '</span>';
 											} else {
-												$la_date = '<span>' . get_the_date( get_option( 'date_format' ) ) . '</span>';
+												$la_date = '<span>' . esc_html( get_the_date( get_option( 'date_format' ) ) ) . '</span>';
 											}
 										}
 										// Affiche le nombre de commentaires
@@ -1308,7 +1321,7 @@ class Html_Sitemap_Widget extends Widget_Base {
 											$c_count = ' (' . get_comments_number() . ')';
 										}
 										?>
-										<li><span><?php echo $la_date; ?><a href="<?php the_permalink(); ?>" title="<?php the_title(); ?>" <?php echo $has_nofollow; ?>><?php the_title(); ?></a><?php echo $c_count; ?><?php echo $id; ?></span></li>
+										<li><span><?php echo wp_kses_post( $la_date ); ?><a href="<?php esc_url( the_permalink() ); ?>" title="<?php esc_attr( the_title() ); ?>" <?php echo esc_html( $has_nofollow ); ?>><?php esc_html( the_title() ); ?></a><?php echo esc_html( $c_count ); ?><?php echo esc_html( $id ); ?></span></li>
 										<?php
 									}
 									wp_reset_postdata();
@@ -1330,16 +1343,19 @@ class Html_Sitemap_Widget extends Widget_Base {
 	/**
 	 * eac_get_html_sitemap_posts
 	 *
-	 * Description:
+	 * Description: affiche la liste des articles
 	 *
-	 * @since 1.7.1
+	 * @since 2.0.2 Ajout de l'édition en ligne du titre
 	 */
 	protected function eac_get_html_sitemap_posts() {
 		$settings = $this->get_settings_for_display();
 		$this->add_render_attribute( 'sitemap_wrapper_post', 'class', 'sitemap-posts' );
+
+		$this->add_inline_editing_attributes( 'stm_post_titre', 'advanced' );
+		$this->add_render_attribute( 'stm_post_titre', 'class', 'sitemap-posts-title' );
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'sitemap_wrapper_post' ); ?>>
-			<div class="sitemap-posts-title"><h2><?php echo sanitize_text_field( $settings['stm_post_titre'] ); ?></h2></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'sitemap_wrapper_post' ) ); ?>>
+			<div <?php echo $this->get_render_attribute_string( 'stm_post_titre' ); ?>><h2><?php echo sanitize_text_field( $settings['stm_post_titre'] ); ?></h2></div>
 			<div class="sitemap-posts-list">
 				<?php
 				global $post;
@@ -1351,22 +1367,22 @@ class Html_Sitemap_Widget extends Widget_Base {
 				$order = $settings['stm_post_order'];
 
 				// Afficher la date
-				$has_date = $settings['stm_post_date'] === 'yes' ? true : false;
+				$has_date = 'yes' === $settings['stm_post_date'] ? true : false;
 				$la_date  = '';
 
 				// Affiche le nombre de commentaires
-				$has_comment = $settings['stm_post_comment'] === 'yes' ? true : false;
+				$has_comment = 'yes' === $settings['stm_post_comment'] ? true : false;
 				$c_count     = '';
 
 				// Ajout de nofollow aux liens
-				$has_nofollow = $settings['stm_post_nofollow'] === 'yes' ? 'rel="nofollow"' : '';
+				$has_nofollow = 'yes' === $settings['stm_post_nofollow'] ? 'rel="nofollow"' : '';
 
 				// Les catégories par article
-				$has_category = $settings['stm_post_category'] === 'yes' ? true : false;
+				$has_category = 'yes' === $settings['stm_post_category'] ? true : false;
 				$categories   = '';
 
 				// Exclusion d'articles
-				$has_id       = $settings['stm_post_id'] === 'yes' ? true : false;
+				$has_id       = 'yes' === $settings['stm_post_id'] ? true : false;
 				$exclude_post = ! empty( $settings['stm_post_exclude'] ) ? explode( ',', sanitize_text_field( $settings['stm_post_exclude'] ) ) : '';
 
 				// Exclure des types d'articles
@@ -1390,16 +1406,16 @@ class Html_Sitemap_Widget extends Widget_Base {
 				// Récupère toute la taxonomie filtrée par le nom
 				$all_taxo = Eac_Tools_Util::get_all_taxonomies_by_name();
 
-				/*highlight_string("<?php\n\$settings =\n" . var_export($all_taxo, true) . ";\n?>");*/
+				/**highlight_string("<?php\n\$settings =\n" . var_export($all_taxo, true) . ";\n?>");*/
 
 				// Récupère tous les types d'articles
 				$post_types = get_post_types( array( 'public' => true ), 'objects' );
 
 				// Boucle sur les types d'articles
 				foreach ( $post_types as $post_type ) {
-					if ( empty( $exclude_posttype ) || ( ! empty( $exclude_posttype ) && ! in_array( $post_type->name, $exclude_posttype ) ) ) {
+					if ( empty( $exclude_posttype ) || ( ! empty( $exclude_posttype ) && ! in_array( $post_type->name, $exclude_posttype, true ) ) ) {
 						?>
-						<h3><?php echo $post_type->labels->name; ?></h3>
+						<h3><?php echo esc_html( $post_type->labels->name ); ?></h3>
 						<?php
 						$args = array(
 							'posts_per_page' => -1,
@@ -1415,44 +1431,45 @@ class Html_Sitemap_Widget extends Widget_Base {
 						?>
 						<ul>
 						<?php
-						foreach ( $posts_array as $post ) {
-							// Renseigne les variables globales de l'article courant
-							setup_postdata( $post );
+						if ( ! is_wp_error( $posts_array ) && ! empty( $posts_array ) ) {
+							foreach ( $posts_array as $post ) {
+								setup_postdata( $post ); // Renseigne les variables globales de l'article courant
 
-							// L'ID de l'article
-							$id = '';
-							if ( $has_id ) {
-								$id = ' ' . get_the_id();
-							}
-
-							// Affiche et formate la date
-							if ( $has_date ) {
-								if ( 'modified' === $orderby ) {
-									$la_date = '<span>' . get_the_modified_date( get_option( 'date_format' ) ) . '</span>';
-								} else {
-									$la_date = '<span>' . get_the_date( get_option( 'date_format' ) ) . '</span>';
+								// L'ID de l'article
+								$id = '';
+								if ( $has_id ) {
+									$id = ' ' . get_the_id();
 								}
-							}
 
-							// Affiche le nombre de commentaires
-							if ( $has_comment ) {
-								$c_count = ' (' . get_comments_number() . ')';
-							}
-
-							// Les catégories sont renseignées
-							if ( $has_category ) {
-								// Récupère toutes les catégories de l'article
-								$post_categories = get_the_terms( get_the_id(), $all_taxo );
-
-								// Recherche les catégories de l'article
-								if ( ! empty( $post_categories ) && ! is_wp_error( $post_categories ) ) {
-									$categories = implode( ',', wp_list_pluck( $post_categories, 'name' ) );
-									$categories = '<span>' . $categories . '</span>';
+								// Affiche et formate la date
+								if ( $has_date ) {
+									if ( 'modified' === $orderby ) {
+										$la_date = '<span>' . esc_html( get_the_modified_date( get_option( 'date_format' ) ) ) . '</span>';
+									} else {
+										$la_date = '<span>' . esc_html( get_the_date( get_option( 'date_format' ) ) ) . '</span>';
+									}
 								}
+
+								// Affiche le nombre de commentaires
+								if ( $has_comment ) {
+									$c_count = ' (' . get_comments_number() . ')';
+								}
+
+								// Les catégories sont renseignées
+								if ( $has_category ) {
+									// Récupère toutes les catégories de l'article
+									$post_categories = get_the_terms( get_the_id(), $all_taxo );
+
+									// Recherche les catégories de l'article
+									if ( ! empty( $post_categories ) && ! is_wp_error( $post_categories ) ) {
+										$categories = implode( ',', wp_list_pluck( $post_categories, 'name' ) );
+										$categories = '<span>' . $categories . '</span>';
+									}
+								}
+								?>
+								<li><span><?php echo wp_kses_post( $categories ) . wp_kses_post( $la_date ); ?><a href="<?php esc_url( the_permalink() ); ?>" <?php echo esc_html( $has_nofollow ); ?>><?php esc_html( the_title() ); ?></a><?php echo esc_html( $c_count ); ?><?php echo esc_html( $id ); ?></span></li>
+								<?php
 							}
-							?>
-							<li><span><?php echo $categories . $la_date; ?><a href="<?php the_permalink(); ?>" <?php echo $has_nofollow; ?>><?php the_title(); ?></a><?php echo $c_count; ?><?php echo $id; ?></span></li>
-							<?php
 						}
 						wp_reset_postdata();
 						?>

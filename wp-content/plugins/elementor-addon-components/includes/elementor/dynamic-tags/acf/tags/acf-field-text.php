@@ -78,14 +78,14 @@ class Eac_Acf_Text extends Tag {
 			}
 
 			// Affecte l'ID de l'article courant ou de la page d'options
-			$post_id = $post_id === '' ? get_the_ID() : $post_id;
+			$post_id = '' === $post_id ? get_the_ID() : $post_id;
 
 			// Récupère l'objet Field
 			$field = get_field_object( $field_key, $post_id );
 
 			if ( $field && ! empty( $field['value'] ) ) {
 				$field_value = $field['value'];
-				console_log( $field );
+				//error_log( "==>" . $field['type'] . "::" . json_encode($field['value']) );
 				/** @since 1.8.5 Traite le champ 'post_object' */
 				switch ( $field['type'] ) {
 					case 'relationship':
@@ -94,7 +94,7 @@ class Eac_Acf_Text extends Tag {
 						/** @since 1.8.5 Fix cast $field_value dans le type tableau */
 						$field_value = is_array( $field_value ) ? $field_value : array( $field_value );
 
-						if ( $field['return_format'] == 'object' ) {
+						if ( 'object' === $field['return_format'] ) {
 							foreach ( $field_value as $value ) {
 								$values[] = "<a href='" . get_permalink( get_post( $value->ID )->ID ) . "'><span class='acf-relationship'>" . $value->post_title . '</span></a><br>';
 							}
@@ -107,7 +107,7 @@ class Eac_Acf_Text extends Tag {
 						break;
 					case 'radio':
 					case 'button_group':
-						if ( $field['return_format'] == 'array' ) {
+						if ( 'array' === $field['return_format'] ) {
 							$field_value = $field_value['value'];
 						}
 						break;
@@ -117,7 +117,7 @@ class Eac_Acf_Text extends Tag {
 						$values      = array();
 
 						foreach ( $field_value as $value ) {
-							if ( $field['return_format'] == 'array' ) {
+							if ( 'array' === $field['return_format'] ) {
 								$values[] = $value['value'];
 							} else {
 								$values[] = $value;

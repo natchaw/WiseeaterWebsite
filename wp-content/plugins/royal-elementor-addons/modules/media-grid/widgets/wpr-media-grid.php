@@ -79,9 +79,9 @@ class Wpr_Media_Grid extends Widget_Base {
 					'date' => esc_html__( 'Date', 'wpr-addons'),
 					'pro-tl' => esc_html__( 'Title (Pro)', 'wpr-addons'),
 					'pro-mf' => esc_html__( 'Last Modified (Pro)', 'wpr-addons'),
-					'pro-d' => esc_html__( 'Post ID', 'wpr-addons' ),
-					'pro-ar' => esc_html__( 'Post Author', 'wpr-addons' ),
-					'pro-cc' => esc_html__( 'Comment Count', 'wpr-addons' )
+					'pro-d' => esc_html__( 'Post ID (Pro)', 'wpr-addons' ),
+					'pro-ar' => esc_html__( 'Post Author (Pro)', 'wpr-addons' ),
+					'pro-cc' => esc_html__( 'Comment Count (Pro)', 'wpr-addons' )
 				],
 				'condition' => [
 					'query_randomize!' => 'rand',
@@ -759,12 +759,30 @@ class Wpr_Media_Grid extends Widget_Base {
 			);
 		}
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'layout_gutter_hr',
 			[
 				'label' => esc_html__( 'Horizontal Gutter', 'wpr-addons' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
+					'size' => 10,
+				],
+				'widescreen_default' => [
+					'size' => 10,
+				],
+				'laptop_default' => [
+					'size' => 10,
+				],
+				'tablet_extra_default' => [
+					'size' => 10,
+				],
+				'tablet_default' => [
+					'size' => 10,
+				],
+				'mobile_extra_default' => [
+					'size' => 10,
+				],
+				'mobile_default' => [
 					'size' => 10,
 				],
 				'range' => [
@@ -780,12 +798,30 @@ class Wpr_Media_Grid extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'layout_gutter_vr',
 			[
 				'label' => esc_html__( 'Vertical Gutter', 'wpr-addons' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
+					'size' => 10,
+				],
+				'widescreen_default' => [
+					'size' => 10,
+				],
+				'laptop_default' => [
+					'size' => 10,
+				],
+				'tablet_extra_default' => [
+					'size' => 10,
+				],
+				'tablet_default' => [
+					'size' => 10,
+				],
+				'mobile_extra_default' => [
+					'size' => 10,
+				],
+				'mobile_default' => [
 					'size' => 10,
 				],
 				'range' => [
@@ -825,6 +861,7 @@ class Wpr_Media_Grid extends Widget_Base {
 			'layout_pagination',
 			[
 				'label' => esc_html__( 'Show Pagination', 'wpr-addons' ),
+				'description' => esc_html__('Please note that Pagination doesn\'t work in editor', 'wpr-addons'),
 				'type' => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'return_value' => 'yes',
@@ -2526,7 +2563,6 @@ class Wpr_Media_Grid extends Widget_Base {
 
 		// Section: Pro Features
 		Utilities::pro_features_list_section( $this, '', Controls_Manager::RAW_HTML, 'media-grid', [
-			'Posts Order',
 			'Grid Columns 1,2,3,4,5,6,7,8',
 			'Masonry Layout',
 			'Random Images Query',
@@ -2549,6 +2585,7 @@ class Wpr_Media_Grid extends Widget_Base {
 			'Grid Category Filter Count',
 			'Grid Item Even/Odd Background Color',
 			'Title & Category Advanced Link Hover Animations',
+			'Image Order'
 		] );
 		
 		// Styles ====================
@@ -7326,12 +7363,41 @@ class Wpr_Media_Grid extends Widget_Base {
 				$settings['filters_animation'] = 'zoom';
 			}
 		}
+
+		$gutter_hr_widescreen = isset($settings['layout_gutter_hr_widescreen']['size']) ? $settings['layout_gutter_hr_widescreen']['size'] : $settings['layout_gutter_hr']['size'];
+		$gutter_hr_desktop = $settings['layout_gutter_hr']['size'];
+		$gutter_hr_laptop = isset($settings['layout_gutter_hr_laptop']['size']) ? $settings['layout_gutter_hr_laptop']['size'] : $gutter_hr_desktop;
+		$gutter_hr_tablet_extra = isset($settings['layout_gutter_hr_tablet_extra']['size']) ? $settings['layout_gutter_hr_tablet_extra']['size'] : $gutter_hr_laptop;
+		$gutter_hr_tablet = isset($settings['layout_gutter_hr_tablet']['size']) ? $settings['layout_gutter_hr_tablet']['size'] : $gutter_hr_tablet_extra;
+		$gutter_hr_mobile_extra = isset($settings['layout_gutter_hr_mobile_extra']['size']) ? $settings['layout_gutter_hr_mobile_extra']['size'] : $gutter_hr_tablet;
+		$gutter_hr_mobile = isset($settings['layout_gutter_hr_mobile']['size']) ? $settings['layout_gutter_hr_mobile']['size'] : $gutter_hr_mobile_extra;
+
+		$gutter_vr_widescreen = isset($settings['layout_gutter_vr_widescreen']['size']) ? $settings['layout_gutter_vr_widescreen']['size'] : $settings['layout_gutter_vr']['size'];
+		$gutter_vr_desktop = $settings['layout_gutter_vr']['size'];
+		$gutter_vr_laptop = isset($settings['layout_gutter_vr_laptop']['size']) ? $settings['layout_gutter_vr_laptop']['size'] : $gutter_vr_desktop;
+		$gutter_vr_tablet_extra = isset($settings['layout_gutter_vr_tablet_extra']['size']) ? $settings['layout_gutter_vr_tablet_extra']['size'] : $gutter_vr_laptop;
+		$gutter_vr_tablet = isset($settings['layout_gutter_vr_tablet']['size']) ? $settings['layout_gutter_vr_tablet']['size'] : $gutter_vr_tablet_extra;
+		$gutter_vr_mobile_extra = isset($settings['layout_gutter_vr_mobile_extra']['size']) ? $settings['layout_gutter_vr_mobile_extra']['size'] : $gutter_vr_tablet;
+		$gutter_vr_mobile = isset($settings['layout_gutter_vr_mobile']['size']) ? $settings['layout_gutter_vr_mobile']['size'] : $gutter_vr_mobile_extra;
+
 		//:TODO
 		$layout_settings = [
 			'layout' => $settings['layout_select'],
 			'columns_desktop' => $settings['layout_columns'],
-			'gutter_hr' => $settings['layout_gutter_hr']['size'],
-			'gutter_vr' => $settings['layout_gutter_vr']['size'],
+			'gutter_hr' => $gutter_hr_desktop,
+			'gutter_hr_mobile' => $gutter_hr_mobile,
+			'gutter_hr_mobile_extra' => $gutter_hr_mobile_extra,
+			'gutter_hr_tablet' => $gutter_hr_tablet,
+			'gutter_hr_tablet_extra' => $gutter_hr_tablet_extra,
+			'gutter_hr_laptop' => $gutter_hr_laptop,
+			'gutter_hr_widescreen' => $gutter_hr_widescreen,
+			'gutter_vr' => $gutter_vr_desktop,
+			'gutter_vr_mobile' => $gutter_vr_mobile,
+			'gutter_vr_mobile_extra' => $gutter_vr_mobile_extra,
+			'gutter_vr_tablet' => $gutter_vr_tablet,
+			'gutter_vr_tablet_extra' => $gutter_vr_tablet_extra,
+			'gutter_vr_laptop' => $gutter_vr_laptop,
+			'gutter_vr_widescreen' => $gutter_vr_widescreen,
 			'animation' => $settings['layout_animation'],
 			'animation_duration' => $settings['layout_animation_duration'],
 			'animation_delay' => $settings['layout_animation_delay'],

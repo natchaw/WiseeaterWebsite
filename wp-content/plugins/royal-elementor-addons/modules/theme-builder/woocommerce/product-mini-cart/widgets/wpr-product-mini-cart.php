@@ -33,7 +33,7 @@ class Wpr_Product_Mini_Cart extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product-ini-cart', 'product', 'mini', 'cart' ];//tmp
+		return [ 'woocommerce', 'product-ini-cart', 'product', 'mini', 'cart' ];
 	}
 
 	public function get_script_depends() {
@@ -593,7 +593,9 @@ class Wpr_Product_Mini_Cart extends Widget_Base {
         echo '<div class="wpr-mini-cart-wrap woocommerce"' . $this->get_render_attribute_string( 'mini_cart_attributes' ) . '>';
 			echo '<span class="wpr-mini-cart-inner">';
 				$this->render_mini_cart_toggle($settings);
-				$this->render_mini_cart($settings);
+				if ( 'none' !== $settings['mini_cart_style'] ) {
+					$this->render_mini_cart($settings);
+				}
 			echo '</span>';
         echo '</div>';
     }    

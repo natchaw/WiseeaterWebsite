@@ -1,6 +1,7 @@
-
 /** le composant et ses liens */
-.eac-lottie-animations a, .eac-lottie-animations a:visited, .eac-lottie-animations a:active {
+.eac-lottie-animations a,
+.eac-lottie-animations a:visited,
+.eac-lottie-animations a:active {
 	text-decoration: none !important;
 	outline: 0 none !important;
 }
@@ -11,7 +12,8 @@
 	justify-content: space-around;
 }
 
-.eac-lottie-animations, .lottie-anim_wrapper {
+.eac-lottie-animations,
+.lottie-anim_wrapper {
 	position: relative;
 	line-height: 0;
 }
@@ -24,7 +26,7 @@
 }
 
 .lottie-anim_wrapper.lottie-anim_wrapper-bg svg:not(:root) {
-    overflow: hidden;
+	overflow: hidden;
 }
 
 .lottie-anim_wrapper-url {

@@ -33,7 +33,7 @@ class Wpr_Product_Media extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product media', 'product', 'image', 'media' ];//tmp
+		return [ 'woocommerce', 'product media', 'product', 'image', 'media' ];
 	}
 
 	public function get_script_depends() {
@@ -1469,6 +1469,10 @@ class Wpr_Product_Media extends Widget_Base {
 
 		return json_encode( $lightbox_settings );	
 	}
+
+	public function wpr_remove_woo_default_lightbox() {	 	 
+	   remove_theme_support( 'wc-product-gallery-lightbox' );	 	 
+	}
 	
 	protected function render() {
 		// Get Settings
@@ -1486,11 +1490,7 @@ class Wpr_Product_Media extends Widget_Base {
 		$post = get_post( $product->get_id() );
 		$gallery_images = $product->get_gallery_image_ids();
 		
-		add_action( 'wp', 'my_remove_lightbox', 99 );
-
-		function my_remove_lightbox() {	 	 
-		   remove_theme_support( 'wc-product-gallery-lightbox' );	 	 
-		}
+		add_action( 'wp', [$this, 'wpr_remove_woo_default_lightbox'], 99 );
 
 		$this->add_render_attribute(
 			'thumbnails_attributes',

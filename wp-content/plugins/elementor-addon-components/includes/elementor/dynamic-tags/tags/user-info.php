@@ -113,8 +113,8 @@ class Eac_User_Info extends Tag {
 				}
 				break;
 			case 'role': // @since 1.6.1
-				$userInfo = get_userdata( $user->ID );
-				$value    = implode( ', ', $userInfo->roles );
+				$user_info = get_userdata( $user->ID );
+				$value    = implode( ', ', $user_info->roles );
 				break;
 		}
 
@@ -143,7 +143,7 @@ class Eac_User_Info extends Tag {
 		);
 
 		foreach ( $usermetas as $key => $vals ) {
-			if ( ! is_serialized( $vals ) && $vals !== '' && $key[0] !== '_' && in_array( $key, $user_meta_fields ) ) {
+			if ( ! is_serialized( $vals ) && '' !== $vals && '_' !== $key[0] && in_array( $key, $user_meta_fields, true ) ) {
 				if ( mb_strlen( $vals, 'UTF-8' ) > self::VALS_LENGTH ) {
 					$list[ $key ] = $key . '::' . mb_substr( $vals, 0, self::VALS_LENGTH, 'UTF-8' ) . '...';
 				} else {

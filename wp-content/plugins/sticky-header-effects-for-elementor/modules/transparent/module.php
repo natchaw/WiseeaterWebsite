@@ -74,7 +74,8 @@ class Module extends Module_Base {
 					'transparent!' => ''
 				],
 				'render_type' => 'none',
-				'description' => __( 'This will completely enable/disable ALL settings for each option except for sticky settings. Sticky settings can be found under the motion effects tab above', 'she-header' ),
+				'description' => __( 'This will completely enable/disable settings below.<br>
+				*MAY NOT AFFECT SOME SETTINGS WITH RESPONSIVE CONTROLS', 'she-header' ),
 				'frontend_available' => true,
 			]
 		);
@@ -360,7 +361,10 @@ $element->add_responsive_control(
 $element->add_control(
 'logo_color_notice',
 [
-	'raw' => __( 'Note: These settings will override the CSS filters set under the logo style tab and might only work on the frontend', 'she-header' ),
+	'raw' => __( 'Note: These settings will override the CSS filters set under the logo style tab and might only work on the frontend
+	<br>
+	<br>
+	<b>Please select only 1 option for each tab</b>', 'she-header' ),
 	'type' => Controls_Manager::RAW_HTML,
 	'content_classes' => 'elementor-descriptor',
 	'condition' => [
@@ -408,8 +412,9 @@ $element->add_control(
 				'transparent!' => '',
 			],
 			'selectors' => [
-				'{{WRAPPER}} .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important; transition: all .4s ease-in-out 0s;',
-				'{{WRAPPER}} .logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important; transition: all .4s ease-in-out 0s;',
+				'.she-header-yes:not(.she-header) .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
+				'.she-header-yes:not(.she-header) .elementor-widget-image img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
+				'.she-header-yes:not(.she-header) .logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
 			],
 		]
 	);
@@ -433,8 +438,9 @@ $element->add_control(
 				'transparent!' => '',
 			],
 			'selectors' => [
-				'{{WRAPPER}} .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important; transition: all .4s ease-in-out 0s;',
-				'{{WRAPPER}} .logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important; transition: all .4s ease-in-out 0s;',
+				'.she-header-yes:not(.she-header) .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
+				'.she-header-yes:not(.she-header) .elementor-widget-image img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
+				'.she-header-yes:not(.she-header) .logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
 			],
 		]
 	);
@@ -473,8 +479,9 @@ $element->add_control(
 				'transparent!' => '',
 			],
 			'selectors' => [
-				'{{WRAPPER}} .elementor-widget-theme-site-logo img.change-logo-color' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important; transition: all .4s ease-in-out 0s;',
-				'{{WRAPPER}} .logo img.change-logo-color' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important; transition: all .4s ease-in-out 0s;',
+				'{{WRAPPER}}.she-header .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
+				'{{WRAPPER}}.she-header .elementor-widget-image img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
+				'{{WRAPPER}}.she-header .logo img' => '-webkit-filter: brightness(0) invert(1) !important; filter: brightness(0) invert(1) !important;',
 			],
 		]
 	);
@@ -498,8 +505,9 @@ $element->add_control(
 				'transparent!' => '',
 			],
 			'selectors' => [
-				'{{WRAPPER}} .elementor-widget-theme-site-logo img.change-logo-color' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important; transition: all .4s ease-in-out 0s;',
-				'{{WRAPPER}} .logo img.change-logo-color' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important; transition: all .4s ease-in-out 0s;',
+				'{{WRAPPER}}.she-header .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
+				'{{WRAPPER}}.she-header .elementor-widget-image img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
+				'{{WRAPPER}}.she-header .logo img' => '-webkit-filter: brightness(0) invert(0) !important; filter: brightness(0) invert(0) !important;',
 			],
 		]
 	);
@@ -523,15 +531,16 @@ $element->add_control(
 				'transparent!' => '',
 			],
 			'selectors' => [
-				'{{WRAPPER}} .elementor-widget-theme-site-logo img.change-logo-color' => '-webkit-filter: brightness(1) invert(0) !important; filter: brightness(1) invert(0) !important; transition: all .4s ease-in-out 0s;',
-				'{{WRAPPER}} .logo img.change-logo-color' => '-webkit-filter: brightness(1) invert(0) !important; filter: brightness(1) invert(0) !important; transition: all .4s ease-in-out 0s;',
+				'{{WRAPPER}}.she-header .elementor-widget-theme-site-logo img' => '-webkit-filter: brightness(1) invert(0) !important; filter: brightness(1) invert(0) !important;',
+				'{{WRAPPER}}.she-header .elementor-widget-image img' => '-webkit-filter: brightness(1) invert(0) !important; filter: brightness(1) invert(0) !important;',
+				'{{WRAPPER}}.she-header .logo img' => '-webkit-filter: brightness(1) invert(0) !important; filter: brightness(1) invert(0) !important;',
 			],
 		]
 	);
 
 	$element->end_controls_tab();
 	$element->end_controls_tabs();
-
+	
 		$element->add_control(
 			'blur_bg',
 			[
@@ -610,31 +619,28 @@ $element->add_control(
 		$element->end_controls_section();
 	}
 
-	private function add_actions() {
-		if( !function_exists('is_plugin_active') ) {
+	private function add_actions()
+	{
+		if (!function_exists('is_plugin_active')) {
 
-			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-
+			include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 		}
 
-		if( is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
-		add_action( 'elementor/element/section/section_effects/after_section_end', [ $this, 'register_controls' ] );
-		} else {
-		add_action( 'elementor/element/section/section_advanced/after_section_end', [ $this, 'register_controls' ] );
+		// add She on sections
+		if (is_plugin_active('elementor/elementor.php')) {
+			add_action('elementor/element/section/section_effects/after_section_end', [$this, 'register_controls']);
 		}
 
-		add_action( 'elementor/frontend/after_enqueue_styles', [ $this, 'enqueue_styles' ] );
+		add_action('elementor/frontend/after_enqueue_styles', [$this, 'enqueue_styles']);
 		if (Elementor\Plugin::instance()->editor->is_edit_mode()) {
-		}else{
-		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		} else {
+			add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
 		}
 
-		if( is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
-			add_action( 'elementor/element/container/section_effects/after_section_end', [ $this, 'register_controls' ] );
-			} else {
-			add_action( 'elementor/element/container/section_advanced/after_section_end', [ $this, 'register_controls' ] );
-			}
-
+		// add She on containers
+		if (is_plugin_active('elementor/elementor.php')) {
+			add_action('elementor/element/container/section_effects/after_section_end', [$this, 'register_controls']);
+		}
 	}
 
 	public function enqueue_styles() {

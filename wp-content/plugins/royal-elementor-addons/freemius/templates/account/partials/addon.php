@@ -91,7 +91,7 @@
             ! $is_paid_trial &&
             ! $fs_addon->_has_premium_license()
         );
-    } elseif ( $is_addon_connected ) {
+    } else if ( $is_addon_connected ) {
         if (
             empty( $addon_info ) ||
             ! isset( $addon_info['site'] )
@@ -190,22 +190,22 @@
                                 'label' => fs_text_inline( 'Cancelled', 'cancelled', $slug ),
                                 'type'  => 'error'
                             );
-                        } elseif ( $license->is_expired() ) {
+                        } else if ( $license->is_expired() ) {
                             $tags[] = array(
                                 'label' => fs_text_inline( 'Expired', 'expired', $slug ),
                                 'type'  => 'error'
                             );
-                        } elseif ( $license->is_lifetime() ) {
+                        } else if ( $license->is_lifetime() ) {
                             $tags[] = array(
                                 'label' => fs_text_inline( 'No expiration', 'no-expiration', $slug ),
                                 'type'  => 'success'
                             );
-                        } elseif ( ! $is_active_subscription && ! $license->is_first_payment_pending() ) {
+                        } else if ( ! $is_active_subscription && ! $license->is_first_payment_pending() ) {
                             $tags[] = array(
                                 'label' => sprintf( $expires_in_text, human_time_diff( time(), strtotime( $license->expiration ) ) ),
                                 'type'  => 'warn'
                             );
-                        } elseif ( $is_active_subscription && ! $subscription->is_first_payment_pending() ) {
+                        } else if ( $is_active_subscription && ! $subscription->is_first_payment_pending() ) {
                             $tags[] = array(
                                 'label' => sprintf( $renews_in_text, human_time_diff( time(), strtotime( $subscription->next_payment ) ) ),
                                 'type'  => 'success'
@@ -267,7 +267,7 @@
                             'POST'
                         );
                     }
-                } elseif ( $is_paid_trial ) {
+                } else if ( $is_paid_trial ) {
                     $buttons[] = fs_ui_get_action_button(
                         $fs->get_id(),
                         'account',
@@ -281,7 +281,7 @@
                         $cancel_trial_confirm_text,
                         'POST'
                     );
-                } elseif ( ! $has_feature_enabled_license ) {
+                } else if ( ! $has_feature_enabled_license ) {
                     $premium_licenses = $fs_addon->get_available_premium_licenses();
 
                     if ( ! empty( $premium_licenses ) ) {
@@ -350,7 +350,7 @@
                     );
                 }
 //            }
-        } elseif ( ! $show_upgrade ) {
+        } else if ( ! $show_upgrade ) {
             if ( $fs->is_addon_installed( $addon_id ) ) {
                 $addon_file = $fs->get_addon_basename( $addon_id );
 

@@ -1,4 +1,3 @@
-
 /** Champs du formulaire des menus de navigation */
 .eac-form-menu .field_badge-wrapper,
 .eac-form-menu .field_icon-wrapper,
@@ -48,21 +47,21 @@
 /** Icones des boutons Open fields, Add et Remove image */
 .eac-field-button .menu-item_button::before {
 	font-family: 'Font Awesome 5 Free';
-    content: '\f044';
+	content: '\f044';
 	font-weight: 600;
 	margin-right: 5px;
 }
 
 .eac-form-menu .menu-item_image-remove-button::before {
 	font-family: 'Font Awesome 5 Free';
-    content: '\f068';
+	content: '\f068';
 	font-weight: 600;
 	margin-right: 5px;
 }
 
 .eac-form-menu .menu-item_image-add-button::before {
 	font-family: 'Font Awesome 5 Free';
-    content: '\f067';
+	content: '\f067';
 	font-weight: 600;
 	margin-right: 5px;
 }
@@ -100,7 +99,7 @@
 	line-height: 2.2em !important;
 }
 
-#eac-form_menu-settings > .field_title-wrapper {
+#eac-form_menu-settings>.field_title-wrapper {
 	margin-top: 10px;
 }
 
@@ -121,15 +120,16 @@
 	cursor: pointer;
 }
 
-.eac-form-menu #eac-menu-saved, .eac-form-menu #eac-menu-notsaved {
+.eac-form-menu #eac-menu-saved,
+.eac-form-menu #eac-menu-notsaved {
 	font-size: 1.5em;
-    font-weight: 600;
+	font-weight: 600;
 	margin-top: .5em;
-	display:none;
+	display: none;
 }
 
 .eac-form-menu #eac-menu-saved {
-	color:blue;
+	color: blue;
 }
 
 .eac-form-menu #eac-menu-notsaved {

@@ -25,14 +25,16 @@ class Utilities {
 			'Magazine Grid' => ['magazine-grid', 'https://royal-elementor-addons.com/elementor-grid-widget-examples/', '#filter:category-magazine-grid', ''],
 			'Posts/Story Timeline' => ['posts-timeline', 'https://royal-elementor-addons.com/elementor-timeline-widget/', '', ''],
 			'Advanced Slider' => ['advanced-slider', 'https://royal-elementor-addons.com/elementor-advanced-slider-widget/', '', ''],
+			'Off-Canvas Content' => ['offcanvas', 'https://royal-elementor-addons.com/elementor-offcanvas-menu-widget/', '', 'new'],
 			'Testimonial' => ['testimonial', 'https://royal-elementor-addons.com/elementor-testimonials-slider-widget/', '', ''],
 			'Nav Menu' => ['nav-menu', 'http://royal-elementor-addons.com/elementor-menu-widget/', '', ''],
 			'Mega Menu' => ['mega-menu', 'https://royal-elementor-addons.com/elementor-mega-menu-widget/', '', 'new'],
 			'Onepage Navigation' => ['onepage-nav', 'https://royal-elementor-addons.com/elementor-one-page-navigation-widget/', '', ''],
-			'Data Table' => ['data-table', 'https://royal-elementor-addons.com/elementor-data-table-widget/', '', 'new'],
+			'Instagram Feed' => ['instagram-feed', 'https://royal-elementor-addons.com/elementor-instagram-feed-widget/', '', 'new'],
+			'Data Table' => ['data-table', 'https://royal-elementor-addons.com/elementor-data-table-widget/', '', ''],
 			'Pricing Table' => ['pricing-table', 'https://royal-elementor-addons.com/elementor-pricing-table-widget/', '', ''],
 			'Content Toggle' => ['content-toggle', 'https://royal-elementor-addons.com/elementor-content-toggle-widget/', '', ''],
-			'Charts' => ['charts', 'https://royal-elementor-addons.com/elementor-charts-widget/', '', 'new'],
+			'Charts' => ['charts', 'https://royal-elementor-addons.com/elementor-charts-widget/', '', ''],
 			'Countdown' => ['countdown', 'https://royal-elementor-addons.com/elementor-countdown-widget/', '', ''],
 			'Progress Bar' => ['progress-bar', 'https://royal-elementor-addons.com/elementor-progress-bar-widget/', '', ''],
 			'Tabs' => ['tabs', 'https://royal-elementor-addons.com/elementor-tabs-widget/', '', ''],
@@ -63,9 +65,12 @@ class Utilities {
 			'Site Logo' => ['logo', '', '', ''],
 			'Popup Trigger' => ['popup-trigger', '', '', ''],
 			'Taxonomy List' => ['taxonomy-list', '', '', ''],
-			'Page List' => ['page-list', '', '', 'new'],
+			'Page List' => ['page-list', '', '', ''],
 			'Template' => ['elementor-template', '', '', ''],
-			'Reading Progress Bar' => ['reading-progress-bar', 'https://royal-elementor-addons.com/elementor-reading-progress-bar-widget/', '', 'new'],
+			'Reading Progress Bar' => ['reading-progress-bar', 'https://royal-elementor-addons.com/elementor-reading-progress-bar-widget/', '', ''],
+			'Twitter Feed' => ['twitter-feed', 'https://royal-elementor-addons.com/elementor-twitter-feed-widget/', '', 'new'],
+			// 'Facebook Feed' => ['facebook-feed', '', '', 'new'],
+			// https://royal-elementor-addons.com/elementor-offcanvas-widget/
 			// 'Random Image' => ['random-image', '', ''],
 		];
 	}
@@ -631,7 +636,7 @@ class Utilities {
 
 		foreach ( $post_types as $post_type_slug => $post_type_name ) {
 			$data[ $post_type_slug ] = [];
-			$posts = get_posts( [ 'post_type' => $post_type_slug ] );
+			$posts = get_posts( [ 'post_type' => $post_type_slug, 'posts_per_page' => -1 ] );
 
 			foreach (  $posts as $key => $post ) {
 				$meta_keys = get_post_custom_keys( $post->ID );

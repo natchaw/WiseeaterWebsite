@@ -128,7 +128,10 @@ class Wpr_Dual_Color_Heading extends Widget_Base {
 				'type'    => Controls_Manager::TEXT,
 				'default' => __('Dual Color', 'wpr-addons'),
 				'separator' => 'before',
-				'label_block' => true
+				'label_block' => true,
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -138,7 +141,10 @@ class Wpr_Dual_Color_Heading extends Widget_Base {
 				'label'   => __('Secondary Heading', 'wpr-addons'),
 				'type'    => Controls_Manager::TEXT,
 				'default' => __('Heading', 'wpr-addons'),
-				'label_block' => true
+				'label_block' => true,
+				'dynamic' => [
+					'active' => true,
+				],
 			]
 		);
 
@@ -161,6 +167,9 @@ class Wpr_Dual_Color_Heading extends Widget_Base {
 				'label'   => __('', 'wpr-addons'),
 				'type'    => Controls_Manager::TEXTAREA,
 				'default' => __('Description text or Sub Heading', 'wpr-addons'),
+				'dynamic' => [
+					'active' => true,
+				],
 				'condition' => [
 					'show_description' => 'yes'
 				]

@@ -56,6 +56,17 @@ class Wpr_Woo_Grid extends Widget_Base {
     		return 'https://wordpress.org/support/plugin/royal-elementor-addons/';
     }
 
+	public function add_control_open_links_in_new_tab() {
+		$this->add_control(
+			'open_links_in_new_tab',
+			[
+				'label' => sprintf( __( 'Open Links in New Tab %s', 'wpr-addons' ), '<i class="eicon-pro-icon"></i>' ),
+				'type' => Controls_Manager::SWITCHER,
+				'classes' => 'wpr-pro-control no-distance'
+			]
+		);
+	}
+
 	public function add_control_query_selection() {
 		$this->add_control(
 			'query_selection',
@@ -862,12 +873,30 @@ class Wpr_Woo_Grid extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'layout_gutter_hr',
 			[
 				'label' => esc_html__( 'Horizontal Gutter', 'wpr-addons' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
+					'size' => 20,
+				],
+				'widescreen_default' => [
+					'size' => 20,
+				],
+				'laptop_default' => [
+					'size' => 20,
+				],
+				'tablet_extra_default' => [
+					'size' => 20,
+				],
+				'tablet_default' => [
+					'size' => 20,
+				],
+				'mobile_extra_default' => [
+					'size' => 20,
+				],
+				'mobile_default' => [
 					'size' => 20,
 				],
 				'range' => [
@@ -883,12 +912,30 @@ class Wpr_Woo_Grid extends Widget_Base {
 			]
 		);
 
-		$this->add_control(
+		$this->add_responsive_control(
 			'layout_gutter_vr',
 			[
 				'label' => esc_html__( 'Vertical Gutter', 'wpr-addons' ),
 				'type' => Controls_Manager::SLIDER,
 				'default' => [
+					'size' => 30,
+				],
+				'widescreen_default' => [
+					'size' => 30,
+				],
+				'laptop_default' => [
+					'size' => 30,
+				],
+				'tablet_extra_default' => [
+					'size' => 30,
+				],
+				'tablet_default' => [
+					'size' => 30,
+				],
+				'mobile_extra_default' => [
+					'size' => 30,
+				],
+				'mobile_default' => [
 					'size' => 30,
 				],
 				'range' => [
@@ -941,6 +988,7 @@ class Wpr_Woo_Grid extends Widget_Base {
 			'layout_pagination',
 			[
 				'label' => esc_html__( 'Show Pagination', 'wpr-addons' ),
+				'description' => esc_html__('Please note that Pagination doesn\'t work in editor', 'wpr-addons'),
 				'type' => Controls_Manager::SWITCHER,
 				'default' => 'yes',
 				'return_value' => 'yes',
@@ -950,6 +998,8 @@ class Wpr_Woo_Grid extends Widget_Base {
 				]
 			]
 		);
+
+		$this->add_control_open_links_in_new_tab();
 
 		$this->add_control_layout_animation();
 
@@ -2900,6 +2950,7 @@ class Wpr_Woo_Grid extends Widget_Base {
 			'Grid Category Filter Count',
 			'Grid Item Even/Odd Background Color',
 			'Title, Category, Read More Advanced Link Hover Animation',
+			'Open Links in New Tab'
 		] );
 		
 		// Styles ====================
@@ -3945,6 +3996,30 @@ class Wpr_Woo_Grid extends Widget_Base {
 				'default' => '#E8E8E8',
 				'selectors' => [
 					'{{WRAPPER}} .wpr-grid-product-tags .inner-block a' => 'border-color: {{VALUE}}',
+				]
+			]
+		);
+
+		$this->add_control(
+			'tags_extra_text_color',
+			[
+				'label'  => esc_html__( 'Extra Text Color', 'wpr-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '#9C9C9C',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-grid-product-tags .inner-block span[class*="wpr-grid-extra-text"]' => 'color: {{VALUE}}',
+				],
+			]
+		);
+
+		$this->add_control(
+			'tags_extra_icon_color',
+			[
+				'label'  => esc_html__( 'Extra Icon Color', 'wpr-addons' ),
+				'type' => Controls_Manager::COLOR,
+				'default' => '#9C9C9C',
+				'selectors' => [
+					'{{WRAPPER}} .wpr-grid-product-tags .inner-block i[class*="wpr-grid-extra-icon"]' => 'color: {{VALUE}}',
 				],
 				'separator' => 'after',
 			]
@@ -7519,13 +7594,14 @@ class Wpr_Woo_Grid extends Widget_Base {
 		$title_pointer = ! wpr_fs()->can_use_premium_code() ? 'none' : $this->get_settings()['title_pointer'];
 		$title_pointer_animation = ! wpr_fs()->can_use_premium_code() ? 'fade' : $this->get_settings()['title_pointer_animation'];
 		$pointer_item_class = (isset($this->get_settings()['title_pointer']) && 'none' !== $this->get_settings()['title_pointer']) ? 'class="wpr-pointer-item"' : '';
+		$open_links_in_new_tab = 'yes' === $this->get_settings()['open_links_in_new_tab'] ? '_blank' : '_self';
 
 		$class .= ' wpr-pointer-'. $title_pointer;
 		$class .= ' wpr-pointer-line-fx wpr-pointer-fx-'. $title_pointer_animation;
 
 		echo '<'. esc_attr($settings['element_title_tag']) .' class="'. esc_attr($class) .'">';
 			echo '<div class="inner-block">';
-				echo '<a '. $pointer_item_class .' href="'. esc_url( get_the_permalink() ) .'">';
+				echo '<a target="'. $open_links_in_new_tab .'"  '. $pointer_item_class .' href="'. esc_url( get_the_permalink() ) .'">';
 				if ( 'word_count' === $settings['element_trim_text_by'] ) {
 					echo esc_html(wp_trim_words( get_the_title(), $settings['element_word_count'] ));
 				} else {
@@ -8350,6 +8426,8 @@ class Wpr_Woo_Grid extends Widget_Base {
 		// Load More / Infinite Scroll
 		} else {
 			echo '<a href="'. esc_url(get_pagenum_link( $paged + 1, true )) .'" class="wpr-load-more-btn" data-e-disable-page-transition>';
+			// echo '<a href="'. esc_url_raw( str_replace( 999999999, '%#%', remove_query_arg( 'add-to-cart', get_pagenum_link( 999999999, false ) ) ) ) .'" class="wpr-load-more-btn" data-e-disable-page-transition>';
+			// echo '<a href="'. esc_url(get_next_posts_page_link()) .'" class="wpr-load-more-btn" data-e-disable-page-transition>';
 				echo esc_html($settings['pagination_load_more_text']);
 			echo '</a>';
 
@@ -8427,11 +8505,40 @@ class Wpr_Woo_Grid extends Widget_Base {
 			}
 		}
 
+		$gutter_hr_widescreen = isset($settings['layout_gutter_hr_widescreen']['size']) ? $settings['layout_gutter_hr_widescreen']['size'] : $settings['layout_gutter_hr']['size'];
+		$gutter_hr_desktop = $settings['layout_gutter_hr']['size'];
+		$gutter_hr_laptop = isset($settings['layout_gutter_hr_laptop']['size']) ? $settings['layout_gutter_hr_laptop']['size'] : $gutter_hr_desktop;
+		$gutter_hr_tablet_extra = isset($settings['layout_gutter_hr_tablet_extra']['size']) ? $settings['layout_gutter_hr_tablet_extra']['size'] : $gutter_hr_laptop;
+		$gutter_hr_tablet = isset($settings['layout_gutter_hr_tablet']['size']) ? $settings['layout_gutter_hr_tablet']['size'] : $gutter_hr_tablet_extra;
+		$gutter_hr_mobile_extra = isset($settings['layout_gutter_hr_mobile_extra']['size']) ? $settings['layout_gutter_hr_mobile_extra']['size'] : $gutter_hr_tablet;
+		$gutter_hr_mobile = isset($settings['layout_gutter_hr_mobile']['size']) ? $settings['layout_gutter_hr_mobile']['size'] : $gutter_hr_mobile_extra;
+
+		$gutter_vr_widescreen = isset($settings['layout_gutter_vr_widescreen']['size']) ? $settings['layout_gutter_vr_widescreen']['size'] : $settings['layout_gutter_vr']['size'];
+		$gutter_vr_desktop = $settings['layout_gutter_vr']['size'];
+		$gutter_vr_laptop = isset($settings['layout_gutter_vr_laptop']['size']) ? $settings['layout_gutter_vr_laptop']['size'] : $gutter_vr_desktop;
+		$gutter_vr_tablet_extra = isset($settings['layout_gutter_vr_tablet_extra']['size']) ? $settings['layout_gutter_vr_tablet_extra']['size'] : $gutter_vr_laptop;
+		$gutter_vr_tablet = isset($settings['layout_gutter_vr_tablet']['size']) ? $settings['layout_gutter_vr_tablet']['size'] : $gutter_vr_tablet_extra;
+		$gutter_vr_mobile_extra = isset($settings['layout_gutter_vr_mobile_extra']['size']) ? $settings['layout_gutter_vr_mobile_extra']['size'] : $gutter_vr_tablet;
+		$gutter_vr_mobile = isset($settings['layout_gutter_vr_mobile']['size']) ? $settings['layout_gutter_vr_mobile']['size'] : $gutter_vr_mobile_extra;
+
+
 		$layout_settings = [
 			'layout' => $settings['layout_select'],
 			'columns_desktop' => $settings['layout_columns'],
-			'gutter_hr' => $settings['layout_gutter_hr']['size'],
-			'gutter_vr' => $settings['layout_gutter_vr']['size'],
+			'gutter_hr' => $gutter_hr_desktop,
+			'gutter_hr_mobile' => $gutter_hr_mobile,
+			'gutter_hr_mobile_extra' => $gutter_hr_mobile_extra,
+			'gutter_hr_tablet' => $gutter_hr_tablet,
+			'gutter_hr_tablet_extra' => $gutter_hr_tablet_extra,
+			'gutter_hr_laptop' => $gutter_hr_laptop,
+			'gutter_hr_widescreen' => $gutter_hr_widescreen,
+			'gutter_vr' => $gutter_vr_desktop,
+			'gutter_vr_mobile' => $gutter_vr_mobile,
+			'gutter_vr_mobile_extra' => $gutter_vr_mobile_extra,
+			'gutter_vr_tablet' => $gutter_vr_tablet,
+			'gutter_vr_tablet_extra' => $gutter_vr_tablet_extra,
+			'gutter_vr_laptop' => $gutter_vr_laptop,
+			'gutter_vr_widescreen' => $gutter_vr_widescreen,
 			'animation' => $settings['layout_animation'],
 			'animation_duration' => $settings['layout_animation_duration'],
 			'animation_delay' => $settings['layout_animation_delay'],

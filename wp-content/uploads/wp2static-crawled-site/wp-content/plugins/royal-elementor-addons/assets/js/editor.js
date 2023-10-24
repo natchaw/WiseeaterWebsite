@@ -284,7 +284,7 @@
 					wrapper.find('.elementor-control-element_extra_icon_pos').removeClass( 'elementor-hidden-control' );
 				}
 			} );
-		});
+		});	
 
 		var sOffsets = {};
 
@@ -313,6 +313,31 @@
 					}, 10 );
 				});
 			}, 100 );
+		});
+	} );
+
+	// Instagram Feed
+	elementor.hooks.addAction( 'panel/open_editor/widget/wpr-instagram-feed', function( panel, model, view ) {
+		// Render Grid Elements
+		panel.$el.find('#elementor-controls').on( 'DOMNodeInserted ', '.elementor-control-insta_feed_elements', function() {
+			$(this).find( '.elementor-control-element_select select' ).on( 'change', function() {
+				var wrapper = $(this).closest( '.elementor-repeater-row-controls' );
+
+				if ( 'lightbox' === $(this).val() ) {
+					wrapper.find('.elementor-control-element_location').find( 'select' ).val( 'over' ).trigger( 'change' );
+					wrapper.find('.elementor-control-element_animation').find( 'select' ).val( 'fade-in' ).trigger( 'change' );
+					wrapper.find('.elementor-control-element_align_hr').find( 'input' ).eq(1).prop('checked',true).trigger( 'change' );
+					wrapper.find('.elementor-control-element_lightbox_overlay').find( 'input' ).prop('checked',true).trigger( 'change' );
+					wrapper.find('.elementor-control-element_extra_icon_pos').find( 'select' ).val( 'before' ).trigger( 'change' );
+					setTimeout(function() {
+						wrapper.find('.elementor-control-element_extra_icon_pos').addClass( 'elementor-hidden-control' );
+					}, 100 );
+				} else {
+					wrapper.find('.elementor-control-element_extra_text_pos').find( 'select' ).val( 'none' ).trigger( 'change' );
+					wrapper.find('.elementor-control-element_extra_icon_pos').find( 'select' ).val( 'none' ).trigger( 'change' );
+					wrapper.find('.elementor-control-element_extra_icon_pos').removeClass( 'elementor-hidden-control' );
+				}
+			} );
 		});
 	} );
 

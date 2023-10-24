@@ -15,6 +15,7 @@
  * @since 1.9.0 Intégration des scripts et des styles dans le constructeur de la class
  * @since 1.9.1 Impossible de sauvegarder le document comme modèle
  *              Check si l'ID de l'article est le même que l'ID d'un template Elementor
+ * @since 2.0.2 Ajout de l'attribut 'loading' aux images et à l'iframe
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -53,7 +54,7 @@ class Modal_Box_Widget extends Widget_Base {
 		parent::__construct( $data, $args );
 
 		wp_register_script( 'eac-modalbox', EAC_Plugin::instance()->get_register_script_url( 'eac-modal-box' ), array( 'jquery', 'elementor-frontend' ), '1.6.1', true );
-		wp_register_style( 'eac-modalbox', EAC_Plugin::instance()->get_register_style_url( 'modal-box' ), array( 'eac' ), '1.6.1' );
+		wp_register_style( 'eac-modalbox', EAC_Plugin::instance()->get_register_style_url( 'modal-box' ), array( 'eac' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -160,21 +161,6 @@ class Modal_Box_Widget extends Widget_Base {
 	}
 
 	/**
-	 * Whether the reload preview is required or not.
-	 *
-	 * Used to determine whether the reload preview is required.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 *
-	 * @return bool Whether the reload preview is required.
-	 */
-	/*
-	public function is_reload_preview_required() {
-		return true;
-	}*/
-
-	/**
 	 * Register widget controls.
 	 *
 	 * Adds different input fields to allow the user to change and customize the widget settings.
@@ -241,10 +227,6 @@ class Modal_Box_Widget extends Widget_Base {
 				array(
 					'label'       => esc_html__( 'Entrer le shortcode du formulaire', 'eac-components' ),
 					'type'        => Controls_Manager::TEXTAREA,
-					/*
-					'dynamic' => [
-						'active' => true,
-					],*/
 					'placeholder' => '[contact-form-7 id="XXXX""]',
 					'default'     => '',
 					'condition'   => array( 'mb_type_content' => 'formulaire' ),
@@ -572,17 +554,25 @@ class Modal_Box_Widget extends Widget_Base {
 			)
 		);
 
-			$this->add_control(
+			$this->add_responsive_control(
 				'mb_modal_box_width',
 				array(
-					'label'       => esc_html__( 'Largeur', 'eac-components' ),
-					'type'        => Controls_Manager::SLIDER,
-					'size_units'  => array( 'px', '%' ),
-					'default'     => array(
-						'unit' => 'px',
-						'size' => 640,
+					'label'          => esc_html__( 'Largeur', 'eac-components' ),
+					'type'           => Controls_Manager::SLIDER,
+					'size_units'     => array( 'px', '%' ),
+					'default'        => array(
+						'unit' => '%',
+						'size' => 70,
 					),
-					'range'       => array(
+					'tablet_default' => array(
+						'unit' => '%',
+						'size' => 80,
+					),
+					'mobile_default' => array(
+						'unit' => '%',
+						'size' => 100,
+					),
+					'range'          => array(
 						'px' => array(
 							'min'  => 50,
 							'max'  => 1000,
@@ -594,8 +584,8 @@ class Modal_Box_Widget extends Widget_Base {
 							'step' => 10,
 						),
 					),
-					'label_block' => true,
-					'selectors'   => array( '#modalbox-hidden-{{ID}}.fancybox-content, .modalbox-visible-{{ID}} .fancybox-content' => 'max-width: {{SIZE}}{{UNIT}}; width: 100%;' ),
+					'label_block'    => true,
+					'selectors'      => array( '#modalbox-hidden-{{ID}}.fancybox-content, .modalbox-visible-{{ID}} .fancybox-content' => 'width: {{SIZE}}{{UNIT}};' ),
 				)
 			);
 
@@ -928,15 +918,6 @@ class Modal_Box_Widget extends Widget_Base {
 			);
 
 			$this->add_group_control(
-				Group_Control_Box_Shadow::get_type(),
-				array(
-					'name'     => 'mb_button_shadow',
-					'label'    => esc_html__( 'Ombre', 'eac-components' ),
-					'selector' => '{{WRAPPER}} .mb-modalbox__wrapper-btn',
-				)
-			);
-
-			$this->add_group_control(
 				Group_Control_Border::get_type(),
 				array(
 					'name'      => 'mb_button_border',
@@ -963,7 +944,15 @@ class Modal_Box_Widget extends Widget_Base {
 					'selectors'          => array(
 						'{{WRAPPER}} .mb-modalbox__wrapper-btn' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					),
-					'separator'          => 'before',
+				)
+			);
+
+			$this->add_group_control(
+				Group_Control_Box_Shadow::get_type(),
+				array(
+					'name'     => 'mb_button_shadow',
+					'label'    => esc_html__( 'Ombre', 'eac-components' ),
+					'selector' => '{{WRAPPER}} .mb-modalbox__wrapper-btn',
 				)
 			);
 
@@ -1011,7 +1000,6 @@ class Modal_Box_Widget extends Widget_Base {
 						array(
 							'name'      => 'mb_image_border',
 							'selector'  => '{{WRAPPER}} .mb-modalbox__wrapper-img',
-							'separator' => 'before',
 						)
 					);
 
@@ -1025,7 +1013,6 @@ class Modal_Box_Widget extends Widget_Base {
 							'selectors'          => array(
 								'{{WRAPPER}} .mb-modalbox__wrapper-img' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 							),
-							'separator'          => 'before',
 						)
 					);
 
@@ -1035,7 +1022,6 @@ class Modal_Box_Widget extends Widget_Base {
 							'name'      => 'mb_image_shadow',
 							'label'     => esc_html__( 'Ombre', 'eac-components' ),
 							'selector'  => '{{WRAPPER}} .mb-modalbox__wrapper-img',
-							'separator' => 'before',
 						)
 					);
 
@@ -1222,16 +1208,18 @@ class Modal_Box_Widget extends Widget_Base {
 	 */
 	protected function render_modal() {
 		$settings = $this->get_settings_for_display();
-		/*highlight_string("<?php\n\$settings =\n" . var_export($settings, true) . ";\n?>");*/
-		$trigger     = $settings['mb_origin_trigger'];      // Button, Text ou Openload
+		/**highlight_string("<?php\n\$settings =\n" . var_export($settings, true) . ";\n?>");*/
+		$trigger     = $settings['mb_origin_trigger']; // Button, Text ou Openload
 		$content     = $settings['mb_type_content'];
-		$link_url    = ! empty( $settings['mb_url_content']['url'] ) ? esc_url( $settings['mb_url_content']['url'] ) : false;
+		$link_url    = ! empty( $settings['mb_url_content']['url'] ) ? $settings['mb_url_content']['url'] : false;
 		$short_code  = $settings['mb_shortcode_content'];
+		$tmplsec     = $settings['mb_tmpl_sec_content'];
+		$tmplpage    = $settings['mb_tmpl_page_content'];
 		$icon_button = false;
 		$type_inline = false;
 
 		// Quelques tests
-		if ( ( ( 'links' === $content || 'html' === $content ) && ! $link_url ) || ( 'formulaire' === $content && empty( $short_code ) ) ) {
+		if ( ( ( 'links' === $content || 'html' === $content ) && ! $link_url ) || ( 'formulaire' === $content && empty( $short_code ) ) || ( 'tmpl_sec' === $content && empty( $tmplsec ) ) || ( 'tmpl_page' === $content && empty( $tmplpage ) ) ) {
 			return;
 		}
 
@@ -1261,9 +1249,7 @@ class Modal_Box_Widget extends Widget_Base {
 
 			// Le déclencheur est une image
 		} elseif ( 'image' === $trigger ) {
-			/**
-			 * @since 1.6.5 Suppression de la valeur de l'attribut ALT par défaut
-			 */
+			/** @since 1.6.5 Suppression de la valeur de l'attribut ALT par défaut */
 			$image_alt = '';
 			$img_class = 'mb-modalbox__wrapper-trigger mb-modalbox__wrapper-img';
 			if ( '' !== $settings['mb_image_hover_animation'] ) {
@@ -1274,12 +1260,15 @@ class Modal_Box_Widget extends Widget_Base {
 				$this->add_render_attribute( 'trigger', 'src', esc_url( $settings['mb_display_image']['url'] ) );
 			}
 
+			/** @since 2.0.2 ajout de l'attribut 'loading' à l'image */
+			$this->add_render_attribute( 'trigger', 'loading', 'lazy' );
+
 			// Image vient de la lib des médias. ID existe
 			if ( ! empty( $settings['mb_display_image']['id'] ) ) {
 				$image = wp_get_attachment_image_src( $settings['mb_display_image']['id'], $settings['mb_image_dimension'] );
 				$this->add_render_attribute( 'trigger', 'width', $image[1] );
 				$this->add_render_attribute( 'trigger', 'height', $image[2] );
-				$image_alt = Control_Media::get_image_alt( $settings['mb_display_image'] ); // 'get_image_alt' renvoie toujours une chaine par défaut
+				$image_alt = Control_Media::get_image_alt( $settings['mb_display_image'] );
 			}
 			$this->add_render_attribute( 'trigger', 'alt', $image_alt ); // Image externe
 
@@ -1293,10 +1282,10 @@ class Modal_Box_Widget extends Widget_Base {
 		$this->add_render_attribute( 'mb_wrapper', 'id', $id );
 		$this->add_render_attribute( 'mb_wrapper', 'data-settings', $this->get_settings_json( $id ) );
 		?>
-		
-		<div <?php echo $this->get_render_attribute_string( 'mb_wrapper' ); ?>>
+
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'mb_wrapper' ) ); ?>>
 			<?php
-			$header      = $settings['mb_enable_header'] === 'yes' && ! empty( $settings['mb_texte_header'] ) ? htmlspecialchars( $settings['mb_texte_header'], ENT_QUOTES ) : '';
+			$header      = 'yes' === $settings['mb_enable_header'] && ! empty( $settings['mb_texte_header'] ) ? sanitize_text_field( $settings['mb_texte_header'] ) : '';
 			$caption     = '';
 			$has_caption = ! empty( $settings['mb_caption_source'] ) && 'none' !== $settings['mb_caption_source'] ? true : false;
 			if ( $has_caption ) {
@@ -1308,59 +1297,61 @@ class Modal_Box_Widget extends Widget_Base {
 			}
 
 			// @since 1.7.0 Affichage du contenu HTML dans une iframe
-			if ( 'html' === $content ) : // Html
+			if ( 'html' === $content ) { // Html
 				?>
-				<a data-fancybox data-options='{"type":"iframe", "caption":"<?php echo $header; ?>", "slideClass":"modalbox-visible-<?php echo $id; ?>", "src":"<?php echo $link_url; ?>"}' href="javascript:;">
-			<?php elseif ( 'links' === $content ) : // Vidéo, Carte ?>
-				<a data-fancybox data-options='{"caption":"<?php echo $header; ?>", "slideClass":"modalbox-visible-<?php echo $id; ?>"}' href="<?php echo $link_url; ?>">
+				<a data-fancybox data-options='{"type":"iframe", "caption":"<?php echo esc_attr( $header ); ?>", "slideClass":"modalbox-visible-<?php echo esc_attr( $id ); ?>", "src":"<?php echo esc_url( $link_url ); ?>"}' href="javascript:;">
+			<?php } elseif ( 'links' === $content ) { // Vidéo, Carte ?>
+				<a data-fancybox data-options='{"caption":"<?php echo esc_attr( $header ); ?>", "slideClass":"modalbox-visible-<?php echo esc_attr( $id ); ?>"}' href="<?php echo esc_url( $link_url ); ?>">
 				<?php
-			else : // Texte, Formulaire ou Template
-				$type_inline = true;
+			} else {
+				$type_inline = true; // Texte, Formulaire ou Template
 				?>
-				<a data-fancybox data-options='{"type":"inline", "src":"#modalbox-hidden-<?php echo $id; ?>"}' href="javascript:;">
-			<?php endif; ?>
-					<?php if ( 'button' === $trigger ) : ?>
-						<button <?php echo $this->get_render_attribute_string( 'trigger' ); ?>>
+				<a data-fancybox data-options='{"type":"inline", "src":"#modalbox-hidden-<?php echo esc_attr( $id ); ?>"}' href="javascript:;">
+			<?php } ?>
+					<?php if ( 'button' === $trigger ) { ?>
+						<button <?php echo wp_kses_post( $this->get_render_attribute_string( 'trigger' ) ); ?>>
 						<?php
-						if ( $icon_button && $settings['mb_position_icon_button'] === 'before' ) {
+						if ( $icon_button && 'before' === $settings['mb_position_icon_button'] ) {
 							Icons_Manager::render_icon( $settings['mb_display_icon_button'], array( 'aria-hidden' => 'true' ) );
 						}
 							echo sanitize_text_field( $settings['mb_display_text_button'] );
-						if ( $icon_button && $settings['mb_position_icon_button'] === 'after' ) {
+
+						if ( $icon_button && 'after' === $settings['mb_position_icon_button'] ) {
 							Icons_Manager::render_icon( $settings['mb_display_icon_button'], array( 'aria-hidden' => 'true' ) );
 						}
 						?>
 						</button>
-					<?php elseif ( 'image' === $trigger ) : ?>
-						<?php
-						if ( ! empty( $caption ) ) :
-							?>
-							<figure><?php endif; ?>
-						<img <?php echo $this->get_render_attribute_string( 'trigger' ); ?>>
-							<?php if ( ! empty( $caption ) ) : ?>
-								<figcaption><?php echo $caption; ?></figcaption>
-							<?php endif; ?>
-						<?php
-						if ( ! empty( $caption ) ) :
-							?>
-							</figure><?php endif; ?>
-					<?php elseif ( 'text' === $trigger ) : ?>
-						<div <?php echo $this->get_render_attribute_string( 'trigger' ); ?>>
+					<?php } elseif ( 'image' === $trigger ) { ?>
+						<?php if ( ! empty( $caption ) ) { ?>
+							<figure>
+						<?php } ?>
+							<img <?php echo wp_kses_post( $this->get_render_attribute_string( 'trigger' ) ); ?>>
+								<?php if ( ! empty( $caption ) ) { ?>
+									<figcaption><?php echo esc_html( $caption ); ?></figcaption>
+								<?php } ?>
+						<?php if ( ! empty( $caption ) ) { ?>
+							</figure>
+						<?php } ?>
+					<?php } elseif ( 'text' === $trigger ) { ?>
+						<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'trigger' ) ); ?>>
 							<span><?php echo sanitize_text_field( $settings['mb_display_texte'] ); ?></span>
 						</div>
 						<?php
-					else :                                                 // déclencheur automatique 'On page load'
-						$type_inline = true;
-					endif;
+					} else {
+						$type_inline = true; // déclencheur automatique 'On page load'
+					}
 					?>
 				</a>
-			
+
 			<!-- Affichage en ligne pour les contenus 'automatique, texte, template, formulaire' -->
-			<?php if ( $type_inline ) { ?>
-				<div id="modalbox-hidden-<?php echo $id; ?>" class="mb-modalbox__hidden-content-wrapper elementor-<?php echo $main_id; ?>">
-					<div class="elementor-element elementor-element-<?php echo $id; ?>">
+			<?php
+			if ( $type_inline ) {
+				ob_start();
+				?>
+				<div id="modalbox-hidden-<?php echo esc_attr( $id ); ?>" style="display: none;" class="mb-modalbox__hidden-content-wrapper elementor-<?php echo esc_attr( $main_id ); ?>">
+					<div class="elementor-element elementor-element-<?php echo esc_attr( $id ); ?>">
 						<div class="mb-modalbox__hidden-content-body-bg"></div>
-						<div fancybox-title class="mb-modalbox__hidden-content-title"><h3><?php echo htmlspecialchars_decode( $header, ENT_QUOTES ); ?></h3></div>
+						<div fancybox-title class="mb-modalbox__hidden-content-title"><h3><?php echo esc_attr( $header ); ?></h3></div>
 						<div fancybox-body class="mb-modalbox__hidden-content-body">
 							<?php
 							if ( 'texte' === $content ) {
@@ -1369,33 +1360,23 @@ class Modal_Box_Widget extends Widget_Base {
 								<?php
 								// global $shortcode_tags;
 								// echo '<pre>'; print_r($shortcode_tags); echo '</pre>';
-							} elseif ( 'tmpl_sec' === $content ) { // ID du template section
-								$tmplsec = $settings['mb_tmpl_sec_content'] !== '' ? $settings['mb_tmpl_sec_content'] : 0;
-								if ( $tmplsec != 0 ) {
-									// @since 1.9.1 Évite la récursivité
-									if ( get_the_ID() === (int) $tmplsec ) {
-										esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
-									} else {
-										// Filtre wpml
-										$tmplsec = apply_filters( 'wpml_object_id', $tmplsec, 'elementor_library', true );
-										echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplsec, true );
-									}
+							} elseif ( 'tmpl_sec' === $content ) { // Template section
+								// @since 1.9.1 Évite la récursivité
+								if ( get_the_ID() === (int) $tmplsec ) {
+									esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
 								} else {
-									esc_html_e( 'Rien à afficher', 'eac-components' );
+									// Filtre wpml
+									$tmplsec = apply_filters( 'wpml_object_id', $tmplsec, 'elementor_library', true );
+									echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplsec, true ); // phpcs:ignore
 								}
-							} elseif ( 'tmpl_page' === $content ) { // ID du template Page
-								$tmplpage = $settings['mb_tmpl_page_content'] !== '' ? $settings['mb_tmpl_page_content'] : 0;
-								if ( $tmplpage != 0 ) {
-									// @since 1.9.1 Évite la récursivité
-									if ( get_the_ID() === (int) $tmplpage ) {
-										esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
-									} else {
-										// Filtre wpml
-										$tmplpage = apply_filters( 'wpml_object_id', $tmplpage, 'elementor_library', true );
-										echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplpage, true );
-									}
+							} elseif ( 'tmpl_page' === $content ) { // Template Page
+								// @since 1.9.1 Évite la récursivité
+								if ( get_the_ID() === (int) $tmplpage ) {
+									esc_html_e( 'ID du modèle ne peut pas être le même que le modèle actuel', 'eac-components' );
 								} else {
-									esc_html_e( 'Rien à afficher', 'eac-components' );
+									// Filtre wpml
+									$tmplpage = apply_filters( 'wpml_object_id', $tmplpage, 'elementor_library', true );
+									echo \Elementor\Plugin::$instance->frontend->get_builder_content_for_display( $tmplpage, true ); // phpcs:ignore
 								}
 							} elseif ( 'formulaire' === $content ) { // Exécute un shortcode
 								echo do_shortcode( shortcode_unautop( $short_code ) );
@@ -1406,7 +1387,11 @@ class Modal_Box_Widget extends Widget_Base {
 						</div>
 					</div>
 				</div>
-			<?php } ?>
+				<?php
+				$content = ob_get_clean();
+				echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+			?>
 		</div>
 		<?php
 	}
@@ -1418,7 +1403,7 @@ class Modal_Box_Widget extends Widget_Base {
 	 * Convert on JSON format
 	 * Modification de la règles 'data_filtre'
 	 *
-	 * @uses         json_encode()
+	 * @uses         wp_json_encode()
 	 *
 	 * @return   JSON oject
 	 *
@@ -1431,15 +1416,15 @@ class Modal_Box_Widget extends Widget_Base {
 		$settings = array(
 			'data_id'        => $dataid,
 			'data_declanche' => $module_settings['mb_origin_trigger'],
-			'data_delay'     => $module_settings['mb_popup_delay'],
-			// "data_editor" => \Elementor\Plugin::$instance->editor->is_edit_mode(),
-			'data_active'    => $module_settings['mb_popup_activated'] === 'yes' ? true : false,
+			'data_delay'     => absint( $module_settings['mb_popup_delay'] ),
+			'data_active'    => 'yes' === $module_settings['mb_popup_activated'] ? true : false,
 			'data_effet'     => $module_settings['mb_modal_box_effect'],
 			'data_position'  => $module_settings['mb_modal_box_position'],
-			'data_modal'     => true, // $module_settings['mb_enable_modal'] === 'yes' ? true : false,
+			'data_modal'     => true, // 'yes' === $module_settings['mb_enable_modal'] ? true : false,
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
+
+	protected function content_template() {}
 }

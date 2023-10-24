@@ -50,7 +50,6 @@ class Eac_Site_Logo extends Data_Tag {
 		if ( $custom_logo_id ) {
 			$url = wp_get_attachment_image_src( $custom_logo_id, 'full' )[0];
 		} else {
-			// $url = Utils::get_placeholder_image_src();
 			return $this->get_settings( 'fallback' );
 		}
 

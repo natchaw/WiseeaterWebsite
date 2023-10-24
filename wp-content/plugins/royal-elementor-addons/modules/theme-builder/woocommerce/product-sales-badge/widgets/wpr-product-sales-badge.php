@@ -29,7 +29,7 @@ class Wpr_Product_SalesBadge extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'product-sales-badge', 'product', 'sales-badge', 'sales', 'badge' ];//tmp
+		return [ 'woocommerce', 'product-sales-badge', 'product', 'sales-badge', 'sales', 'badge' ];
 	}
 
 	protected function register_controls() {

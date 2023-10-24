@@ -43,23 +43,17 @@ class WprPluginUpdateNotice {
                             <img src="'. esc_url(WPR_ADDONS_ASSETS_URL) .'/img/logo-128x128.png">
                         </div>
                         <div>
-                            <h3><span>New Feature</span><br> Royal WooCommerce Builder</h3>
-                            <p>
-                                Royal Elementor WooCommerce Builder lets you customize every fundamental part of your WooCommerce site without coding. Including your Header, Footer, Product Archives, Products, Post Archives, Posts, Default Pages, 404 Pages, etc..
-                                <br><br><strong>New Woo Builder Template Kits:</strong>
-                                <a href="https://demosites.royal-elementor-addons.com/fashion-v1/?ref=rea-plugin-backend-update-notice" target="_blank">Fashion</a>, 
-                                <a href="https://demosites.royal-elementor-addons.com/furniture-shop-v1/?ref=rea-plugin-backend-update-notice" target="_blank">Furniture Shop</a>, 
-                                <a href="https://demosites.royal-elementor-addons.com/grocery-store-v1/?ref=rea-plugin-backend-update-notice" target="_blank">Grocery Store</a>,
-                                <a href="https://demosites.royal-elementor-addons.com/woo-food-v1/?ref=rea-plugin-backend-update-notice" target="_blank">Food Delivery</a>,
-                                <a href="https://demosites.royal-elementor-addons.com/wooshop-v1/?ref=rea-plugin-backend-update-notice" target="_blank">WooShop</a>.
-                            </p>
-                            <br>
-                            <div>
-                                <a href="'. esc_url(get_admin_url()) .'admin.php?page=wpr-templates-kit" class="wpr-get-started-button button button-primary">Go to Templates Library</a>
-                                <a href="'. esc_url(get_admin_url()) .'admin.php?page=wpr-theme-builder&tab=wpr_tab_product_archive" class="wpr-get-started-button button button-secondary">Go to WooCommerce Builder</a>
-                            </div>
+                            <h3><span>New Features</span><br> Introducing New Widgets</h3>
+                            <p>We are excited to announce that we have added new Widgets, Template Kits, and other Elementor<br> features to enhance your website building experience. Stay tuned for the weekly updates!</p>
+                            <ul class="wpr-new-widgets-list">
+                                <li><a target="_blank" href="https://royal-elementor-addons.com/elementor-mega-menu-widget/?ref=rea-plugin-backend-update-notice">Mega Menu</a></li>
+                                <li><a target="_blank" href="https://royal-elementor-addons.com/elementor-offcanvas-menu-widget/?ref=rea-plugin-backend-update-notice">Off-Canvas Content</a></li>
+                                <li><a target="_blank" href="https://royal-elementor-addons.com/elementor-instagram-feed-widget/?ref=rea-plugin-backend-update-notice">Instagram Feed</a></li>
+                                <li><a target="_blank" href="https://royal-elementor-addons.com/elementor-twitter-feed-widget/?ref=rea-plugin-backend-update-notice">Twitter Feed</a></li>
+                                <li><a target="_blank" href="https://royal-elementor-addons.com/elementor-image-accordion-widget/?ref=rea-plugin-backend-update-notice">Image Accordion</a></li>
+                            </ul>
                         </div>
-                        <div class="image-wrap"><img src="'. esc_url(WPR_ADDONS_ASSETS_URL) .'/img/new-theme-builder.png"></div>
+                        <div class="image-wrap"><img src="'. esc_url(WPR_ADDONS_ASSETS_URL) .'img/new-theme-builder.png"></div>
                         <canvas id="wpr-notice-confetti"></canvas>
                 </div>';
         }
@@ -157,7 +151,7 @@ class WprPluginUpdateNotice {
             .wpr-plugin-update-notice h3 {
                 font-size: 36px;
                 margin-top: 0;
-                margin-bottom: 35px;
+                margin-bottom: 20px;
             }
 
             .wpr-plugin-update-notice h3 span {
@@ -176,6 +170,31 @@ class WprPluginUpdateNotice {
               font-size: 14px;
             }
 
+            .wpr-plugin-update-notice ul {
+                display: flex;
+            }
+            
+            .wpr-plugin-update-notice ul a {
+            display: block;
+            text-decoration: none;
+            }
+            
+            .wpr-plugin-update-notice ul li a:after {
+            content: ' ';
+            display: inline-block;
+            position: relative;
+            top: -2px;
+            width: 5px;
+            height: 5px;
+            margin-left: 12px;
+            margin-right: 12px;
+            background-color: #e0e0e0;
+            transform: rotate(45deg);
+            }
+            
+            .wpr-plugin-update-notice ul li:last-child a:after {
+            display: none;
+            }
             .wpr-get-started-button.button-primary {
             background-color: #6A4BFF;
             }
@@ -185,7 +204,7 @@ class WprPluginUpdateNotice {
             }
 
             .wpr-get-started-button.button-secondary {
-            border: 2px solid #6A4BFF;
+            border: 1px solid #6A4BFF;
             color: #6A4BFF;
             }
 
@@ -213,8 +232,18 @@ class WprPluginUpdateNotice {
             }
 
             @media screen and (max-width: 1366px) {
+                .wpr-plugin-update-notice h3 {
+                    font-size: 32px;
+                }
+
                 .wpr-plugin-update-notice .image-wrap img {
                   zoom: 0.4;
+                }
+            }
+
+            @media screen and (max-width: 1280px) {
+                .wpr-plugin-update-notice .image-wrap img {
+                  zoom: 0.35;
                 }
             }
 

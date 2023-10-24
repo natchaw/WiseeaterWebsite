@@ -1,6 +1,11 @@
 /*--------------------------------------------------------------
 == Library - Predefined Styles
 --------------------------------------------------------------*/
+.wpr-tplib-popup-overlay * {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
 #wpr-library-btn {
     display: -webkit-inline-box;
     display: -ms-inline-flexbox;
@@ -205,12 +210,12 @@
     -webkit-box-pack: justify;
         -ms-flex-pack: justify;
             justify-content: space-between;
-    padding: 30px;
+    padding: 30px 37px 30px;
 }
 
 .wpr-tplib-sidebar .wpr-tplib-search {
     position: relative;
-    width: 210px;
+    width: 250px;
     -webkit-box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%);
             box-shadow: 0 2px 5px 0 rgb(0 0 0 / 5%);
 }
@@ -231,6 +236,8 @@
     border: 0;
     border-bottom: 1px solid #efefef;
     font-size: 14px;
+    line-height: 23px;
+    border-radius: 3px;
 }
 
 .wpr-tplib-sidebar .wpr-tplib-search input::-webkit-input-placeholder {
@@ -311,6 +318,10 @@
     color: #6d7882;
 }
 
+.wpr-tplib-price i {
+    margin-top: 3px;
+}
+
 .wpr-tplib-filters h3,
 .wpr-tplib-price h3 {
     display: -webkit-box;
@@ -360,6 +371,7 @@
         flex-wrap: wrap;
     list-style: none;
     padding-left: 0;
+    margin: 0;
 }
 
 .wpr-tplib-filters-list ul li,

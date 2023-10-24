@@ -85,7 +85,7 @@ class Eac_Acf_Group_Url extends Data_Tag {
 			}
 
 			// Affecte l'ID de l'article courant ou de la page d'options
-			$post_id = $post_id === '' ? get_the_ID() : (int) $post_id;
+			$post_id = '' === $post_id ? get_the_ID() : (int) $post_id;
 
 			/**
 			 * @since 1.8.4

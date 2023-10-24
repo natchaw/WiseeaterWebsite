@@ -51,8 +51,7 @@ class Eac_Featured_Image extends Data_Tag {
 		if ( $id ) {
 			$url = wp_get_attachment_image_src( $id, 'full' )[0];
 		} else {
-			// $url = Utils::get_placeholder_image_src();
-			 return $this->get_settings( 'fallback' );
+			return $this->get_settings( 'fallback' );
 		}
 
 		return array(

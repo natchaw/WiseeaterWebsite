@@ -76,7 +76,7 @@ class Eac_Load_Features {
 	 * @since 1.9.3
 	 * @since 1.9.5 Ajout du widget 'Openstreetmap' dans le test
 	 * @since 1.9.9 Remplacer 'is_admin()' par 'current_user_can'
-	 * @since 2.0.1 Change les droits 'manage_options' 	par 'administrator'
+	 * @since 2.0.1 Change les droits 'manage_options' par 'administrator'
 	 */
 	public function add_json_mime_type( $mimes ) {
 		// Lottie animation ou Lottie background ou Openstreetmap sont activés et le user est un administrateur

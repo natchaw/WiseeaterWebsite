@@ -255,7 +255,10 @@
 					// Pas très élégant
 					// Test Samsung phone UA: Mozilla/5.0 (Linux; Android 9; SAMSUNG SM-G960U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/10.2 Chrome/71.0.3578.99 Mobile Safari/537.36
 					// https://developers.whatismybrowser.com/useragents/explore/software_name/samsung-browser/
-					setIntervalIsotope = window.setInterval(function() {	$targetId.isotope(); /*console.log('Samsung phone::' + $targetId.selector);*/}, 5000);
+					setIntervalIsotope = window.setInterval(function() {
+						$targetId.isotope();
+						/*console.log('Samsung phone::' + $targetId.selector);*/
+					}, 5000);
 				}
 			}).fail(function(instance) {
 				 console.log('Post Grid::Imagesloaded::All images loaded, at least one is broken');
@@ -291,7 +294,7 @@
 			if(settings.data_filtre) {
 				var queryString = window.location.search;
 				var urlParams = new URLSearchParams(queryString);
-				var filter = urlParams.has('filter') ? urlParams.get('filter') : false;
+				var filter = urlParams.has('filter') ? decodeURIComponent(urlParams.get('filter')) : false;
 				var domInterval = 0;
 				//console.log(filter);
 				if(filter) {

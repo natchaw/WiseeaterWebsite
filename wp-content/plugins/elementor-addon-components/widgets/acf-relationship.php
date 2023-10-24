@@ -15,6 +15,10 @@
  * @since 1.9.5 Fix: vsprintf passé des strings en arguments à la place d'un array()
  * @since 1.9.7 Ajout du traitement du mode 'slider'
  * @since 1.9.8 Ajout du bouton 'En savoir plus'
+ * @since 2.0.2 Intègre les pages d'options dans la liste du champ relationnel
+ *              Suppression de la méthode 'get_acf_fields_options'
+ *              Ajout du contrôle d'alignement vertical
+ *              Ajout de l'attribut ALT aux images
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -26,6 +30,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 use EACCustomWidgets\EAC_Plugin;
 use EACCustomWidgets\Core\Utils\Eac_Tools_Util;
 use EACCustomWidgets\Core\Eac_Config_Elements;
+use EACCustomWidgets\Includes\Elementor\DynamicTags\ACF\Eac_Acf_Tags;
+use EACCustomWidgets\Includes\ACF\OptionsPage\Eac_Acf_Options_Page;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
@@ -34,12 +40,14 @@ use Elementor\Group_Control_Typography;
 use Elementor\Core\Schemes\Typography;
 use Elementor\Core\Schemes\Color;
 use Elementor\Group_Control_Border;
+use Elementor\Icons_Manager;
 use Elementor\Core\Breakpoints\Manager as Breakpoints_manager;
 use Elementor\Plugin;
 
 class Acf_Relationship_Widget extends Widget_Base {
-	/** Le slider Trait */
+	/** Les traits */
 	use \EACCustomWidgets\Widgets\Traits\Slider_Trait;
+	use \EACCustomWidgets\Widgets\Traits\Button_Read_More_Trait;
 
 	/**
 	 * Constructeur de la class Acf_Relationship_Widget
@@ -51,13 +59,12 @@ class Acf_Relationship_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_script( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js', array( 'jquery' ), '8.3.2', true );
-		wp_register_style( 'swiper', 'https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css', array(), '8.3.2' );
-
+		wp_register_script( 'swiper', 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.3.2/swiper-bundle.min.js', array( 'jquery' ), '8.3.2', true );
 		wp_register_script( 'eac-acf-relation', EAC_Plugin::instance()->get_register_script_url( 'acf-relationship' ), array( 'jquery', 'elementor-frontend', 'swiper' ), '1.9.7', true );
 
-		wp_register_style( 'eac-swiper', EAC_Plugin::instance()->get_register_style_url( 'swiper' ), array( 'eac', 'swiper' ), '1.9.7' );
-		wp_register_style( 'eac-acf-relation', EAC_Plugin::instance()->get_register_style_url( 'acf-relationship' ), array( 'eac' ), '1.8.2' );
+		wp_register_style( 'swiper-bundle', 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.3.2/swiper-bundle.min.css', array(), '8.3.2' );
+		wp_register_style( 'eac-swiper', EAC_Plugin::instance()->get_register_style_url( 'swiper' ), array( 'eac', 'swiper-bundle' ), EAC_ADDONS_VERSION );
+		wp_register_style( 'eac-acf-relation', EAC_Plugin::instance()->get_register_style_url( 'acf-relationship' ), array( 'eac', 'eac-swiper' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -133,7 +140,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 	 * @return CSS list.
 	 */
 	public function get_style_depends() {
-		return array( 'swiper', 'eac-swiper', 'eac-acf-relation' );
+		return array( 'swiper-bundle', 'eac-swiper', 'eac-acf-relation' );
 	}
 
 	/**
@@ -185,12 +192,13 @@ class Acf_Relationship_Widget extends Widget_Base {
 			)
 		);
 
+			/** @since 2.0.2 */
 			$this->add_control(
 				'acf_relation_settings_origine',
 				array(
 					'label'       => esc_html__( 'Champ relationnel', 'eac-components' ),
 					'type'        => Controls_Manager::SELECT,
-					'options'     => $this->get_acf_fields_options( $this->get_acf_supported_fields(), get_the_ID() ),
+					'options'     => Eac_Acf_Tags::get_acf_fields_options( $this->get_acf_supported_fields(), get_the_ID() ),
 					'label_block' => true,
 				)
 			);
@@ -217,7 +225,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 				)
 			);
 
-			/*
+			/**
 			$this->add_control('acf_relation_settings_duplicates',
 				[
 					'label' => esc_html__("Conserver les doublons", 'eac-components'),
@@ -239,7 +247,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 			)
 		);
 
-			/** @since 1.9.7    Ajout de l'option 'slider' */
+			/** @since 1.9.7 Ajout de l'option 'slider' */
 			$this->add_control(
 				'acf_relation_layout_type',
 				array(
@@ -248,7 +256,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 					'default' => 'fitRows',
 					'options' => array(
 						'fitRows' => esc_html__( 'Grille', 'eac-components' ),
-						'slider'  => esc_html__( 'Slider' ),
+						'slider'  => esc_html( 'Slider' ),
 					),
 				)
 			);
@@ -269,15 +277,19 @@ class Acf_Relationship_Widget extends Widget_Base {
 			// @since 1.8.7 Add default values for all active breakpoints.
 			$columns_device_args = array();
 		foreach ( $active_breakpoints as $breakpoint_name => $breakpoint_instance ) {
-			// if (! in_array($breakpoint_name, [Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN, Breakpoints_manager::BREAKPOINT_KEY_LAPTOP])) {
-			if ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE ) {
+			if ( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_LAPTOP === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET_EXTRA === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE === $breakpoint_name ) {
 				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-			} elseif ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA ) {
-				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-			} else {
-				$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
 			}
-				// }
 		}
 
 			/**
@@ -288,11 +300,13 @@ class Acf_Relationship_Widget extends Widget_Base {
 			$this->add_responsive_control(
 				'acf_relation_layout_columns',
 				array(
-					'label'        => esc_html__( 'Nombre de colonnes', 'eac-components' ),
-					'type'         => Controls_Manager::SELECT,
-					'default'      => '3',
-					'device_args'  => $columns_device_args,
-					'options'      => array(
+					'label'          => esc_html__( 'Nombre de colonnes', 'eac-components' ),
+					'type'           => Controls_Manager::SELECT,
+					'default'        => '3',
+					'tablet_default' => '2',
+					'mobile_default' => '1',
+					// 'device_args'  => $columns_device_args,
+					'options'        => array(
 						'1' => '1',
 						'2' => '2',
 						'3' => '3',
@@ -300,8 +314,8 @@ class Acf_Relationship_Widget extends Widget_Base {
 						'5' => '5',
 						'6' => '6',
 					),
-					'prefix_class' => 'responsive%s-',
-					'condition'    => array( 'acf_relation_layout_type' => 'fitRows' ),
+					'prefix_class'   => 'responsive%s-',
+					'condition'      => array( 'acf_relation_layout_type' => 'fitRows' ),
 				)
 			);
 
@@ -329,7 +343,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 			)
 		);
 
-			/*
+			/**
 			$this->add_control('acf_relation_content_parent',
 				[
 					'label' => esc_html__("Le titre de l'article parent", 'eac-components'),
@@ -339,7 +353,8 @@ class Acf_Relationship_Widget extends Widget_Base {
 					'return_value' => 'yes',
 					'default' => '',
 				]
-			);*/
+			);
+			*/
 
 			$this->add_control(
 				'acf_relation_content_date',
@@ -403,14 +418,41 @@ class Acf_Relationship_Widget extends Widget_Base {
 				)
 			);
 
-			$this->add_control(
-				'acf_relation_content_button_label',
+			/** @since 2.0.2 */
+			$this->add_responsive_control(
+				'acf_relation_content_align_v',
 				array(
-					'label'     => esc_html__( 'Label du bouton', 'eac-components' ),
-					'type'      => Controls_Manager::TEXT,
-					'dynamic'   => array( 'active' => true ),
-					'default'   => esc_html__( 'En savoir plus', 'eac-components' ),
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
+					'label'       => esc_html__( 'Alignement vertical', 'eac-components' ),
+					'type'        => Controls_Manager::CHOOSE,
+					'options'     => array(
+						'flex-start'    => array(
+							'title' => esc_html__( 'Haut', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-start-v',
+						),
+						'center'        => array(
+							'title' => esc_html__( 'Centre', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-center-v',
+						),
+						'flex-end'      => array(
+							'title' => esc_html__( 'Bas', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-end-v',
+						),
+						'space-between' => array(
+							'title' => esc_html__( 'Espace entre', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-space-between-v',
+						),
+						'space-around'  => array(
+							'title' => esc_html__( 'Espace autour', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-space-around-v',
+						),
+						'space-evenly'  => array(
+							'title' => esc_html__( 'Espace uniforme', 'eac-components' ),
+							'icon'  => 'eicon-flex eicon-justify-space-evenly-v',
+						),
+					),
+					'default'     => 'flex-start',
+					'label_block' => true,
+					'selectors'   => array( '{{WRAPPER}} .acf-relation_content' => 'justify-content: {{VALUE}};' ),
 				)
 			);
 
@@ -456,7 +498,6 @@ class Acf_Relationship_Widget extends Widget_Base {
 				)
 			);
 
-			/** @since 1.8.7 Application des breakpoints */
 			$this->add_responsive_control(
 				'acf_relation_image_style_ratio',
 				array(
@@ -464,7 +505,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 					'type'       => Controls_Manager::SLIDER,
 					'size_units' => array( '%' ),
 					'default'    => array(
-						'size' => 0.6,
+						'size' => 1,
 						'unit' => '%',
 					),
 					'range'      => array(
@@ -589,6 +630,20 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 		$this->end_controls_section();
 
+		$this->start_controls_section(
+			'acf_relation_more_settings',
+			array(
+				'label'     => esc_html__( "Bouton 'En savoir plus'", 'eac-components' ),
+				'tab'       => Controls_Manager::TAB_CONTENT,
+				'condition' => array( 'acf_relation_content_button' => 'yes' ),
+			)
+		);
+
+			// Trait du contenu du bouton read more
+			$this->register_button_more_content_controls();
+
+		$this->end_controls_section();
+
 		/** Generale Style Section */
 		$this->start_controls_section(
 			'acf_relation_general_style',
@@ -664,7 +719,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 			/** Articles */
 			$this->add_control(
-				'al_items_style',
+				'acf_relation_items_style',
 				array(
 					'label'     => esc_html__( 'Articles', 'eac-components' ),
 					'type'      => Controls_Manager::HEADING,
@@ -687,11 +742,20 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 			/** Images */
 			$this->add_control(
-				'al_images_style',
+				'acf_relation_images_style',
 				array(
 					'label'     => esc_html__( 'Images', 'eac-components' ),
 					'type'      => Controls_Manager::HEADING,
 					'separator' => 'before',
+					'condition' => array( 'acf_relation_content_image' => 'yes' ),
+				)
+			);
+
+			$this->add_group_control(
+				Group_Control_Border::get_type(),
+				array(
+					'name'      => 'acf_relation_image_border',
+					'selector'  => '{{WRAPPER}} .acf-relation_img img',
 					'condition' => array( 'acf_relation_content_image' => 'yes' ),
 				)
 			);
@@ -718,18 +782,9 @@ class Acf_Relationship_Widget extends Widget_Base {
 				)
 			);
 
-			$this->add_group_control(
-				Group_Control_Border::get_type(),
-				array(
-					'name'      => 'acf_relation_image_border',
-					'selector'  => '{{WRAPPER}} .acf-relation_img img',
-					'condition' => array( 'acf_relation_content_image' => 'yes' ),
-				)
-			);
-
 			/** Titre */
 			$this->add_control(
-				'al_title_style',
+				'acf_relation_title_style',
 				array(
 					'label'     => esc_html__( 'Titre', 'eac-components' ),
 					'type'      => Controls_Manager::HEADING,
@@ -765,7 +820,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 			/** Date */
 			$this->add_control(
-				'al_date_style',
+				'acf_relation_date_style',
 				array(
 					'label'     => esc_html__( 'Date', 'eac-components' ),
 					'type'      => Controls_Manager::HEADING,
@@ -801,7 +856,7 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 			/** Résumé */
 			$this->add_control(
-				'al_excerpt_style',
+				'acf_relation_excerpt_style',
 				array(
 					'label'     => esc_html__( 'Résumé', 'eac-components' ),
 					'type'      => Controls_Manager::HEADING,
@@ -832,98 +887,6 @@ class Acf_Relationship_Widget extends Widget_Base {
 					'scheme'    => Typography::TYPOGRAPHY_4,
 					'selector'  => '{{WRAPPER}} .acf-relation_excerpt',
 					'condition' => array( 'acf_relation_content_excerpt' => 'yes' ),
-				)
-			);
-
-			/** @since 1.9.8 Bouton */
-			$this->add_control(
-				'al_button_style',
-				array(
-					'label'     => esc_html__( 'Bouton', 'eac-components' ),
-					'type'      => Controls_Manager::HEADING,
-					'separator' => 'before',
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_control(
-				'acf_relation_button_color',
-				array(
-					'label'     => esc_html__( 'Couleur', 'eac-components' ),
-					'type'      => Controls_Manager::COLOR,
-					'scheme'    => array(
-						'type'  => Color::get_type(),
-						'value' => Color::COLOR_4,
-					),
-					'selectors' => array( '{{WRAPPER}} .acf-relation_button' => 'color: {{VALUE}}' ),
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_group_control(
-				Group_Control_Typography::get_type(),
-				array(
-					'name'      => 'acf_relation_button_typography',
-					'label'     => esc_html__( 'Typographie', 'eac-components' ),
-					'scheme'    => Typography::TYPOGRAPHY_1,
-					'selector'  => '{{WRAPPER}} .acf-relation_button',
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_control(
-				'acf_relation_button_background',
-				array(
-					'label'     => esc_html__( 'Couleur du fond', 'eac-components' ),
-					'type'      => Controls_Manager::COLOR,
-					'selectors' => array( '{{WRAPPER}} .acf-relation_button' => 'background-color: {{VALUE}};' ),
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_responsive_control(
-				'acf_relation_button_padding',
-				array(
-					'label'     => esc_html__( 'Marges internes', 'eac-components' ),
-					'type'      => Controls_Manager::DIMENSIONS,
-					'selectors' => array(
-						'{{WRAPPER}} .acf-relation_button' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					),
-					'separator' => 'before',
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_group_control(
-				Group_Control_Box_Shadow::get_type(),
-				array(
-					'name'      => 'acf_relation_button_shadow',
-					'label'     => esc_html__( 'Ombre', 'eac-components' ),
-					'selector'  => '{{WRAPPER}} .acf-relation_button',
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_group_control(
-				Group_Control_Border::get_type(),
-				array(
-					'name'      => 'acf_relation_button_border',
-					'selector'  => '{{WRAPPER}} .acf-relation_button',
-					'condition' => array( 'acf_relation_content_button' => 'yes' ),
-				)
-			);
-
-			$this->add_control(
-				'acf_relation_button_radius',
-				array(
-					'label'              => esc_html__( 'Rayon de la bordure', 'eac-components' ),
-					'type'               => Controls_Manager::DIMENSIONS,
-					'size_units'         => array( 'px', '%' ),
-					'allowed_dimensions' => array( 'top', 'right', 'bottom', 'left' ),
-					'selectors'          => array(
-						'{{WRAPPER}} .acf-relation_button' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-					),
-					'condition'          => array( 'acf_relation_content_button' => 'yes' ),
 				)
 			);
 
@@ -975,6 +938,20 @@ class Acf_Relationship_Widget extends Widget_Base {
 			$this->register_slider_style_controls();
 
 		$this->end_controls_section();
+
+		$this->start_controls_section(
+			'acf_relation_readmore_style',
+			array(
+				'label'     => esc_html__( "Bouton 'En savoir plus'", 'eac-components' ),
+				'tab'       => Controls_Manager::TAB_STYLE,
+				'condition' => array( 'acf_relation_content_button' => 'yes' ),
+			)
+		);
+
+			// Trait Style du bouton read more
+			$this->register_button_more_style_controls();
+
+		$this->end_controls_section();
 	}
 
 	/**
@@ -997,24 +974,25 @@ class Acf_Relationship_Widget extends Widget_Base {
 		$has_scrollbar  = $has_swiper && 'yes' === $settings['slider_scrollbar'] ? true : false;
 
 		if ( $has_swiper ) { ?>
-			<div id="<?php echo esc_attr( $slider_id ); ?>" class="eac-acf-relationship swiper-container">
+		<div id="<?php echo esc_attr( $slider_id ); ?>" class="eac-acf-relationship swiper-container">
 		<?php } else { ?>
-			<div class="eac-acf-relationship">
+		<div class="eac-acf-relationship">
 			<?php
 		}
-				$this->get_relation_by_id();
+			$this->get_relation_by_id();
+
 		if ( $has_navigation ) {
 			?>
-					<div class="swiper-button-prev"></div>
-					<div class="swiper-button-next"></div>
-				<?php } ?>
-				<?php if ( $has_scrollbar ) { ?>
-					<div class="swiper-scrollbar"></div>
-				<?php } ?>
-				<?php if ( $has_pagination ) { ?>
-					<div class="swiper-pagination-bullet"></div>
-				<?php } ?>
-			</div>
+				<div class="swiper-button-prev"></div>
+				<div class="swiper-button-next"></div>
+			<?php } ?>
+			<?php if ( $has_scrollbar ) { ?>
+				<div class="swiper-scrollbar"></div>
+			<?php } ?>
+			<?php if ( $has_pagination ) { ?>
+				<div class="swiper-pagination-bullet"></div>
+			<?php } ?>
+		</div>
 		<?php
 	}
 
@@ -1066,9 +1044,9 @@ class Acf_Relationship_Widget extends Widget_Base {
 		$max_loops = 1;
 
 		$settings          = $this->get_settings_for_display();
-		$has_excerpt       = $settings['acf_relation_content_excerpt'] === 'yes' ? true : false;
-		$has_duplicate     = false; // $settings['acf_relation_settings_duplicates'] === 'yes' ? true : false;
-		$excerpt_length    = $settings['acf_relation_excerpt_length'];
+		$has_excerpt       = 'yes' === $settings['acf_relation_content_excerpt'] ? true : false;
+		$has_duplicate     = false; // 'yes' === $settings['acf_relation_settings_duplicates'] ? true : false;
+		$excerpt_length    = absint( $settings['acf_relation_excerpt_length'] );
 		$include_posttypes = $settings['acf_relation_settings_include_type'];
 		$field_value       = '';
 
@@ -1076,6 +1054,14 @@ class Acf_Relationship_Widget extends Widget_Base {
 
 		if ( empty( $field_key ) ) {
 			return;
+		}
+
+		// @since 2.0.2 Récupère l'ID de l'article Page d'Options
+		if ( class_exists( Eac_Acf_Options_Page::class ) ) {
+			$id_page = Eac_Acf_Options_Page::get_options_page_id( $field_key );
+			if ( ! empty( $id_page ) ) {
+				$parent_id = (int) $id_page;
+			}
 		}
 
 		$field = get_field_object( $field_key, $parent_id );
@@ -1090,40 +1076,44 @@ class Acf_Relationship_Widget extends Widget_Base {
 					$values   = array();
 					$featured = true;
 					$img      = '';
-					if ( $field['type'] == 'relationship' ) {
-						$featured = is_array( $field['elements'] ) && ! empty( $field['elements'][0] ) && $field['elements'][0] == 'featured_image' ? true : false;
+					if ( 'relationship' === $field['type'] ) {
+						$featured = is_array( $field['elements'] ) && ! empty( $field['elements'][0] ) && 'featured_image' === $field['elements'][0] ? true : false;
 					}
 					/** @since 1.8.5 Fix cast $field_value dans le type tableau */
 					$field_value = is_array( $field_value ) ? $field_value : array( $field_value );
 
 					// Première boucle on ajoute l'ID du post courant
-					if ( $loop == 1 ) {
-						$items_id[ $parent_id ] = $parent_id; }
+					if ( 1 === $loop ) {
+						$items_id[ $parent_id ] = $parent_id;
+					}
 
 					// Boucle sur tous les relationship posts
 					foreach ( $field_value as $value ) {
 						$item = array();
-						$id   = $field['return_format'] == 'object' ? (int) $value->ID : (int) $value;
+						$id   = 'object' === $field['return_format'] ? (int) $value->ID : (int) $value;
 
 						// Le post_type n'est pas dans la liste
-						if ( ! in_array( get_post_type( $id ), $include_posttypes ) ) {
-							continue; }
+						if ( ! in_array( get_post_type( $id ), $include_posttypes, true ) ) {
+							continue;
+						}
 
 						// Ne conserve pas les doublons et l'ID de l'article est déjà analysé ou c'est l'article courant
-						if ( ! $has_duplicate && in_array( $id, $items_id ) ) {
-							continue; }
+						if ( ! $has_duplicate && in_array( $id, $items_id, true ) ) {
+							continue;
+						}
 
 						// Enregistre les données
 						$item[ $id ]['post_id']           = $id;
 						$item[ $id ]['post_parent_id']    = $parent_id;
 						$item[ $id ]['post_parent_title'] = get_post( $parent_id )->post_title;
 						$item[ $id ]['post_type']         = get_post_type( $id );
-						$item[ $id ]['post_title']        = $field['return_format'] == 'object' ? esc_html( $value->post_title ) : esc_html( get_post( $id )->post_title );
-						$item[ $id ]['link']              = esc_url( get_permalink( get_post( $id )->ID ) );
-						$item[ $id ]['img']               = $featured ? get_the_post_thumbnail( $id, $image_size ) : '';
+						$item[ $id ]['post_title']        = 'object' === $field['return_format'] ? $value->post_title : get_post( $id )->post_title;
+						$item[ $id ]['link']              = get_permalink( get_post( $id )->ID );
+						$item[ $id ]['img']               = $featured ? wp_get_attachment_image_src( get_post_thumbnail_id( $id ), $image_size ) : '';
+						$item[ $id ]['img_alt']           = $featured ? get_post_meta( get_post_thumbnail_id( $id ), '_wp_attachment_image_alt', true ) : '';
 						$item[ $id ]['post_date']         = get_the_modified_date( get_option( 'date_format' ), $id );
-						$item[ $id ]['post_excerpt']      = in_array( get_post_type( $id ), array( 'page', 'attachment' ) ) || ! $has_excerpt ? '[...]' : Eac_Tools_Util::get_post_excerpt( $id, $excerpt_length );
-						$item[ $id ]['class']             = esc_attr( implode( ' ', get_post_class( '', $id ) ) );
+						$item[ $id ]['post_excerpt']      = in_array( get_post_type( $id ), array( 'page', 'attachment' ), true ) || ! $has_excerpt ? '[...]' : Eac_Tools_Util::get_post_excerpt( $id, $excerpt_length );
+						$item[ $id ]['class']             = implode( ' ', get_post_class( '', $id ) );
 						$item[ $id ]['id']                = 'post-' . $id;
 						$item[ $id ]['processed']         = false;
 
@@ -1142,18 +1132,19 @@ class Acf_Relationship_Widget extends Widget_Base {
 					}
 
 					if ( $loop > $max_loops ) {
-						return $items; }
+						return $items;
+					}
 
 					// Boucle sur tous les items
 					foreach ( $items as $post_key => $post_val ) {
 						// $exp = $items[$post_key]['post_title']."::".$items[$post_key]['processed'];
 
 						// L'article n'a pas été analysé
-						if ( $post_val['processed'] == false ) {
+						if ( false === $post_val['processed'] ) {
 							$items[ $post_key ]['processed'] = true;
 
 							// Champs ACF relationship (Field-key::Field-name) pour cet article
-							$key = $this->get_acf_fields_options( $this->get_acf_supported_fields(), $post_val['post_id'] );
+							$key = Eac_Acf_Tags::get_acf_fields_options( $this->get_acf_supported_fields(), $post_val['post_id'] );
 
 							// Récursivité on analyse l'ID pour chercher les articles en relationship
 							if ( is_array( $key ) && ! empty( $key ) ) {
@@ -1177,16 +1168,17 @@ class Acf_Relationship_Widget extends Widget_Base {
 	 */
 	protected function render_relationship_content( $items = array() ) {
 		$settings         = $this->get_settings_for_display();
-		$has_image        = $settings['acf_relation_content_image'] === 'yes' ? true : false;
-		$has_ratio        = $settings['acf_relation_image_style_ratio_enable'] === 'yes' ? true : false;
-		$has_date         = $settings['acf_relation_content_date'] === 'yes' ? true : false;
-		$has_excerpt      = $settings['acf_relation_content_excerpt'] === 'yes' ? true : false;
-		$has_link         = $settings['acf_relation_content_image_link'] === 'yes' ? true : false;
-		$has_button       = $settings['acf_relation_content_button'] === 'yes' ? true : false;
-		$has_parent_title = false; // $settings['acf_relation_content_parent'] === 'yes' ? true : false;
+		$has_image        = 'yes' === $settings['acf_relation_content_image'] ? true : false;
+		$has_ratio        = 'yes' === $settings['acf_relation_image_style_ratio_enable'] ? true : false;
+		$has_date         = 'yes' === $settings['acf_relation_content_date'] ? true : false;
+		$has_excerpt      = 'yes' === $settings['acf_relation_content_excerpt'] ? true : false;
+		$has_link         = 'yes' === $settings['acf_relation_content_image_link'] ? true : false;
+		$has_button       = 'yes' === $settings['acf_relation_content_button'] ? true : false;
+		$has_button_picto = $has_button && 'yes' === $settings['button_add_more_picto'] ? true : false;
+		$has_parent_title = false; // 'yes' === $settings['acf_relation_content_parent'] ? true : false;
 		$nb_posts         = ! empty( $settings['acf_relation_settings_nombre'] ) ? $settings['acf_relation_settings_nombre'] : -1;
 		$nb_displayed     = 0;
-		$has_swiper       = $settings['acf_relation_layout_type'] === 'slider' ? true : false;
+		$has_swiper       = 'slider' === $settings['acf_relation_layout_type'] ? true : false;
 
 		// Formate le titre avec son tag
 		$title_tag   = $settings['acf_relation_title_tag'];
@@ -1204,126 +1196,106 @@ class Acf_Relationship_Widget extends Widget_Base {
 		if ( ! $has_swiper ) {
 			$class = sprintf( 'acf-relation_container %s', $has_ratio ? 'acf-relation_img-ratio' : '' );
 		} else {
-			$class = sprintf( 'acf-relation_container swiper-wrapper' );
+			$class = 'acf-relation_container swiper-wrapper';
 		}
 
-		$this->add_render_attribute( 'container_wrapper', 'class', $class );
-		$this->add_render_attribute( 'container_wrapper', 'id', $id );
+		$this->add_render_attribute( 'container_wrapper', 'class', esc_attr( $class ) );
+		$this->add_render_attribute( 'container_wrapper', 'id', esc_attr( $id ) );
 		$this->add_render_attribute( 'container_wrapper', 'data-settings', $this->get_settings_json() );
-
-		$container = '<div ' . $this->get_render_attribute_string( 'container_wrapper' ) . '>';
-
-		$values = array();
-
+		?>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'container_wrapper' ) ); ?>>
+		<?php
+		ob_start();
 		foreach ( $items as $item ) {
-			if ( $nb_posts != -1 && $nb_displayed >= $nb_posts ) {
-				break; }
-			$value = '';
+			if ( -1 !== $nb_posts && $nb_displayed >= $nb_posts ) {
+				break;
+			}
 
 			if ( $has_swiper ) {
 				$item['class'] = $item['class'] . ' swiper-slide';
 			}
-			$value     .= "<article id='" . $item['id'] . "' class='" . $item['class'] . "'>";
-				$value .= "<div class='acf-relation_inner-wrapper'>";
-
-					/** Affichage de l'image */
-			if ( $has_image && ! empty( $item['img'] ) ) {
-				/** Le lien sur l'image */
-				if ( $has_link ) {
-					$value .= "<div class='acf-relation_img'><a href='" . $item['link'] . "'>" . $item['img'] . '</a></div>';
-				} else {
-					$value .= "<div class='acf-relation_img'>" . $item['img'] . '</div>';
+			?>
+			<article id="<?php echo esc_attr( $item['id'] ); ?>" class="<?php echo esc_attr( $item['class'] ); ?>">
+			<div class="acf-relation_inner-wrapper">
+			<?php
+			/** Affichage de l'image */
+			if ( $has_image && ! empty( $item['img'] ) && is_array( $item['img'] ) ) {
+				$image     = $item['img'][0];
+				$image_alt = ! empty( $item['img_alt'] ) ? $item['img_alt'] : $item['post_title'];
+				if ( $image ) {
+					/** Le lien sur l'image */
+					if ( $has_link ) {
+						?>
+						<div class="acf-relation_img"><a href="<?php echo esc_url( $item['link'] ); ?>"><img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" /></a></div>
+					<?php } else { ?>
+						<div class="acf-relation_img"><img src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" /></div>
+						<?php
+					}
 				}
 			}
+			?>
+			<!-- Affichage du contenu -->
+			<div class="acf-relation_content">
 
-					/** Affichage du contenu */
-					$value .= "<div class='acf-relation_content'>";
+			<!-- Affichage du titre -->
+			<div class="acf-relation_title">
+				<a href="<?php echo esc_url( $item['link'] ); ?>"><?php echo $open_title . esc_html( $item['post_title'] ) . $close_title; ?></a>
+			</div>
 
-						/** Affichage du titre */
-						$value     .= "<div class='acf-relation_title'>";
-							$value .= "<a href='" . $item['link'] . "'>" . $open_title . $item['post_title'] . $close_title . '</a>';
-						$value     .= '</div>';
+			<!-- Affichage du titre du parent -->
+			<?php if ( $has_parent_title ) { ?>
+				<div class="acf-relation_title-parent">
+				<?php echo $open_title . esc_html( $item['post_parent_title'] ) . $close_title; ?>
+				</div>
+			<?php } ?>
 
-						/** Affichage du titre du parent */
-			if ( $has_parent_title ) {
-				$value     .= "<div class='acf-relation_title-parent'>";
-					$value .= $open_title . $item['post_parent_title'] . $close_title;
-				$value     .= '</div>';
-			}
+			<!-- Affichage de la date -->
+			<?php if ( $has_date ) { ?>
+				<div class="acf-relation_date"><?php echo esc_html( $item['post_date'] ); ?></div>
+			<?php } ?>
 
-						/** Affichage de la date */
-			if ( $has_date ) {
-				$value .= "<div class='acf-relation_date'>" . $item['post_date'] . '</div>';
-			}
+			<!-- Affichage du résumé -->
+			<?php if ( $has_excerpt ) { ?>
+				<div class="acf-relation_excerpt"><?php echo wp_kses_post( $item['post_excerpt'] ); ?></div>
+			<?php } ?>
 
-						/** Affichage du résumé */
-			if ( $has_excerpt ) {
-				$value .= "<div class='acf-relation_excerpt'>" . $item['post_excerpt'] . '</div>';
-			}
-
-						/** @since 1.9.8 Affichage du bouton */
+			<!-- @since 1.9.8 Affichage du bouton -->
+			<?php
 			if ( $has_button ) {
-				$label          = ! empty( $settings['acf_relation_content_button_label'] ) ? sanitize_text_field( $settings['acf_relation_content_button_label'] ) : esc_html__( 'En savoir plus', 'eac-components' );
-				$value         .= '<div class="acf-relation_button-wrapper">';
-					$value     .= "<a href='" . $item['link'] . "'>";
-						$value .= '<button class="acf-relation_button" type="button">' . $label . '</button>';
-					$value     .= '</a>';
-				$value         .= '</div>';
-			}
-					$value .= '</div>'; // Fin div contenu
-				$value     .= '</div>'; // Fin div wrapper
-			$value         .= '</article>'; // Fin article
+				$label = ! empty( $settings['button_more_label'] ) ? sanitize_text_field( $settings['button_more_label'] ) : esc_html__( 'En savoir plus', 'eac-components' );
+				?>
+				<div class="buttons-wrapper">
+					<span class="button__readmore-wrapper">
+					<a href="<?php echo esc_url( $item['link'] ); ?>">
+						<button class="button-readmore" type="button" title="<?php echo esc_html( $item['post_title'] ); ?>">
+						<?php
+						if ( $has_button_picto && 'before' === $settings['button_more_position'] ) {
+							Icons_Manager::render_icon( $settings['button_more_picto'], array( 'aria-hidden' => 'true' ) );
+						}
+						echo wp_kses_post( $label );
+						if ( $has_button_picto && 'after' === $settings['button_more_position'] ) {
+							Icons_Manager::render_icon( $settings['button_more_picto'], array( 'aria-hidden' => 'true' ) );
+						}
+						?>
+						</button>
+					</a>
+					</span>
+				</div>
+			<?php } ?>
 
-			$values[] = $value;
+			</div> <!-- Fin div contenu -->
+			</div> <!-- Fin div inner wrapper -->
+			</article> <!-- Fin article -->
+
+			<?php
 			$nb_displayed++;
 		}
-		echo $container . implode( ' ', $values ) . '</div>';
-	}
-
-	/**
-	 * get_acf_fields_options
-	 *
-	 * Retourne Field_id et Field_name pour un article
-	 *
-	 * @access protected
-	 */
-	protected function get_acf_fields_options( $field_type, $post_id ) {
-		$groups  = array();
-		$options = array( '' => esc_html__( 'Select...', 'eac-components' ) );
-
-		// Les groupes pour l'article
-		$acf_groups = acf_get_field_groups( array( 'post_id' => $post_id ) );
-
-		foreach ( $acf_groups as $group ) {
-			// Le groupe n'est pas désactivé
-			if ( ! $group['active'] ) {
-				continue;
-			}
-
-			if ( isset( $group['ID'] ) && ! empty( $group['ID'] ) ) {
-				$fields = acf_get_fields( $group['ID'] );
-			} else {
-				$fields = acf_get_fields( $group );
-			}
-
-			// Pas de champ
-			if ( ! is_array( $fields ) ) {
-				continue;
-			}
-
-			foreach ( $fields as $field ) {
-				// C'est le bon type de champ ACF
-				if ( ! in_array( $field['type'], $field_type, true ) ) {
-					continue;
-				}
-
-				// Clé unique et slug comme indice du tableau
-				$key             = $field['key'] . '::' . $field['name'];
-				$options[ $key ] = $group['title'] . '::' . $field['label'];
-			}
-		}
-
-		return $options;
+		?>
+		</div> <!-- Fin div container_wrapper -->
+		<?php
+		$output = ob_get_contents();
+		ob_end_clean();
+		echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1354,34 +1326,33 @@ class Acf_Relationship_Widget extends Widget_Base {
 	 * @since 1.9.7
 	 */
 	protected function get_settings_json() {
-		$module_settings = $this->get_settings_for_display();
+		$settings = $this->get_settings_for_display();
 
-		$effect = $module_settings['slider_effect'];
-		if ( in_array( $effect, array( 'fade', 'creative' ) ) ) {
+		$effect = $settings['slider_effect'];
+		if ( in_array( $effect, array( 'fade', 'creative' ), true ) ) {
 			$nb_images = 1;
-		} elseif ( empty( $module_settings['slider_images_number'] ) || $module_settings['slider_images_number'] === 0 ) {
+		} elseif ( empty( $settings['slider_images_number'] ) || 0 === $settings['slider_images_number'] ) {
 			$nb_images = 'auto';
 			$effect    = 'slide';
 		} else {
-			$nb_images = absint( sanitize_text_field( $module_settings['slider_images_number'] ) );
+			$nb_images = absint( sanitize_text_field( $settings['slider_images_number'] ) );
 		}
 
 		$settings = array(
 			'data_id'                  => $this->get_id(),
-			'data_sw_swiper'           => 'slider' === $module_settings['acf_relation_layout_type'] ? true : false,
-			'data_sw_autoplay'         => 'yes'    === $module_settings['slider_autoplay'] ? true : false,
-			'data_sw_loop'             => 'yes'    === $module_settings['slider_loop'] ? true : false,
-			'data_sw_delay'            => $module_settings['slider_delay'],
+			'data_sw_swiper'           => 'slider' === $settings['acf_relation_layout_type'] ? true : false,
+			'data_sw_autoplay'         => 'yes' === $settings['slider_autoplay'] ? true : false,
+			'data_sw_loop'             => 'yes' === $settings['slider_loop'] ? true : false,
+			'data_sw_delay'            => absint( $settings['slider_delay'] ),
 			'data_sw_imgs'             => $nb_images,
 			'data_sw_dir'              => 'horizontal',
-			'data_sw_rtl'              => 'right' === $module_settings['slider_rtl'] ? true : false,
+			'data_sw_rtl'              => 'right' === $settings['slider_rtl'] ? true : false,
 			'data_sw_effect'           => $effect,
 			'data_sw_free'             => true,
-			'data_sw_pagination_click' => 'yes' === $module_settings['slider_pagination'] && 'yes' === $module_settings['slider_pagination_click'] ? true : false,
+			'data_sw_pagination_click' => 'yes' === $settings['slider_pagination'] && 'yes' === $settings['slider_pagination_click'] ? true : false,
 		);
 
-		$settings = wp_json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}

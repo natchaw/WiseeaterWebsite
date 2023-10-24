@@ -68,6 +68,7 @@
     padding: 8px 10px;
     border: 0;
     border-bottom: 1px solid #efefef;
+    border-radius: 3px;
 }
 
 .wpr-tplib-sidebar .wpr-tplib-search input::-webkit-input-placeholder {

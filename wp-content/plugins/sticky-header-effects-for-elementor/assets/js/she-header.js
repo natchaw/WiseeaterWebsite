@@ -39,8 +39,6 @@ function sheHeader() {
 	}
 	}
 	
-	console.log($j.inArray(enabled, responsive_settings));
-	
 	if ($j.inArray(enabled, responsive_settings)!='-1') {
 								
 	var scroll_distance = data_settings["scroll_distance"];
@@ -69,23 +67,6 @@ function sheHeader() {
 	// add transparent class
 	if(transparent_header == "yes" ){
 		header.addClass('she-header-transparent-yes');
-	}
-																
-	// header height shrink
-	if( typeof data_height != 'undefined' && data_height) {
-	if( width >= 1025 ) {
-		var shrink_height = data_height["size"];
-	}else if (width  > 767 && width < 1025  ) {
-		var shrink_height = data_height_tablet["size"];
-		if(shrink_height == ''){
-		   shrink_height = data_height["size"];
-		}
-	}else if (width <= 767 ) {
-		var shrink_height = data_height_mobile["size"];
-		if(shrink_height == ''){
-		   shrink_height = data_height["size"];
-		}
-	}
 	}
 							
 		// border bottom
@@ -129,7 +110,7 @@ function sheHeader() {
 				
 				if( shrink_header == "yes" ) {
 					header.css({"padding-top":"0", "padding-bottom":"0", "margin-top":"0", "margin-bottom":"0"});
-					container.css({"min-height": shrink_height, "transition": "all 0.4s ease-in-out", "-webkit-transition": "all 0.4s ease-in-out", "-moz-transition": "all 0.4s ease-in-out"});
+					container.css({"min-height": data_height, "transition": "all 0.4s ease-in-out", "-webkit-transition": "all 0.4s ease-in-out", "-moz-transition": "all 0.4s ease-in-out"});
 										
 				}
 				

@@ -43,7 +43,7 @@
 				$support_feature->title = fs_text_inline( 'Support', $plugin->slug );
 				$features_plan_map[ $support_feature->id ] = array( 'feature' => $support_feature, 'plans' => array() );
 			} else {
-				$support_feature = $features_plan_map['support'];
+                $support_feature = $features_plan_map['support']['feature'];
 			}
 
 			$features_plan_map[ $support_feature->id ]['plans'][ $plan->id ] = $support_feature;
@@ -78,7 +78,7 @@
 									if ( 1 == $pricing->licenses ) {
 										if ( $pricing->has_annual() ) {
 											echo "\${$pricing->annual_price} / " . fs_esc_html_x_inline( 'year', 'as annual period', 'year', $plugin->slug );
-										} elseif ( $pricing->has_monthly() ) {
+										} else if ( $pricing->has_monthly() ) {
 											echo "\${$pricing->monthly_price} / " . fs_esc_html_x_inline( 'mo', 'as monthly period', 'mo', $plugin->slug );
 										} else {
 											echo "\${$pricing->lifetime_price}";

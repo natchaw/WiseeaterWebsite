@@ -41,6 +41,7 @@ trait Badge_Stock_Trait {
 					),
 				),
 				'default'      => 'left',
+				'toggle'       => false,
 				'prefix_class' => 'badge-stock-pos-',
 			)
 		);

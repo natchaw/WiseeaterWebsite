@@ -18,6 +18,7 @@
  * @since 1.9.8 Simplification de l'enregistrement des Tags
  *              Deprecated register_tags
  *              Deprecated register_tag
+ * @since 2.0.2 Suppression des actions et fonctions depréciées
  */
 
 namespace EACCustomWidgets\Includes\Elementor\DynamicTags\ACF;
@@ -69,13 +70,10 @@ class Eac_Acf_Tags {
 	 *
 	 * @access public
 	 * @since 1.9.8 register vs register_tags
+	 * @since 2.0.2 action register_tags depréciée
 	 */
 	public function __construct() {
-		if ( version_compare( ELEMENTOR_VERSION, '3.5.0', '<' ) ) {
-			add_action( 'elementor/dynamic_tags/register_tags', array( $this, 'register_tags' ) );
-		} else {
-			add_action( 'elementor/dynamic_tags/register', array( $this, 'register_tags' ) );
-		}
+		add_action( 'elementor/dynamic_tags/register', array( $this, 'register_tags' ) );
 
 		add_filter( 'acf/pre_load_post_id', array( $this, 'fix_post_id_on_preview' ), 10, 2 );
 	}
@@ -85,14 +83,15 @@ class Eac_Acf_Tags {
 	 *
 	 * @since 1.7.5
 	 * @since 1.9.8 register vs register_tag
+	 * @since 2.0.2 fonction register_tag depréciée
 	 */
 	public function register_tags( $dynamic_tags ) {
 		// Enregistre le nouveau groupe avant d'enregistrer les Tags
 		\Elementor\Plugin::$instance->dynamic_tags->register_group( 'eac-acf-groupe', array( 'title' => esc_html__( 'ACF', 'eac-components' ) ) );
 
-		foreach ( $this->tags_list as $file => $className ) {
-			$full_class_name = self::TAG_NAMESPACE . $className;
-			$full_file      = self::TAG_DIR . $file . '.php';
+		foreach ( $this->tags_list as $file => $class_name ) {
+			$full_class_name = self::TAG_NAMESPACE . $class_name;
+			$full_file       = self::TAG_DIR . $file . '.php';
 
 			if ( ! file_exists( $full_file ) ) {
 				continue;
@@ -102,11 +101,7 @@ class Eac_Acf_Tags {
 			require_once $full_file;
 
 			if ( class_exists( $full_class_name ) ) {
-				if ( version_compare( ELEMENTOR_VERSION, '3.5.0', '<' ) ) {
-					$dynamic_tags->register_tag( new $full_class_name() );
-				} else {
-					$dynamic_tags->register( new $full_class_name() );
-				}
+				$dynamic_tags->register( new $full_class_name() );
 			}
 		}
 	}
@@ -125,16 +120,21 @@ class Eac_Acf_Tags {
 	public static function get_acf_field_name( $metavalue, $metakey, $postid ) {
 		global $wpdb;
 		$name = '';
-		
+
 		$meta_key = $wpdb->get_results(
-			"SELECT meta_key
-			FROM {$wpdb->prefix}postmeta
-			WHERE meta_value = '{$metavalue}'
-			AND post_id = {$postid}
-			AND meta_key LIKE '%{$metakey}'"
+			$wpdb->prepare(
+				"SELECT meta_key
+				FROM {$wpdb->prefix}postmeta
+				WHERE meta_value = %s
+				AND post_id = %d
+				AND meta_key LIKE %s",
+				$metavalue,
+				$postid,
+				'%' . $metakey
+			)
 		);
 
-		if ( $meta_key && ! empty( $meta_key ) && count( $meta_key ) == 1 ) { // Il ne doit y avoir qu'une seule meta_key
+		if ( $meta_key && ! empty( $meta_key ) && count( $meta_key ) === 1 ) { // Il ne doit y avoir qu'une seule meta_key
 			$name = substr( reset( $meta_key )->meta_key, 1, 999 ); // Supprime l'underscore du début de la donnée
 		}
 		// console_log($meta_key);
@@ -152,7 +152,7 @@ class Eac_Acf_Tags {
 	 */
 	public function fix_post_id_on_preview( $null, $post_id ) {
 		if ( is_preview() ) {
-			return ( $post_id == null ? get_the_ID() : get_the_ID() == $post_id ) ? get_the_ID() : $post_id;
+			return ( null === $post_id ? get_the_ID() : get_the_ID() === $post_id ) ? get_the_ID() : $post_id;
 		} else {
 			$acf_post_id = isset( $post_id->ID ) ? $post_id->ID : $post_id;
 
@@ -177,9 +177,11 @@ class Eac_Acf_Tags {
 	public static function get_acf_fields_group( $fields_type, $post_id = '' ) {
 		$options = array( '' => esc_html__( 'Select...', 'eac-components' ) );
 		// Le post_type pour l'article courant
-		$posttype   = get_post_type( get_the_ID() );
-		$postid     = empty( $post_id ) ? get_the_ID() : $post_id;
-		$acf_groups = $acf_groups_pt = $acf_groups_cpt = array();
+		$posttype       = get_post_type( get_the_ID() );
+		$postid         = empty( $post_id ) ? get_the_ID() : $post_id;
+		$acf_groups     = array();
+		$acf_groups_pt  = array();
+		$acf_groups_cpt = array();
 
 		/**
 		 * @since 1.7.5 Les groupes pour le type d'article
@@ -255,9 +257,11 @@ class Eac_Acf_Tags {
 	public static function get_acf_fields_options( $field_type, $post_id = '' ) {
 		$options = array( '' => esc_html__( 'Select...', 'eac-components' ) );
 		// Le post_type pour l'article courant
-		$posttype   = get_post_type( get_the_ID() );
-		$postid     = empty( $post_id ) ? get_the_ID() : $post_id;
-		$acf_groups = $acf_groups_pt = $acf_groups_cpt = array();
+		$posttype       = get_post_type( get_the_ID() );
+		$postid         = empty( $post_id ) ? get_the_ID() : $post_id;
+		$acf_groups     = array();
+		$acf_groups_pt  = array();
+		$acf_groups_cpt = array();
 
 		/**
 		 * @since 1.7.5 Les groupes pour le type d'article
@@ -343,7 +347,7 @@ class Eac_Acf_Tags {
 
 				foreach ( $fields as $field ) {
 					$pcontent = (array) maybe_unserialize( $field->post_content );
-					if ( is_array( $acf_supported_field_types ) && in_array( $pcontent['type'], $acf_supported_field_types ) ) {
+					if ( is_array( $acf_supported_field_types ) && in_array( $pcontent['type'], $acf_supported_field_types, true ) ) {
 						// $options[(int) $group['ID'] . "::" . (int) $field->ID . "::" . $field->post_excerpt] = $group['title'] . "::" . $field->post_title . "::" . $pcontent['type'];
 						$options[] = array(
 							'group_title' => $group['title'],

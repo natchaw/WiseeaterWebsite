@@ -71,9 +71,9 @@
 		static function equals( $entity1, $entity2 ) {
 			if ( is_null( $entity1 ) && is_null( $entity2 ) ) {
 				return true;
-			} elseif ( is_object( $entity1 ) && is_object( $entity2 ) ) {
+			} else if ( is_object( $entity1 ) && is_object( $entity2 ) ) {
 				return ( $entity1->id == $entity2->id );
-			} elseif ( is_object( $entity1 ) ) {
+			} else if ( is_object( $entity1 ) ) {
 				return is_null( $entity1->id );
 			} else {
 				return is_null( $entity2->id );

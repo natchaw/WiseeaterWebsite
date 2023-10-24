@@ -53,18 +53,12 @@ $key_product_request   = 'wc_product_request';
 $title_product_request = esc_html__( 'Demander un devis', 'eac-components' );
 $info_product_request  = esc_html__( 'Affiche un message dans la page du produit pour demander un devis', 'eac-components' );
 
-/*
-$key_product_pages   = 'wc_product_redirect_pages';
-$title_product_pages = esc_html__( 'Rediriger les URLs des pages', 'eac-components' );
-$info_product_pages  = esc_html__( "Les pages 'Vitrine, Panier et Validation de la commande' seront redirigées vers la page sélectionnée dans la liste", 'eac-components' );
-*/
-
 $key_product_pages   = 'wc_product_redirect_pages';
 $title_product_pages = esc_html__( 'Rediriger les URLs des pages', 'eac-components' );
 $first               = esc_html__( "Les pages 'Vitrine et Panier' seront redirigées vers la page sélectionnée dans la liste", 'eac-components' );
 $second              = '<br />';
 $thirst              = esc_html__( "La page 'Panier' sera vidée de ses items", 'eac-components' );
-$info_product_pages  = sprintf('%1$s %2$s %3$s', $first, $second, $thirst );
+$info_product_pages  = sprintf( '%1$s %2$s %3$s', $first, $second, $thirst );
 
 $key_product_breadcrumb   = 'wc_product_breadcrumb';
 $title_product_breadcrumb = esc_html__( "Rediriger le fil d'ariane", 'eac-components' );
@@ -95,8 +89,6 @@ if ( $options ) {
 	$active_product_metas      = false;
 }
 
-// error_log("==>".$active_product_catalog."::".$active_product_request);
-
 /** Les class des éléments du formulaire */
 $class_wrapper_config     = 'eac-elements__common-item config';
 $class_wrapper_select     = 'eac-elements__common-item select';
@@ -120,7 +112,7 @@ if ( ! $active_product_catalog ) {
 	$class_wrapper_request = 'eac-elements__common-item request hide';
 	$class_wrapper_pages   = 'eac-elements__common-item pages hide';
 } elseif ( $active_product_catalog && 0 !== $active_product_id ) {
-	$class_wrapper_pages   = 'eac-elements__common-item pages';
+	$class_wrapper_pages = 'eac-elements__common-item pages';
 }
 
 ob_start();
@@ -129,21 +121,21 @@ ob_start();
 	<div id="tab-5" style="display: none;">
 		<div class="eac-settings-tabs">
 			<div class="eac-elements__table-common wc">
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_config ); ?>">
 					<span class="info"><?php echo $info_product_config; ?></span>
 				</div>
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_select ); ?>">
 					<span class="eac-elements__item-content"><?php echo $title_product_select_page; ?></span>
 					<span style="margin: 13.3px 10px;">
 						<select name="<?php echo esc_attr( $key_product_select_page ); ?>" id="<?php echo esc_attr( $key_product_select_page ); ?>">
 							<?php
-							foreach ( $posts_list as $id => $title ) {
-								if ( $id === $active_product_id ) {
-									echo '<option value="' . esc_attr( $id ) . '" selected>' . esc_attr( $title ) . '</option>';
+							foreach ( $posts_list as $ident => $widget_title ) {
+								if ( $ident === $active_product_id ) {
+									echo '<option value="' . esc_attr( $ident ) . '" selected>' . esc_attr( $widget_title ) . '</option>';
 								} else {
-									echo '<option value="' . esc_attr( $id ) . '">' . esc_attr( $title ) . '</option>';
+									echo '<option value="' . esc_attr( $ident ) . '">' . esc_attr( $widget_title ) . '</option>';
 								}
 							}
 							?>
@@ -151,7 +143,7 @@ ob_start();
 					</span>
 					<span class="info"><?php echo $info_product_select_page; ?></span>
 				</div>
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_catalog ); ?>">
 					<span class="eac-elements__item-content"><?php echo $title_product_catalog; ?>
 						<a href="<?php echo esc_url( 'https://elementor-addon-components.com/woocommerce-product-grid-for-elementor/#turn-your-woocommerce-store-into-a-catalog' ); ?>" target="_blank" rel="noopener noreferrer">
@@ -166,7 +158,7 @@ ob_start();
 					</span>
 					<span class="info"><?php echo $info_product_catalog; ?></span>
 				</div>
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_request ); ?>">
 					<span class="eac-elements__item-content"><?php echo $title_product_request; ?></span>
 					<span>
@@ -177,7 +169,7 @@ ob_start();
 					</span>
 					<span class="info"><?php echo $info_product_request; ?></span>
 				</div>
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_pages ); ?>">
 					<span class="eac-elements__item-content"><?php echo $title_product_pages; ?></span>
 					<span>
@@ -188,7 +180,7 @@ ob_start();
 					</span>
 					<span class="info"><?php echo $info_product_pages; ?></span>
 				</div>
-				
+
 				<div class="<?php echo esc_attr( $class_wrapper_redirect ); ?>">
 					<span class="eac-elements__item-content"><?php echo $title_product_redirect; ?></span>
 					<span>
@@ -221,12 +213,13 @@ ob_start();
 					</span>
 					<span class="info"><?php echo $info_product_metas; ?></span>
 				</div>
-				
+
 			</div> <!-- Table common -->
 		</div> <!-- Settings TAB -->
 	</div> <!-- TAB 5-->
 
 	<div class="eac-saving-box">
+		<div id="eac-wc-integration-to-save"><?php esc_html_e( 'Vous devez enregistrer les réglages', 'eac-components' ); ?></div>
 		<input id="eac-sumit" type="submit" value="<?php esc_html_e( 'Enregistrer les modifications', 'eac-components' ); ?>">
 		<div id="eac-wc-integration-saved"></div>
 		<div id="eac-wc-integration-notsaved"></div>
@@ -234,4 +227,4 @@ ob_start();
 </form>
 <?php
 $output = ob_get_clean();
-echo $output;
+echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

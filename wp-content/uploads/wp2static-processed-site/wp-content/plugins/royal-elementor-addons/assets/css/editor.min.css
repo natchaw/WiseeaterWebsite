@@ -89,7 +89,10 @@
 .elementor-control-slider_item_bg_size,
 .elementor-control-element_addcart_variable_txt,
 .elementor-control-type,
-.elementor-control-show_last_update_date {
+.elementor-control-show_last_update_date,
+.elementor-control-insta_feed_elements .elementor-control-element_lightbox_overlay,
+.elementor-control-insta_feed_elements .elementor-control-element_avatar_size,
+.elementor-control-insta_feed_elements .elementor-control-element-hide_year {
 	margin-bottom: 15px;
 }
 
@@ -128,6 +131,7 @@
 .elementor-control-divider_style,
 .elementor-control-filters_pointer,
 .elementor-control-title_transition_duration,
+.elementor-control-read_more_transition_duration,
 .elementor-control-tax1_transition_duration,
 .elementor-control-tax2_transition_duration,
 .elementor-control-filters_transition_duration,
@@ -145,7 +149,15 @@
 .elementor-control-title_pointer_animation + .elementor-control-title_transition_duration,
 .elementor-control-tax1_pointer_animation + .elementor-control-tax1_transition_duration,
 .elementor-control-tax2_pointer_animation + .elementor-control-tax2_transition_duration,
-.elementor-control-filters_pointer_animation + .elementor-control-filters_transition_duration {
+.elementor-control-filters_pointer_animation + .elementor-control-filters_transition_duration,
+.elementor-control-insta_feed_elements .elementor-control-element_extra_text_pos,
+.elementor-control-insta_feed_elements .elementor-control-element_sharing_icon_1,
+.elementor-control-insta_feed_elements .elementor-control-element_username_tag,
+.elementor-control-insta_feed_elements .elementor-control-element_location,
+.elementor-control-twitter_feed_elements .elementor-control-element_username_tag,
+.elementor-control-filters_transition_duration,
+.elementor-control-show_last_update_date,
+.elementor-control-insta_layout_select {
 	padding-top: 0 !important;
 }
 
@@ -187,6 +199,15 @@
 .elementor-control-element_show_on {
 	padding-top: 15px !important;
 	border-top: 1px solid #d5dadf;
+}
+
+.elementor-control-show_word_count {
+	padding-top: 0!important;
+}
+
+.elementor-control-twitter_feed_elements .elementor-control-element_show_on {
+	padding-top: 0 !important;
+	border-top: none;
 }
 
 [class*="wpr__section_"] ~ .elementor-control-type-number .elementor-control-input-wrapper,
@@ -514,7 +535,10 @@
 .elementor-control-wpr_library_buttons .wpr-advanced-accordion a:last-child,
 .elementor-control-wpr_library_buttons .wpr-image-accordion a:last-child,
 .elementor-control-wpr_library_buttons .wpr-mega-menu a:last-child,
-.elementor-control-wpr_library_buttons .wpr-charts a:last-child {
+.elementor-control-wpr_library_buttons .wpr-charts a:last-child,
+.elementor-control-wpr_library_buttons .wpr-offcanvas a:last-child,
+.elementor-control-wpr_library_buttons .wpr-instagram-feed a:last-child,
+.elementor-control-wpr_library_buttons .wpr-twitter-feed a:last-child {
 	display: none;
 }
 
@@ -615,6 +639,14 @@
 
 .elementor-control[class*="pro_notice"] {
 	padding: 5px 0 15px 0 !important;
+}
+
+.elementor-control.elementor-control-limit_pro_notice {
+	padding-bottom: 0 !important;
+}
+
+.wpr-pro-control.elementor-control-open_links_in_new_tab {
+	padding-top: 20px;
 }
 
 .wpr-pro-notice {
@@ -1001,4 +1033,43 @@ pre.xdebug-var-dump {
   border: 2px solid #000;
   padding: 20px;
   left: 300px;
+}
+
+
+/*--------------------------------------------------------------
+== Authorize Instagram
+--------------------------------------------------------------*/
+
+.elementor-control-instagram_access_token_authorize {
+	height: 50px;
+	padding: 0;
+}
+
+.elementor-control-instagram_access_token_authorize .elementor-control-raw-html {
+	padding: 0 10px 10px 10px;
+}
+
+.elementor-control-instagram_access_token_authorize a {
+	width: 100%;
+	text-align: center;
+    margin: 0;
+    font-weight: 500;
+    outline: none;
+    border-radius: 3px;
+    transition-property: background,color,box-shadow,opacity,-webkit-box-shadow;
+    transition-duration: .3s;
+    font-size: 13px;
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    display: inline-block;
+    background-color: #39b54a;
+    opacity: .85;
+    box-shadow: 0 0 2px rgba(0,0,0,.12),0 2px 2px rgba(0,0,0,.2);;
+}
+
+
+.elementor-control-instagram_access_token_authorize a:hover {
+	color: #fff;
 }

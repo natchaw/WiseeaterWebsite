@@ -31,7 +31,7 @@ class Wpr_Page_Checkout extends Widget_Base {
 	}
 
 	public function get_keywords() {
-		return [ 'qq', 'woocommerce', 'checkout', 'product', 'page', 'checkout page', 'page checkout' ];//tmp
+		return [ 'woocommerce', 'checkout', 'product', 'page', 'checkout page', 'page checkout' ];
 	}
 
 	protected function register_controls() {

@@ -208,7 +208,6 @@ class Pinterest_Rss_Widget extends Widget_Base {
 					'label'     => esc_html__( 'Nom du tableau', 'eac-components' ),
 					'type'      => Controls_Manager::TEXT,
 					'condition' => array( 'pin_switch_board' => 'yes' ),
-					// 'label_block' => true,
 				)
 			);
 
@@ -547,14 +546,18 @@ class Pinterest_Rss_Widget extends Widget_Base {
 			$active_breakpoints  = Plugin::$instance->breakpoints->get_active_breakpoints();
 			$columns_device_args = array();
 		foreach ( $active_breakpoints as $breakpoint_name => $breakpoint_instance ) {
-			if ( ! in_array( $breakpoint_name, array( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN, Breakpoints_manager::BREAKPOINT_KEY_LAPTOP ) ) ) {
-				if ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE ) {
-					$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-				} elseif ( $breakpoint_name === Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA ) {
-					$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
-				} else {
-					$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
-				}
+			if ( Breakpoints_manager::BREAKPOINT_KEY_WIDESCREEN === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_LAPTOP === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '4' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET_EXTRA === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_TABLET === $breakpoint_name ) {
+					$columns_device_args[ $breakpoint_name ] = array( 'default' => '3' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE_EXTRA === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '2' );
+			} elseif ( Breakpoints_manager::BREAKPOINT_KEY_MOBILE === $breakpoint_name ) {
+				$columns_device_args[ $breakpoint_name ] = array( 'default' => '1' );
 			}
 		}
 
@@ -779,9 +782,9 @@ class Pinterest_Rss_Widget extends Widget_Base {
 		/** @since 1.9.3 'input hidden' */
 		?>
 		<div class="eac-pin-galerie">
-			<input type="hidden" id="pin_nonce" name="pin_nonce" value="<?php echo wp_create_nonce( 'eac_rss_feed_' . $this->get_id() ); ?>" />
+			<input type="hidden" id="pin_nonce" name="pin_nonce" value="<?php echo wp_create_nonce( 'eac_rss_feed_' . $this->get_id() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>" />
 			<?php $this->render_galerie(); ?>
-			<div <?php echo $this->get_render_attribute_string( 'pin_galerie' ); ?>></div>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'pin_galerie' ) ); ?>></div>
 		</div>
 		<?php
 	}
@@ -803,14 +806,14 @@ class Pinterest_Rss_Widget extends Widget_Base {
 			<div class="pin-options-items-list">
 				<select id="pin_options_items" class="pin-options-items">
 					<?php foreach ( $settings['pin_pinterest_list'] as $item ) { ?>
-						<?php $has_board = $item['pin_switch_board'] === 'yes' && ! empty( $item['pin_item_board'] ) ? true : false; ?>
+						<?php $has_board = 'yes' === $item['pin_switch_board'] && ! empty( $item['pin_item_board'] ) ? true : false; ?>
 						<?php if ( ! empty( $item['pin_item_url']['url'] ) && ! empty( $item['pin_item_user'] ) ) : ?>
 							<?php if ( $has_board ) : ?>
-								<?php $url = esc_url( $item['pin_item_url']['url'] ) . '/' . sanitize_text_field( $item['pin_item_user'] ) . '/' . sanitize_text_field( $item['pin_item_board'] ) . $board; ?>
+								<?php $url = $item['pin_item_url']['url'] . '/' . sanitize_text_field( $item['pin_item_user'] ) . '/' . sanitize_text_field( $item['pin_item_board'] ) . $board; ?>
 							<?php else : ?>
-								<?php $url = esc_url( $item['pin_item_url']['url'] ) . '/' . sanitize_text_field( $item['pin_item_user'] ) . $user; ?>
+								<?php $url = $item['pin_item_url']['url'] . '/' . sanitize_text_field( $item['pin_item_user'] ) . $user; ?>
 							<?php endif; ?>
-							<option value="<?php echo $url; ?>"><?php echo sanitize_text_field( $item['pin_item_title'] ); ?></option>
+							<option value="<?php echo esc_url( $url ); ?>"><?php echo sanitize_text_field( $item['pin_item_title'] ); ?></option>
 						<?php endif; ?>
 					<?php } ?>
 				</select>
@@ -830,7 +833,7 @@ class Pinterest_Rss_Widget extends Widget_Base {
 	 * Retrieve fields values to pass at the widget container
 	 * Convert on JSON format
 	 *
-	 * @uses      json_encode()
+	 * @uses      wp_json_encode()
 	 *
 	 * @return    JSON oject
 	 *
@@ -844,18 +847,16 @@ class Pinterest_Rss_Widget extends Widget_Base {
 
 		$settings = array(
 			'data_id'       => $this->get_id(),
-			'data_nombre'   => $module_settings['pin_item_nombre'],
-			'data_longueur' => $module_settings['pin_item_length'],
+			'data_nombre'   => absint( $module_settings['pin_item_nombre'] ),
+			'data_longueur' => absint( $module_settings['pin_item_length'] ),
 			'data_style'    => $module_settings['pin_wrapper_style'],
-			'data_date'     => $module_settings['pin_item_date'] === 'yes' ? true : false,
-			'data_img'      => $module_settings['pin_item_image'] === 'yes' ? true : false,
-			'data_lightbox' => $module_settings['pin_item_lightbox'] === 'yes' ? true : false,
+			'data_date'     => 'yes' === $module_settings['pin_item_date'] ? true : false,
+			'data_img'      => 'yes' === $module_settings['pin_item_image'] ? true : false,
+			'data_lightbox' => 'yes' === $module_settings['pin_item_lightbox'] ? true : false,
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}
-
 }

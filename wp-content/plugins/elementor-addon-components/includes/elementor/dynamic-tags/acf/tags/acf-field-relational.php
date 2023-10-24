@@ -93,7 +93,7 @@ class Eac_Acf_Relational extends Tag {
 			}
 
 			// Affecte l'ID de l'article courant ou de la page d'options
-			$post_id = $post_id === '' ? get_the_ID() : $post_id;
+			$post_id = '' === $post_id ? get_the_ID() : $post_id;
 
 			// Récupère l'objet Field
 			$field = get_field_object( $field_key, $post_id );
@@ -107,8 +107,8 @@ class Eac_Acf_Relational extends Tag {
 						$values   = array();
 						$featured = true;
 						$img      = '';
-						if ( $field['type'] == 'relationship' ) {
-							$featured = is_array( $field['elements'] ) && ! empty( $field['elements'][0] ) && $field['elements'][0] == 'featured_image' ? true : false;
+						if ( 'relationship' === $field['type'] ) {
+							$featured = is_array( $field['elements'] ) && ! empty( $field['elements'][0] ) && 'featured_image' === $field['elements'][0] ? true : false;
 						}
 						/** @since 1.8.5 Fix cast $field_value dans le type tableau */
 						$field_value = is_array( $field_value ) ? $field_value : array( $field_value );
@@ -119,22 +119,22 @@ class Eac_Acf_Relational extends Tag {
 								break;
 							}
 
-							$id = $field['return_format'] == 'object' ? (int) $value->ID : (int) $value;
+							$id = 'object' === $field['return_format'] ? absint( $value->ID ) : absint( $value );
 
-							$title = $field['return_format'] == 'object' ? esc_html( $value->post_title ) : esc_html( get_post( $id )->post_title );
+							$title = 'object' === $field['return_format'] ? esc_html( $value->post_title ) : esc_html( get_post( $id )->post_title );
 
 							if ( $featured ) {
-								$img = "<div class='acf-relational_img'><a href='" . get_permalink( get_post( $id )->ID ) . "'>" . get_the_post_thumbnail( $id, 'thumbnail' ) . '</a></div>'; }
+								$img = "<div class='acf-relational_img'><a href='" . esc_url( get_permalink( get_post( $id )->ID ) ) . "'>" . get_the_post_thumbnail( $id, 'thumbnail' ) . '</a></div>'; }
 
-							$title_link = "<div class='acf-relational_content'><div class='acf-relational_title'><a href='" . get_permalink( get_post( $id )->ID ) . "'><h3>" . $title . '</h3></a></div>';
+							$title_link = "<div class='acf-relational_content'><div class='acf-relational_title'><a href='" . esc_url( get_permalink( get_post( $id )->ID ) ) . "'><h3>" . esc_html( $title ) . '</h3></a></div>';
 
-							$date_modif = "<div class='acf-relational_date'>" . get_the_modified_date( get_option( 'date_format' ), $id ) . '</div>';
+							$date_modif = "<div class='acf-relational_date'>" . esc_html( get_the_modified_date( get_option( 'date_format' ), $id ) ) . '</div>';
 
-							$excerpt = "<div class='acf-relational_excerpt'>" . Eac_Tools_Util::get_post_excerpt( $id, self::EXCERPT_LENGTH ) . '</div>';
+							$excerpt = "<div class='acf-relational_excerpt'>" . wp_kses_post( Eac_Tools_Util::get_post_excerpt( $id, self::EXCERPT_LENGTH ) ) . '</div>';
 
 							$classes = esc_attr( implode( ' ', get_post_class( '', $id ) ) );
 
-							$article = "<article id='post-" . $id . "' class='" . $classes . "'>";
+							$article = "<article id='post-" . esc_attr( $id ) . "' class='" . esc_attr( $classes ) . "'>";
 
 							$values[] = "<div class='acf-relational_post'>" . $article . $img . $title_link . $date_modif . $excerpt . '</article></div>';
 						}

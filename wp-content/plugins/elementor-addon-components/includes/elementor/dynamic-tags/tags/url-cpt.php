@@ -50,9 +50,10 @@ class Eac_Cpts_Tag extends Data_Tag {
 		$this->add_control(
 			'single_cpt_url',
 			array(
-				'label'   => esc_html__( 'Articles Url', 'eac-components' ),
-				'type'    => Controls_Manager::SELECT,
-				'options' => $this->get_custom_keys_array(),
+				'label'       => esc_html__( 'Articles personnalisés Url', 'eac-components' ),
+				'type'        => Controls_Manager::SELECT,
+				'options'     => $this->get_custom_keys_array(),
+				'label_block' => true,
 			)
 		);
 	}
@@ -100,7 +101,7 @@ class Eac_Cpts_Tag extends Data_Tag {
 
 		// Supprime le filtre
 		remove_all_filters( 'eac/tools/post_types' );
-		
+
 		$result = $wpdb->get_results(
 			"SELECT ID, post_type, post_title, post_name, guid
 			FROM {$wpdb->prefix}posts

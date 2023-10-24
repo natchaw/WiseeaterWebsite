@@ -6,10 +6,10 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 global $wpdb;
 
-$options       = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE '%eac_option%'" ) );
-$updates       = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE '%eac_up%'" ) );
-$nominatims    = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE '%eac_nominatim_%'" ) );
-$menu_item_ids = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE '_eac_custom_nav_%'" ) );
+$options       = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE %s", '%eac_option%' ) );
+$updates       = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE %s", '%eac_up%' ) );
+$nominatims    = $wpdb->get_results( $wpdb->prepare( "SELECT option_name FROM {$wpdb->prefix}options WHERE option_name LIKE %s", '%eac_nominatim_%' ) );
+$menu_item_ids = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key LIKE %s", '_eac_custom_nav_%' ) );
 
 /** Nettoie les options */
 if ( $options && ! empty( $options ) ) {
@@ -41,11 +41,11 @@ if ( $menu_item_ids && ! empty( $menu_item_ids ) ) {
 
 /** Suppression des capacités editor et shop_manager */
 $role_editor = get_role( 'editor' );
-if ( $role_editor->has_cap( 'eac_manage_options' ) === true ) {
+if ( true === $role_editor->has_cap( 'eac_manage_options' ) ) {
 	wp_roles()->remove_cap( 'editor', 'eac_manage_options' );
 }
 
-$role_manager = get_role( 'shop_manager' );
-if ( ! is_null( $role_manager ) && $role_manager->has_cap( 'eac_manage_options' ) === true ) {
+$role_shop_manager = get_role( 'shop_manager' );
+if ( ! is_null( $role_shop_manager ) && true === $role_shop_manager->has_cap( 'eac_manage_options' ) ) {
 	wp_roles()->remove_cap( 'shop_manager', 'eac_manage_options' );
 }

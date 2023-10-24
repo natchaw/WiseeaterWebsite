@@ -9,6 +9,7 @@
  * @since 1.8.6
  * @since 1.8.7 Application des breakpoints
  * @since 1.9.0 Intégration des scripts et des styles dans le constructeur de la class
+ * @since 2.0.2 Transformation de l'image en image de fond
  */
 
 namespace EACCustomWidgets\Widgets;
@@ -44,7 +45,7 @@ class Image_Hotspots_Widget extends Widget_Base {
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
 
-		wp_register_style( 'eac-image-hotspots', EAC_Plugin::instance()->get_register_style_url( 'image-hotspots' ), array( 'eac' ), '1.8.6' );
+		wp_register_style( 'eac-image-hotspots', EAC_Plugin::instance()->get_register_style_url( 'image-hotspots' ), array( 'eac' ), EAC_ADDONS_VERSION );
 	}
 
 	/**
@@ -169,38 +170,125 @@ class Image_Hotspots_Widget extends Widget_Base {
 			$this->add_control(
 				'hst_image_background',
 				array(
-					'label'       => esc_html__( 'Image', 'eac-components' ),
-					'type'        => Controls_Manager::MEDIA,
-					'description' => esc_html__( "La meilleure pratique pour la réactivité serait d'utiliser une image avec une orientation paysage", 'eac-components' ),
-					'dynamic'     => array( 'active' => true ),
-					'default'     => array(
+					'label'   => esc_html__( 'Image', 'eac-components' ),
+					'type'    => Controls_Manager::MEDIA,
+					'dynamic' => array( 'active' => true ),
+					'default' => array(
 						'url' => Utils::get_placeholder_image_src(),
 					),
 				)
 			);
 
 			$this->add_control(
-				'hst_image_alignment',
+				'hst_image_position',
 				array(
-					'label'     => esc_html__( 'Alignement', 'eac-components' ),
-					'type'      => Controls_Manager::CHOOSE,
-					'options'   => array(
-						'left'   => array(
-							'title' => esc_html__( 'Gauche', 'eac-components' ),
-							'icon'  => 'eicon-text-align-left',
-						),
-						'center' => array(
-							'title' => esc_html__( 'Centre', 'eac-components' ),
-							'icon'  => 'eicon-text-align-center',
-						),
-						'right'  => array(
-							'title' => esc_html__( 'Droite', 'eac-components' ),
-							'icon'  => 'eicon-text-align-right',
+					'label'   => esc_html__( 'Position', 'eac-components' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'center center',
+					'options' => array(
+						'top left'      => esc_html__( 'Haut gauche', 'eac-components' ),
+						'top center'    => esc_html__( 'Haut centré', 'eac-components' ),
+						'top right'     => esc_html__( 'Haut droit', 'eac-components' ),
+						'center left'   => esc_html__( 'Centre gauche', 'eac-components' ),
+						'center center' => esc_html__( 'Centre centré', 'eac-components' ),
+						'center right'  => esc_html__( 'Centre droit', 'eac-components' ),
+						'bottom left'   => esc_html__( 'Bas gauche', 'eac-components' ),
+						'bottom center' => esc_html__( 'Bas centré', 'eac-components' ),
+						'bottom right'  => esc_html__( 'Bas droit', 'eac-components' ),
+						'initial'       => esc_html__( 'Personnaliser', 'eac-components' ),
+					),
+				)
+			);
+
+			$this->add_control(
+				'hst_image_position_x',
+				array(
+					'label'      => esc_html__( 'Position horizontale (%)', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
+						'size' => 50,
+						'unit' => '%',
+					),
+					'range'      => array(
+						'%' => array(
+							'min'  => 0,
+							'max'  => 100,
+							'step' => 5,
 						),
 					),
-					'default'   => 'center',
-					'toggle'    => false,
-					'selectors' => array( '{{WRAPPER}} .hst-hotspots__wrapper-img' => 'text-align: {{VALUE}};' ),
+					'condition'  => array( 'hst_image_position' => 'initial' ),
+				)
+			);
+
+			$this->add_control(
+				'hst_image_position_y',
+				array(
+					'label'      => esc_html__( 'Position verticale (%)', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( '%' ),
+					'default'    => array(
+						'size' => 50,
+						'unit' => '%',
+					),
+					'range'      => array(
+						'%' => array(
+							'min'  => 0,
+							'max'  => 100,
+							'step' => 5,
+						),
+					),
+					'condition'  => array( 'hst_image_position' => 'initial' ),
+				)
+			);
+
+			$this->add_control(
+				'hst_image_repeat',
+				array(
+					'label'   => esc_html__( 'Répéter', 'eac-components' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'no-repeat',
+					'options' => array(
+						'no-repeat' => esc_html__( 'Non répété', 'eac-components' ),
+						'repeat'    => esc_html__( 'Répéter', 'eac-components' ),
+						'repeat-x'  => esc_html__( 'Répéter horizontalement', 'eac-components' ),
+						'repeat-y'  => esc_html__( 'Répéter verticalement', 'eac-components' ),
+					),
+				)
+			);
+
+			$this->add_control(
+				'hst_image_size',
+				array(
+					'label'   => esc_html__( 'Taille', 'eac-components' ),
+					'type'    => Controls_Manager::SELECT,
+					'default' => 'cover',
+					'options' => array(
+						'auto'    => esc_html__( 'Auto', 'eac-components' ),
+						'cover'   => esc_html__( 'Couvrir', 'eac-components' ),
+						'contain' => esc_html__( 'Contenir', 'eac-components' ),
+					),
+				)
+			);
+
+			$this->add_responsive_control(
+				'hst_image_height',
+				array(
+					'label'      => esc_html__( 'Hauteur min.', 'eac-components' ),
+					'type'       => Controls_Manager::SLIDER,
+					'size_units' => array( 'px' ),
+					'default'    => array(
+						'unit' => 'px',
+						'size' => 450,
+					),
+					'range'      => array(
+						'px' => array(
+							'min'  => 150,
+							'max'  => 1000,
+							'step' => 50,
+						),
+					),
+					'selectors'  => array( '{{WRAPPER}} .hst-hotspots__wrapper' => 'min-height: {{SIZE}}px;' ),
 				)
 			);
 
@@ -594,11 +682,9 @@ class Image_Hotspots_Widget extends Widget_Base {
 					'label'      => esc_html__( 'Rayon de la bordure', 'eac-components' ),
 					'type'       => Controls_Manager::DIMENSIONS,
 					'size_units' => array( 'px', '%' ),
-					// 'allowed_dimensions' => ['top', 'right', 'bottom', 'left'],
 					'selectors'  => array(
 						'{{WRAPPER}} .hst-hotspots__wrapper-text' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 					),
-					'separator'  => 'before',
 				)
 			);
 
@@ -716,17 +802,15 @@ class Image_Hotspots_Widget extends Widget_Base {
 								'{{WRAPPER}} .hst-hotspots__wrapper-icon .tooltip,
 							{{WRAPPER}} .hst-hotspots__wrapper-text .tooltip' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 							),
-							'separator'          => 'before',
 						)
 					);
 
 					$this->add_group_control(
 						Group_Control_Box_Shadow::get_type(),
 						array(
-							'name'      => 'hst_shape_tooltips_shadow',
-							'label'     => esc_html__( 'Ombre portée', 'eac-components' ),
-							'selector'  => '{{WRAPPER}} .hst-hotspots__wrapper-icon .tooltip, {{WRAPPER}} .hst-hotspots__wrapper-text .tooltip',
-							'separator' => 'before',
+							'name'     => 'hst_shape_tooltips_shadow',
+							'label'    => esc_html__( 'Ombre', 'eac-components' ),
+							'selector' => '{{WRAPPER}} .hst-hotspots__wrapper-icon .tooltip, {{WRAPPER}} .hst-hotspots__wrapper-text .tooltip',
 						)
 					);
 
@@ -820,30 +904,50 @@ class Image_Hotspots_Widget extends Widget_Base {
 		$settings = $this->get_settings_for_display();
 
 		// Unique ID du widget
-		$id = $this->get_id();
+		$id = esc_attr( $this->get_id() );
 
-		// Le wrapper global du composant
+		$url = '';
+
+		if ( ! empty( $settings['hst_image_background']['id'] ) ) {
+			$image = wp_get_attachment_image_src( $settings['hst_image_background']['id'], 'full' );
+			if ( ! $image ) {
+				$image    = array();
+				$image[0] = plugins_url() . '/elementor/assets/images/placeholder.png';
+			}
+			$url = esc_url( $image[0] );
+		} else {
+			$url = esc_url( $settings['hst_image_background']['url'] );
+		}
+
+		$position = esc_attr( $settings['hst_image_position'] );
+		if ( 'initial' === $position ) {
+			$position = absint( $settings['hst_image_position_x']['size'] ) . '% ' . absint( $settings['hst_image_position_y']['size'] ) . '%';
+		}
+
+		$repeat = $settings['hst_image_repeat'];
+
+		$size = esc_attr( $settings['hst_image_size'] );
+
+		/**
+		 * Le wrapper global du composant
+		 * @since 2.0.2 Image de fond
+		 */
 		$this->add_render_attribute( 'hst_wrapper', 'class', 'hst-hotspots__wrapper' );
-		$this->add_render_attribute( 'hst_wrapper', 'id', $id );
-		// $this->add_render_attribute('hst_wrapper', 'data-settings', $this->get_settings_json($id));
-
-		$this->add_render_attribute( 'hst_img', 'src', esc_url( $settings['hst_image_background']['url'] ) );
-		$this->add_render_attribute( 'hst_img', 'alt', Control_Media::get_image_alt( $settings['hst_image_background'] ) );
+		$this->add_render_attribute( 'hst_wrapper', 'style', "background: url('" . $url . "') " . $position . ' / ' . $size . ' ' . $repeat . ' scroll;' );
 
 		?>
-		<div <?php echo $this->get_render_attribute_string( 'hst_wrapper' ); ?>>
-			<div class="hst-hotspots__wrapper-img"><img <?php echo $this->get_render_attribute_string( 'hst_img' ); ?>></div>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'hst_wrapper' ) ); ?>>
 			<?php
 
 			// Boucle sur le repeater
 			foreach ( $settings['hst_markers_list'] as $key => $item ) {
 				// $tooltip_data = $this->get_repeater_setting_key('hst_tooltip_content', 'hst_markers_list', $key);
-				$has_picto   = $item['hst_trigger_type'] === 'picto' && ! empty( $item['hst_trigger_icon']['value'] ) ? true : false;
-				$has_text    = $item['hst_trigger_type'] === 'text' && ! empty( $item['hst_trigger_text'] ) ? true : false;
-				$has_anim    = $item['hst_trigger_type'] === 'anim' ? true : false;
+				$has_picto   = 'picto' === $item['hst_trigger_type'] && ! empty( $item['hst_trigger_icon']['value'] ) ? true : false;
+				$has_text    = 'text' === $item['hst_trigger_type'] && ! empty( $item['hst_trigger_text'] ) ? true : false;
+				$has_anim    = 'anim' === $item['hst_trigger_type'] ? true : false;
 				$title       = ! empty( $item['hst_trigger_label'] ) ? sanitize_text_field( $item['hst_trigger_label'] ) : '';
 				$tooltip_pos = ! empty( $item['hst_tooltip_position'] ) ? $item['hst_tooltip_position'] : 'top';
-				$glow        = $item['hst_trigger_icon_glow'] === 'show' ? ' hst-hotspots__glow-show' : '';
+				$glow        = 'show' === $item['hst_trigger_icon_glow'] ? ' hst-hotspots__glow-show' : '';
 				$content     = ! empty( $item['hst_tooltip_content'] ) ? $item['hst_tooltip_content'] : '';
 
 				if ( ! $has_picto && ! $has_anim && ! $has_text ) {
@@ -860,11 +964,11 @@ class Image_Hotspots_Widget extends Widget_Base {
 					$this->add_render_attribute( 'hst_trigger', 'class', 'hst-hotspots__wrapper-text' );
 				}
 				?>
-				<div <?php echo $this->get_render_attribute_string( 'hst_trigger' ); ?>>
+				<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'hst_trigger' ) ); ?>>
 					<?php if ( ! empty( $content ) ) : ?>
 						<div class="tooltip <?php echo esc_attr( $tooltip_pos ); ?>"><?php echo wp_kses_post( $content ); ?></div>
 					<?php endif; ?>
-					
+
 					<?php if ( $has_picto ) : ?>
 						<span class="hst-hotspots__icon-awe"><?php Icons_Manager::render_icon( $item['hst_trigger_icon'], array( 'aria-hidden' => 'true' ) ); ?></span>
 					<?php elseif ( $has_anim ) : ?>
@@ -882,33 +986,5 @@ class Image_Hotspots_Widget extends Widget_Base {
 		<?php
 	}
 
-	/**
-	 * get_settings_json
-	 *
-	 * Retrieve fields values to pass at the widget container
-	 * Convert on JSON format
-	 *
-	 * @uses         json_encode()
-	 *
-	 * @return   JSON oject
-	 *
-	 * @access   protected
-	 * @since    0.0.9
-	 */
-	protected function get_settings_json( $dataid ) {
-		$module_settings = $this->get_settings_for_display();
-
-		$settings = array(
-			'data_id'             => $dataid,
-			'data_tooltip'        => ! empty( $module_settings['hst_tooltip_position'] ) ? $module_settings['hst_tooltip_position'] : 'top',
-			'data_tooltip_tablet' => ! empty( $module_settings['hst_tooltip_position_tablet'] ) ? $module_settings['hst_tooltip_position_tablet'] : 'top',
-			'data_tooltip_mobile' => ! empty( $module_settings['hst_tooltip_position_mobile'] ) ? $module_settings['hst_tooltip_position_mobile'] : 'top',
-		);
-
-		$settings = json_encode( $settings );
-		return $settings;
-	}
-
 	protected function content_template() {}
-
 }

@@ -94,6 +94,8 @@ class Plugin {
 
 		// Ajax Search
 		require WPR_ADDONS_PATH . 'classes/wpr-ajax-search.php';
+		require WPR_ADDONS_PATH . 'classes/wpr-load-more-instagram-posts.php';
+		require WPR_ADDONS_PATH . 'classes/wpr-load-more-tweets.php';
 
 		// Particles
 		if ( 'on' === get_option('wpr-particles', 'on') ) {//TODO: make this check automatic(loop through) for all extensions
@@ -124,7 +126,7 @@ class Plugin {
 			require WPR_ADDONS_PATH . 'classes/plugin-update-notice.php';
 			
 			// Plugin Sale Notice
-			// require WPR_ADDONS_PATH . 'classes/plugin-sale-notice.php';
+			require WPR_ADDONS_PATH . 'classes/plugin-sale-notice.php';
 			
 			// Rating Notice 
 			require WPR_ADDONS_PATH . 'classes/rating-notice.php';
@@ -282,6 +284,7 @@ class Plugin {
 			Plugin::instance()->get_version()
 		);
 
+		// GOGA - development had enqueue instead of register (reason found)
 		wp_enqueue_style(
 			'wpr-text-animations-css',
 			WPR_ADDONS_URL . 'assets/css/lib/animations/text-animations'. $this->script_suffix() .'.css',
@@ -371,7 +374,6 @@ class Plugin {
 			[],
 			Plugin::instance()->get_version()
 		);
-
 		
 		wp_enqueue_style( 
 			'wpr-aos-css', 
@@ -420,7 +422,7 @@ class Plugin {
 			[
 				'ajaxurl' => admin_url( 'admin-ajax.php' ),
 				'resturl' => get_rest_url() . 'wpraddons/v1',
-				'nonce' => wp_create_nonce( 'wpr-addons-js' ),
+				'nonce' => wp_create_nonce( 'wpr-addons-js' )
 			]
 		);
 	}
@@ -516,6 +518,7 @@ class Plugin {
 			 null, 
 			 true 
 		);
+		
 		wp_register_script(
 			'wpr-aos-js',
 			 WPR_ADDONS_URL  . 'assets/js/lib/aos/aos'. $this->script_suffix() .'.js',

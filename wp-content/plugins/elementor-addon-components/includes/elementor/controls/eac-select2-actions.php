@@ -39,29 +39,32 @@ class Eac_Select2_Actions {
 	public function autocomplete_ajax() {
 		// error_log("autocomplete_ajax::" . json_encode($_POST));
 
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'eac_autocomplete_search_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'eac_autocomplete_search_nonce' ) ) {
 			$error[] = array(
 				'id'   => 0,
 				'text' => esc_html__( 'Erreur de sécurité', 'eac-components' ),
 			);
-			wp_send_json_error( json_encode( $error ) );
+			wp_send_json_error( wp_json_encode( $error ) );
 		}
 
 		global $wpdb;
 		// Chaine à rechercher
-		$search = sanitize_text_field( $_POST['search'] );
+		$search = sanitize_text_field( wp_unslash( $_POST['search'] ) );
 		// post_type ou all
-		$post_type = sanitize_text_field( $_POST['object_type'] );
+		$post_type = sanitize_text_field( wp_unslash( $_POST['object_type'] ) );
 		// post, taxonomy ou term
-		$query_type = sanitize_text_field( $_POST['query_type'] );
+		$query_type = sanitize_text_field( wp_unslash( $_POST['query_type'] ) );
 		// category, post_tag, product_cat, product_tag, pa_xxxxx (attribute: pa_tissu)
-		$query_taxo = ! empty( $_POST['query_taxo'] ) ? explode( ',', sanitize_text_field( $_POST['query_taxo'] ) ) : '';
+		$query_taxo = ! empty( $_POST['query_taxo'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['query_taxo'] ) ) ) : '';
 		// Nombre d'entrées
 		$query_limit = 40;
 
-		$suggestions = $objects = $taxonomies = $terms = array();
+		$suggestions = array();
+		$objects     = array();
+		$taxonomies  = array();
+		$terms       = array();
 
-		if ( $post_type === 'all' ) {
+		if ( 'all' === $post_type ) {
 			$all_post_type = \EACCustomWidgets\Core\Utils\Eac_Tools_Util::get_all_post_types();
 			if ( ! empty( $all_post_type ) ) {
 				foreach ( $all_post_type as $name => $pt ) {
@@ -73,14 +76,14 @@ class Eac_Select2_Actions {
 						);
 					}
 				}
-				wp_send_json_success( json_encode( $suggestions ) );
+				wp_send_json_success( wp_json_encode( $suggestions ) );
 			}
 
 			$error[] = array(
 				'id'   => 0,
 				'text' => esc_html__( 'Aucun résultat trouvé', 'eac-components' ),
 			);
-			wp_send_json_error( json_encode( $error ) );
+			wp_send_json_error( wp_json_encode( $error ) );
 		}
 
 		switch ( $query_type ) {
@@ -93,7 +96,7 @@ class Eac_Select2_Actions {
 				$limit = sprintf( 'ORDER BY post_title LIMIT %d', $query_limit );
 
 				$query = "SELECT ID, post_title from {$wpdb->prefix}posts where post_status = 'publish' $where $limit";
-				
+
 				$objects = $wpdb->get_results( $query );
 				break;
 			case 'taxonomy':
@@ -122,7 +125,7 @@ class Eac_Select2_Actions {
 					'text' => $result->post_title,
 				);
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		} elseif ( ! is_wp_error( $taxonomies ) && ! empty( $taxonomies ) ) {
 			foreach ( $taxonomies as $key => $text ) {
 				if ( str_contains( strtolower( $text ), $search ) ) {
@@ -132,26 +135,26 @@ class Eac_Select2_Actions {
 					);
 				}
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		} elseif ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			$taxos = get_taxonomies( array( 'object_type' => array( $post_type ) ), 'names' );
 
 			foreach ( $terms as $term ) {
-				if ( in_array( $term->taxonomy, $taxos ) ) {
+				if ( in_array( $term->taxonomy, $taxos, true ) ) {
 					$suggestions[] = array(
 						'id'   => $term->term_id,
 						'text' => esc_attr( $term->name ),
 					);
 				}
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		}
 
 		$error[] = array(
 			'id'   => 0,
 			'text' => esc_html__( 'Aucun résultat trouvé', 'eac-components' ),
 		);
-		wp_send_json_error( json_encode( $error ) );
+		wp_send_json_error( wp_json_encode( $error ) );
 	}
 
 	/**
@@ -169,12 +172,12 @@ class Eac_Select2_Actions {
 	public function autocomplete_ajax_reload() {
 		// error_log("autocomplete_ajax_reload::" . json_encode($_POST));
 
-		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'eac_autocomplete_search_nonce' ) ) {
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'eac_autocomplete_search_nonce' ) ) {
 			$error[] = array(
 				'id'   => 0,
 				'text' => esc_html__( 'Erreur de sécurité', 'eac-components' ),
 			);
-			wp_send_json_error( json_encode( $error ) );
+			wp_send_json_error( wp_json_encode( $error ) );
 		}
 
 		if ( empty( $_POST['search'] ) ) {
@@ -182,22 +185,25 @@ class Eac_Select2_Actions {
 				'id'   => 0,
 				'text' => esc_html__( 'Aucun résultat trouvé', 'eac-components' ),
 			);
-			wp_send_json_error( json_encode( $error ) );
+			wp_send_json_error( wp_json_encode( $error ) );
 		}
 
 		global $wpdb;
 		$search = is_array( $_POST['search'] ) ? $_POST['search'] : array( $_POST['search'] );
 		$search = array_map( 'sanitize_text_field', $search );
 		// post_type
-		$post_type = sanitize_text_field( $_POST['object_type'] );
+		$post_type = sanitize_text_field( wp_unslash( $_POST['object_type'] ) );
 		// post ou taxonomy
-		$query_type = sanitize_text_field( $_POST['query_type'] );
+		$query_type = sanitize_text_field( wp_unslash( $_POST['query_type'] ) );
 		// category, post_tag, product_cat, product_tag, pa_xxxxx (attribute: pa_tissu)
-		$query_taxo = ! empty( $_POST['query_taxo'] ) ? explode( ',', sanitize_text_field( $_POST['query_taxo'] ) ) : '';
+		$query_taxo = ! empty( $_POST['query_taxo'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_POST['query_taxo'] ) ) ) : '';
 
-		$suggestions = $objects = $taxonomies = $terms = array();
+		$suggestions = array();
+		$objects     = array();
+		$taxonomies  = array();
+		$terms       = array();
 
-		if ( $post_type === 'all' ) {
+		if ( 'all' === $post_type ) {
 			foreach ( $search as $posttype ) {
 				$pt = get_post_type_object( $posttype );
 				if ( $pt ) {
@@ -207,7 +213,7 @@ class Eac_Select2_Actions {
 					);
 				}
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		}
 
 		switch ( $query_type ) {
@@ -247,7 +253,7 @@ class Eac_Select2_Actions {
 					'text' => $value->post_title,
 				);
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		} elseif ( ! is_wp_error( $taxonomies ) && ! empty( $taxonomies ) ) {
 			foreach ( $taxonomies as $taxonomie ) {
 				foreach ( $taxonomie as $key => $text ) {
@@ -257,7 +263,7 @@ class Eac_Select2_Actions {
 					);
 				}
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		} elseif ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
 			foreach ( $terms as $key => $name ) {
 				$suggestions[] = array(
@@ -265,13 +271,13 @@ class Eac_Select2_Actions {
 					'text' => esc_attr( $name ),
 				);
 			}
-			wp_send_json_success( json_encode( $suggestions ) );
+			wp_send_json_success( wp_json_encode( $suggestions ) );
 		}
 
 		$error[] = array(
 			'id'   => 0,
 			'text' => esc_html__( 'Aucun résultat trouvé', 'eac-components' ),
 		);
-		wp_send_json_error( json_encode( $error ) );
+		wp_send_json_error( wp_json_encode( $error ) );
 	}
 } new Eac_Select2_Actions();

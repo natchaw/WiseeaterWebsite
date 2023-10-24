@@ -20,6 +20,11 @@ class Wpr_Parallax_Scroll {
         add_action( 'elementor/frontend/section/before_render', [$this, '_before_render'], 10, 1);
         add_action( 'elementor/section/print_template', [ $this, '_print_template' ], 10, 2 );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+        // FLEXBOX
+        add_action('elementor/element/container/section_layout/after_section_end', [$this, 'register_controls'], 10);
+        add_action('elementor/frontend/container/before_render', [$this, '_before_render'], 10, 1);
+        add_action( 'elementor/container/print_template', [ $this, '_print_template' ], 10, 2 );
     }
 
     public function register_controls( $element ) {
@@ -356,7 +361,8 @@ class Wpr_Parallax_Scroll {
     public function _before_render( $element ) {
         // bail if any other element but section
         // output buffer controlling functions removed elements from live preview
-        if ( $element->get_name() !== 'section' ) return;
+
+        if ( $element->get_name() !== 'section' && $element->get_name() !== 'container' ) return;
 
         $settings = $element->get_settings_for_display();
 

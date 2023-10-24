@@ -197,18 +197,18 @@
 
             if ( is_bool( $val ) ) {
                 return $val;
-            } elseif ( is_numeric( $val ) ) {
+            } else if ( is_numeric( $val ) ) {
                 if ( 1 == $val ) {
                     return true;
-                } elseif ( 0 == $val ) {
+                } else if ( 0 == $val ) {
                     return false;
                 }
-            } elseif ( is_string( $val ) ) {
+            } else if ( is_string( $val ) ) {
                 $val = strtolower( $val );
 
                 if ( 'true' === $val ) {
                     return true;
-                } elseif ( 'false' === $val ) {
+                } else if ( 'false' === $val ) {
                     return false;
                 }
             }
@@ -313,7 +313,7 @@
             }
             if ( ! empty( $_REQUEST['_wp_http_referer'] ) ) {
                 return wp_unslash( $_REQUEST['_wp_http_referer'] );
-            } elseif ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+            } else if ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
                 return wp_unslash( $_SERVER['HTTP_REFERER'] );
             }
 
@@ -413,7 +413,7 @@
                     $confirmation,
                     $title
                 );
-            } elseif ( 'GET' !== strtoupper( $method ) ) {
+            } else if ( 'GET' !== strtoupper( $method ) ) {
                 return sprintf( '<form action="%s" method="%s"><input type="hidden" name="fs_action" value="%s">%s<a href="#" class="%s" onclick="this.parentNode.submit(); return false;">%s</a></form>',
                     freemius( $module_id )->_get_admin_page_url( $page, $params ),
                     $method,
@@ -685,7 +685,7 @@
         function fs_urlencode_rfc3986( $input ) {
             if ( is_array( $input ) ) {
                 return array_map( 'fs_urlencode_rfc3986', $input );
-            } elseif ( is_scalar( $input ) ) {
+            } else if ( is_scalar( $input ) ) {
                 return str_replace( '+', ' ', str_replace( '%7E', '~', rawurlencode( $input ) ) );
             }
 
@@ -756,7 +756,7 @@
             } // If b has a priority and a does not, b wins.
             elseif ( isset( $a['priority'] ) && ! isset( $b['priority'] ) ) {
                 return - 1;
-            } // If neither has a priority or both priorities are equal its a tie.
+            } // If neither has a priority or both priorities are equal it's a tie.
             elseif ( ( ! isset( $a['priority'] ) && ! isset( $b['priority'] ) ) || $a['priority'] === $b['priority'] ) {
                 return 0;
             }
@@ -770,6 +770,12 @@
     #region Localization
     #--------------------------------------------------------------------------------
 
+    global $fs_text_overrides;
+
+    if ( ! isset( $fs_text_overrides ) ) {
+        $fs_text_overrides = array();
+    }
+
     if ( ! function_exists( 'fs_text' ) ) {
         /**
          * Retrieve a translated text by key.
@@ -782,12 +788,10 @@
          *
          * @return string
          *
-         * @global       $fs_text , $fs_text_overrides
+         * @global       $fs_text_overrides
          */
         function fs_text( $key, $slug = 'freemius' ) {
-            global $fs_text,
-                   $fs_module_info_text,
-                   $fs_text_overrides;
+            global $fs_text_overrides;
 
             if ( isset( $fs_text_overrides[ $slug ] ) ) {
                 if ( isset( $fs_text_overrides[ $slug ][ $key ] ) ) {
@@ -798,22 +802,6 @@
                 if ( isset( $fs_text_overrides[ $slug ][ $lower_key ] ) ) {
                     return $fs_text_overrides[ $slug ][ $lower_key ];
                 }
-            }
-
-            if ( ! isset( $fs_text ) ) {
-                $dir = defined( 'WP_FS__DIR_INCLUDES' ) ?
-                    WP_FS__DIR_INCLUDES :
-                    dirname( __FILE__ );
-
-                require_once $dir . '/i18n.php';
-            }
-
-            if ( isset( $fs_text[ $key ] ) ) {
-                return $fs_text[ $key ];
-            }
-
-            if ( isset( $fs_module_info_text[ $key ] ) ) {
-                return $fs_module_info_text[ $key ];
             }
 
             return $key;
@@ -1349,7 +1337,7 @@
         function fs_is_plugin_uninstall() {
             return (
                 defined( 'WP_UNINSTALL_PLUGIN' ) ||
-                ( 0 < did_action( 'update_option_uninstall_plugins' ) )
+                ( 0 < did_action( 'pre_uninstall_plugin' ) )
             );
         }
     }

@@ -74,7 +74,7 @@ class Eac_Acf_Color extends Data_Tag {
 			}
 
 			// Affecte l'ID de l'article courant ou de la page d'options
-			$post_id = $post_id === '' ? get_the_ID() : $post_id;
+			$post_id = '' === $post_id ? get_the_ID() : $post_id;
 
 			// Récupère l'objet Field
 			$field = get_field_object( $field_key, $post_id );

@@ -113,7 +113,6 @@ class Eac_Injection_Image_Alt {
 					'description' => esc_html__( "Valoriser l'attribut 'ALT' pour une image externe (SEO)", 'eac-components' ),
 					'label_block' => true,
 					'render_type' => 'none',
-					// 'condition' => ['image[url]!' => '']
 				)
 			);
 

@@ -1,5 +1,5 @@
 <div class="elementskit-testimonial-slider slick-slider arrow_inside <?php echo !empty($settings['ekit_testimonial_show_dot']) ? 'slick-dotted' : '' ?>" <?php echo $this->get_render_attribute_string('wrapper'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Already escaped by elementor ?>>
-	<div class="swiper-container">
+	<div <?php $this->print_render_attribute_string('swiper-container'); ?>>
         <div class="slick-list swiper-wrapper">
 			<?php
 				foreach ($testimonials as $testimonial):
@@ -65,7 +65,7 @@
 			<?php endforeach; ?>
 		</div>
 	</div>
-	<ul class="slick-dots swiper-pagination swiper-pagination-clickable swiper-pagination-bullets"></ul>
+	<ul aria-describedby="paginations" class="slick-dots swiper-pagination swiper-pagination-clickable swiper-pagination-bullets"></ul>
 	<?php if(!empty($settings['ekit_testimonial_show_arrow'])) : ?>
 		<button type="button" class="slick-prev slick-arrow"><i class="<?php echo esc_attr($prevArrowIcon); ?>"></i></button>
 		<button type="button" class="slick-next slick-arrow"><i class="<?php echo esc_attr($nextArrowIcon); ?>"></i></button>

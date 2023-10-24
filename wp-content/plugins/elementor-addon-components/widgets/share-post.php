@@ -315,7 +315,7 @@ class Reseaux_Sociaux_Widget extends Widget_Base {
 					'default'      => 'yes',
 				)
 			);
-			/*
+			/**
 			$this->add_responsive_control('rs_item_margin',
 				[
 					'label' => esc_html__('Marge supérieure (%)', 'eac-components'),
@@ -346,7 +346,7 @@ class Reseaux_Sociaux_Widget extends Widget_Base {
 
 		?>
 		<div class="eac-reseaux-sociaux">
-			<div <?php echo $this->get_render_attribute_string( 'rs_items_list' ); ?>></div>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'rs_items_list' ) ); ?>></div>
 		</div>
 		<?php
 	}
@@ -357,7 +357,7 @@ class Reseaux_Sociaux_Widget extends Widget_Base {
 	 * Retrieve fields values to pass at the widget container
 	 * Convert on JSON format
 	 *
-	 * @uses      json_encode()
+	 * @uses      wp_json_encode()
 	 *
 	 * @return    JSON oject
 	 *
@@ -368,37 +368,37 @@ class Reseaux_Sociaux_Widget extends Widget_Base {
 	protected function get_settings_json() {
 		$module_settings = $this->get_settings_for_display();
 		$networks        = array();
-		if ( $module_settings['rs_item_facebook'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_facebook'] ) {
 			$networks[] = 'facebook';
 		};
-		if ( $module_settings['rs_item_twitter'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_twitter'] ) {
 			$networks[] = 'twitter';
 		};
-		if ( $module_settings['rs_item_google_plus'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_google_plus'] ) {
 			$networks[] = 'google-plus';
 		};
-		if ( $module_settings['rs_item_linkedin'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_linkedin'] ) {
 			$networks[] = 'linkedin';
 		};
-		if ( $module_settings['rs_item_odnoklassniki'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_odnoklassniki'] ) {
 			$networks[] = 'odnoklassniki';
 		};
-		if ( $module_settings['rs_item_pinterest'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_pinterest'] ) {
 			$networks[] = 'pinterest';
 		};
-		if ( $module_settings['rs_item_reddit'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_reddit'] ) {
 			$networks[] = 'reddit';
 		};
-		if ( $module_settings['rs_item_telegram'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_telegram'] ) {
 			$networks[] = 'telegram';
 		};
-		if ( $module_settings['rs_item_tumblr'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_tumblr'] ) {
 			$networks[] = 'tumblr';
 		};
-		if ( $module_settings['rs_item_whatsapp'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_whatsapp'] ) {
 			$networks[] = 'whatsapp';
 		};
-		if ( $module_settings['rs_item_mail'] === 'yes' ) {
+		if ( 'yes' === $module_settings['rs_item_mail'] ) {
 			$networks[] = 'mail';
 		};
 
@@ -406,13 +406,11 @@ class Reseaux_Sociaux_Widget extends Widget_Base {
 			'data_place'   => $module_settings['rs_share_place'],
 			'data_text'    => sanitize_text_field( $module_settings['rs_share_text'] ),
 			'data_buttons' => $networks,
-			'data_popup'   => $module_settings['rs_item_target'] === 'yes' ? true : false,
+			'data_popup'   => 'yes' === $module_settings['rs_item_target'] ? true : false,
 		);
 
-		$settings = json_encode( $settings );
-		return $settings;
+		return wp_json_encode( $settings );
 	}
 
 	protected function content_template() {}
-
 }

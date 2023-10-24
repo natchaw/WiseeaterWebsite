@@ -154,7 +154,7 @@ class Eac_Load_Scripts {
 		/**
 		 * Semblerait que les fonts Awesome ne soient pas chargées dans l'éditeur Elementor
 		 */
-		// if (! wp_style_is('font-awesome', 'enqueued')) {
+		// if ( ! wp_style_is( 'font-awesome', 'enqueued' ) ) {
 			wp_enqueue_style( 'font-awesome-5-all', plugins_url( '/elementor/assets/lib/font-awesome/css/all.min.css' ), false, '5.15.3' );
 		// }
 	}
@@ -167,7 +167,7 @@ class Eac_Load_Scripts {
 	 * @since 0.0.9
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( 'eac', EAC_Plugin::instance()->get_register_style_url( 'eac-components' ), false, '1.0.0' );
+		wp_enqueue_style( 'eac', EAC_Plugin::instance()->get_register_style_url( 'eac-components' ), false, EAC_ADDONS_VERSION );
 		wp_enqueue_style( 'eac-image-fancybox', EAC_Plugin::instance()->get_register_style_url( 'jquery.fancybox' ), array( 'eac' ), '3.5.7' );
 	}
 
@@ -182,7 +182,7 @@ class Eac_Load_Scripts {
 	 * @since 1.8.9 File viewer
 	 */
 	public function enqueue_panel_styles() {
-		wp_enqueue_style( 'eac-editor-panel', EAC_Plugin::instance()->get_register_style_url( 'eac-editor-panel' ), false, '1.0.0' );
+		wp_enqueue_style( 'eac-editor-panel', EAC_Plugin::instance()->get_register_style_url( 'eac-editor-panel' ), false, EAC_ADDONS_VERSION );
 	}
 
 } Eac_Load_Scripts::instance();

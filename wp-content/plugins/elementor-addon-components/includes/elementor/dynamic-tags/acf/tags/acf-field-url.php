@@ -65,7 +65,6 @@ class Eac_Acf_Url extends Data_Tag {
 		$key         = $this->get_settings( 'acf_url_key' );
 
 		if ( ! empty( $key ) ) {
-			// list($field_key, $meta_key, $post_id) = array_pad(explode('::', $key ), 3, '');
 			list($field_key, $meta_key) = explode( '::', $key );
 
 			// @since 1.8.4 Récupère l'ID de l'article Page d'Options
@@ -77,7 +76,7 @@ class Eac_Acf_Url extends Data_Tag {
 			}
 
 			// Affecte l'ID de l'article courant ou de la page d'options
-			$post_id = $post_id === '' ? get_the_ID() : $post_id;
+			$post_id = '' === $post_id ? get_the_ID() : $post_id;
 
 			// Récupère l'objet Field
 			$field = get_field_object( $field_key, $post_id );

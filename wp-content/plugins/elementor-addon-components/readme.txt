@@ -2,11 +2,11 @@
 Contributors: EAC Team
 Tags: page-builder, elementor, components, addon, widget, dynamic tags, custom css, template, image, TOC, OpenStreetMap, PDF viewer, WooCommerce
 Wordpress tested up to: 6.1.1
-Elementor tested up to: 3.8.1
+Elementor tested up to: 3.10.2
 WC requires at least: 6.9.0
 WC tested up to: 7.1.0
 ACF tested up to: 6.0.3
-Stable tag: 1.9.9
+Stable tag: 2.0.0
 License: GPLv3 or later License
 URI: http://www.gnu.org/licenses/gpl-3.0.html
 "Elementor Addon Components" is distributed in the hope that it will be useful,
@@ -29,6 +29,20 @@ See the GPL General Public License for more details.
 * "English (United States)" is the default language of the plugin except for wordpress sites whose language setting is French.
  
 == Change Log ==
+
+= V2.0.2 - 03/03/2023 =
+* New: 'Effect Ken Burns' is a new feature that allows you to create a background slideshow with a Ken Burns effect for each image.
+* Updated: 'ACF relationship grid' now supports global ACF fields created with the feature Options pages.
+* Fix: 'ACF relationship grid' WooCommerce product image not loading.
+* Improved: 'ACF relationship grid' improved content display in grid or slider mode by adding a vertical align control.
+* Updated: 'Image hotspots' added new controls to manage the image. Default values ​​can impact the existing.
+* Fix: 'Modal box' the contents of block templates appear briefly when the page loads.
+* Fix: 'Openstreetmap' default configuration tiles file does not load correctly.
+* Fix: 'Openstreetmap' on Safari the click on the markers is inoperative.
+* Fix: 'Product grid' displays the sold quantity of the product even if the product is out of stock.
+* Improved: compatibility with Elementor 3.10.2
+* Notice: minimum Elementor version expected 3.5.0
+* Notice: old components 'Background slideshow' and 'Ken Burn slideshow' are removed from this release.
 
 = V2.0.1 - 01/20/2023 =
 * Updated: 'Product grid' add a configuration tab in the plugin settings page for better integration with WooCommerce.

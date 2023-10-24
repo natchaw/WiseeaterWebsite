@@ -26,7 +26,7 @@ class Wpr_Search extends Widget_Base {
 	}
 
 	public function get_title() {
-		return esc_html__( 'Search (Ajax)', 'wpr-addons' );
+		return esc_html__( 'Search (AJAX)', 'wpr-addons' );
 	}
 
 	public function get_icon() {
@@ -1029,6 +1029,16 @@ class Wpr_Search extends Widget_Base {
 		);
 
 		$this->add_control(
+			'search_aria_label',
+			[
+				'label' => esc_html__( 'Aria Label', 'wpr-addons' ),
+				'type' => Controls_Manager::TEXT,
+				'default' => esc_html__( 'Search', 'wpr-addons' ),
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
 			'search_btn',
 			[
 				'label' => esc_html__( 'Button', 'wpr-addons' ),
@@ -1689,6 +1699,7 @@ class Wpr_Search extends Widget_Base {
 		$this->add_render_attribute(
 		'button', [
 			'class' => 'wpr-search-form-submit',
+			'aria-label' => $settings['search_aria_label'],
 			'type' => 'submit',
 		]
 		);
@@ -1718,6 +1729,7 @@ class Wpr_Search extends Widget_Base {
 		$this->add_render_attribute(
 			'input', [
 				'placeholder' => $settings['search_placeholder'],
+				'aria-label' => $settings['search_aria_label'],
 				'class' => 'wpr-search-form-input',
 				'type' => 'search',
 				'name' => 's',

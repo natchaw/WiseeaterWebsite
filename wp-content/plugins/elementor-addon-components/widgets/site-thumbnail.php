@@ -336,9 +336,9 @@ class Site_Thumbnails_Widget extends Widget_Base {
 			return;
 		}
 
-		$has_url = $settings['st_add_link'] === 'yes' ? true : false;
-		$url     = esc_url( $settings['st_site_url']['url'] );
-		$this->add_render_attribute( 'st-link-to', 'href', $url );
+		$has_url = 'yes' === $settings['st_add_link'] ? true : false;
+		$url     = $settings['st_site_url']['url'];
+		$this->add_render_attribute( 'st-link-to', 'href', esc_url( $url ) );
 
 		/** @since 1.9.2 Ajout des attributs 'noopener noreferrer' */
 		if ( $settings['st_site_url']['is_external'] ) {
@@ -349,20 +349,20 @@ class Site_Thumbnails_Widget extends Widget_Base {
 			$this->add_render_attribute( 'st-link-to', 'rel', 'nofollow' );
 		}
 
-		$has_caption = $settings['st_add_caption'] === 'yes' && ! empty( $settings['st_site_caption'] );
+		$has_caption = 'yes' === $settings['st_add_caption'] && ! empty( $settings['st_site_caption'] );
 		?>
 		<div class="eac-site-thumbnail">
 			<div class="site-thumbnail-container">
 				<?php if ( $has_url ) { ?>
-					<a <?php echo $this->get_render_attribute_string( 'st-link-to' ); ?>>
+					<a <?php echo wp_kses_post( $this->get_render_attribute_string( 'st-link-to' ) ); ?>>
 				<?php } ?>
 					<span class="site-thumbnail__wrapper-overlay"></span>
 				<?php if ( $has_url ) { ?>
 					</a>
 				<?php } ?>
-				<div class="thumbnail-container" title="<?php echo $url; ?>">
+				<div class="thumbnail-container" title="<?php echo esc_attr( $url ); ?>">
 					<div class="thumbnail">
-						<iframe src="<?php echo $url; ?>" frameborder="0" onload="var that=this;setTimeout(function() { that.style.opacity=1 }, 500)"></iframe>
+						<iframe src="<?php echo esc_url( $url ); ?>" frameborder="0" onload="var that=this;setTimeout(function() { that.style.opacity=1 }, 500)"></iframe>
 					</div>
 				</div>
 			</div>
@@ -374,5 +374,4 @@ class Site_Thumbnails_Widget extends Widget_Base {
 	}
 
 	protected function content_template() {}
-
 }

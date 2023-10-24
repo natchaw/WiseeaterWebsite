@@ -232,7 +232,6 @@ class Syntax_Highlighter_Widget extends Widget_Base {
 					'label'       => esc_html__( 'Hauteur', 'eac-components' ),
 					'type'        => Controls_Manager::SLIDER,
 					'size_units'  => array( 'px' ),
-					// 'default' => ['size' => 500, 'unit' => 'px'],
 					'range'       => array(
 						'px' => array(
 							'min'  => 200,
@@ -321,11 +320,11 @@ class Syntax_Highlighter_Widget extends Widget_Base {
 		$syntax_code = htmlentities( $settings['sh_syntax_code'] );
 
 		// Numérotage des lignes
-		$line_num = $settings['sh_syntax_linenumbers'] === 'yes' ? 'line-numbers' : '';
+		$line_num = 'yes' === $settings['sh_syntax_linenumbers'] ? 'line-numbers' : '';
 
 		$pre_class .= $settings['sh_syntax_theme'];
 		$pre_class .= ' language-' . $language;
-		$pre_class .= $settings['sh_syntax_linenumbers'] === 'yes' ? ' line-numbers' : '';
+		$pre_class .= 'yes' === $settings['sh_syntax_linenumbers'] ? ' line-numbers' : '';
 
 		$code_class .= $settings['sh_syntax_theme'];
 		$code_class .= ' language-' . $language;
@@ -337,7 +336,7 @@ class Syntax_Highlighter_Widget extends Widget_Base {
 		$pre  = "<div class='sh-syntax_wrapper'><pre " . $this->get_render_attribute_string( 'pre_class' ) . '>';
 		$code = $pre . '<code ' . $this->get_render_attribute_string( 'code_class' ) . '>' . $syntax_code . '</code></pre></div>';
 
-		echo $code;
+		echo $code; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo $this->load_script_code();
 	}
 

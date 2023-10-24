@@ -1035,7 +1035,7 @@ class Image_Promotion_Widget extends Widget_Base {
 		$this->add_render_attribute( 'ip_wrapper', 'class', 'ip-wrapper' );
 		?>
 		<div class="eac-image-promo">
-			<div <?php echo $this->get_render_attribute_string( 'ip_wrapper' ); ?>>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'ip_wrapper' ) ); ?>>
 				<?php $this->render_galerie(); ?>
 			</div>
 		</div>
@@ -1065,7 +1065,7 @@ class Image_Promotion_Widget extends Widget_Base {
 
 		// Il y a un titre ?
 		$iptitle       = $settings['ip_title'] ? $settings['ip_title'] : false;
-		$has_title_url = $iptitle && ! empty( $settings['ip_title_url']['url'] ) && $settings['ip_title_url']['url'] !== '#' ? true : false;
+		$has_title_url = $iptitle && ! empty( $settings['ip_title_url']['url'] ) && '#' !== $settings['ip_title_url']['url'] ? true : false;
 
 		// Étiquette du titre et affectation d'une class pour le modifier
 		$title_tag   = $settings['ip_title_tag'];
@@ -1076,10 +1076,10 @@ class Image_Promotion_Widget extends Widget_Base {
 		$prix = wp_kses_post( $settings['ip_price'] );
 
 		// Visionneuse pour l'image ?
-		$visionneuse = $settings['ip_lightbox'] === 'yes' ? true : false;
+		$visionneuse = 'yes' === $settings['ip_lightbox'] ? true : false;
 
 		// Le ribbon est affiché
-		$has_ribbon = $settings['ip_ribbon_switcher'] === 'yes' ? true : false;
+		$has_ribbon = 'yes' === $settings['ip_ribbon_switcher'] ? true : false;
 		$image_url  = '';
 		$link_icon  = false;
 		$link_url   = '';
@@ -1119,7 +1119,7 @@ class Image_Promotion_Widget extends Widget_Base {
 		 *
 		 * @since 1.9.2 Ajout des attributs 'noopener noreferrer'
 		 */
-		if ( $settings['ip_link_to'] === 'custom' ) {
+		if ( 'custom' === $settings['ip_link_to'] ) {
 			$link_url = esc_url( $settings['ip_link_url']['url'] );
 			$this->add_render_attribute( 'ip-link-to', 'href', $link_url );
 
@@ -1131,7 +1131,7 @@ class Image_Promotion_Widget extends Widget_Base {
 			if ( $settings['ip_link_url']['nofollow'] ) {
 				$this->add_render_attribute( 'ip-link-to', 'rel', 'nofollow' );
 			}
-		} elseif ( $settings['ip_link_to'] === 'file' ) {
+		} elseif ( 'file' === $settings['ip_link_to'] ) {
 			$link_url = $settings['ip_link_page'];
 			$this->add_render_attribute( 'ip-link-to', 'href', esc_url( get_permalink( get_page_by_title( $link_url ) ) ) );
 		}
@@ -1155,88 +1155,87 @@ class Image_Promotion_Widget extends Widget_Base {
 			$this->add_render_attribute( 'ribbon', 'class', 'image-ribbon image-ribbon-' . $settings['ip_ribbon_position'] );
 		}
 		?>
-		
+
 		<!-- Ribbon + lightbox -->
 		<?php if ( $has_ribbon ) : ?>
 			<?php if ( $visionneuse && ! empty( $image_url ) ) : ?>
-				<a <?php echo $this->get_render_attribute_string( 'ip-lightbox' ); ?>>
+				<a <?php echo wp_kses_post( $this->get_render_attribute_string( 'ip-lightbox' ) ); ?>>
 			<?php endif; ?>
-		
-			<span <?php echo $this->get_render_attribute_string( 'ribbon' ); ?>>
+
+			<span <?php echo wp_kses_post( $this->get_render_attribute_string( 'ribbon' ) ); ?>>
 				<span class="image-ribbon-inner"><?php echo sanitize_text_field( $settings['ip_ribbon_text'] ); ?></span>
 			</span>
-		
+
 			<?php if ( $visionneuse && ! empty( $image_url ) ) : ?>
 				</a>
 			<?php endif; ?>
 		<?php endif; ?>
-		
+
 		<!-- Image + lightbox -->
 		<?php if ( ! empty( $image_url ) ) : ?>
 			<figure class="ip-image">
 				<?php if ( $visionneuse ) : ?>
-					<a <?php echo $this->get_render_attribute_string( 'ip-lightbox' ); ?>>
+					<a <?php echo wp_kses_post( $this->get_render_attribute_string( 'ip-lightbox' ) ); ?>>
 				<?php endif; ?>
-				
-				<?php echo Group_Control_Image_Size::get_attachment_image_html( $settings, 'ip_image', 'ip_image_content' ); ?>
-				
+
+				<?php echo Group_Control_Image_Size::get_attachment_image_html( $settings, 'ip_image', 'ip_image_content' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+
 				<?php if ( $visionneuse ) : ?>
 					</a>
 				<?php endif; ?>
 			</figure>
 		<?php endif; ?>
-		
+
 		<!-- Affichage d'une icone -->
 		<?php if ( $link_icon ) : ?>
-			<div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
+			<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'wrapper' ) ); ?>>
 				<div class="ip-icone elementor-icon">
-					<i <?php echo $this->get_render_attribute_string( 'icon' ); ?>></i>
+					<i <?php echo wp_kses_post( $this->get_render_attribute_string( 'icon' ) ); ?>></i>
 				</div>
 			</div>
 		<?php endif; ?>
-		
+
 		<!-- Affichage du titre -->
 		<?php if ( $iptitle ) : ?>
 			<?php if ( $has_title_url ) : ?>
 				<a href="<?php echo esc_url( $settings['ip_title_url']['url'] ); ?>">
 			<?php endif; ?>
-			
+
 				<?php echo $open_title; ?><?php echo sanitize_text_field( $settings['ip_title'] ); ?><?php echo $close_title; ?>
-				
+
 			<?php if ( $has_title_url ) : ?>
 				</a>
 			<?php endif; ?>
 		<?php endif; ?>
-		
+
 		<!-- Affichage des caractéristiques -->
 		<?php if ( count( $settings['ip_carac_list'] ) ) { ?>
 			<div class="ip-description woocommerce">
 				<div class="ip-description-item">
 					<?php foreach ( $settings['ip_carac_list'] as $item ) { ?>
-						<?php $icone = $item['ip_carac_inclus'] === 'yes' ? '<i class="fa fa-check fa-fw" aria-hidden="true"></i>' : '<i class="fa fa-times fa-fw" aria-hidden="true"></i>'; ?>
+						<?php $icone = 'yes' === $item['ip_carac_inclus'] ? '<i class="fa fa-check fa-fw" aria-hidden="true"></i>' : '<i class="fa fa-times fa-fw" aria-hidden="true"></i>'; ?>
 						<span>
 							<span><?php echo $icone; ?></span>
 							<span><?php echo wp_kses( $item['ip_carac_item'], $allowed_content ); ?></span>
-							<!--<span><?php // echo $item['ip_carac_item']; ?></span>-->
 						</span>
 					<?php } ?>
 				</div>
 			</div>
 		<?php } ?>
-		
+
 		<!-- Affichage du prix -->
 		<?php if ( ! empty( $prix ) ) : ?>
 			<div class="ip-prix">
 				<?php echo $prix; ?>
 			</div>
 		<?php endif; ?>
-		
+
 		<!-- Affichage du bouton linker -->
-		<div <?php echo $this->get_render_attribute_string( 'wrapper-button' ); ?>>
+		<div <?php echo wp_kses_post( $this->get_render_attribute_string( 'wrapper-button' ) ); ?>>
 			<?php if ( ! empty( $link_url ) ) : ?>
-				<a  <?php echo $this->get_render_attribute_string( 'ip-link-to' ); ?>>
+				<a  <?php echo wp_kses_post( $this->get_render_attribute_string( 'ip-link-to' ) ); ?>>
 			<?php endif; ?>
-				<span <?php echo $this->get_render_attribute_string( 'button' ); ?>>
+				<span <?php echo wp_kses_post( $this->get_render_attribute_string( 'button' ) ); ?>>
 					<i class="fa fa-arrow-right" aria-hidden="true"></i><?php echo sanitize_text_field( $settings['ip_button_text'] ); ?>
 				</span>
 			<?php if ( ! empty( $link_url ) ) : ?>
@@ -1247,5 +1246,4 @@ class Image_Promotion_Widget extends Widget_Base {
 	}
 
 	protected function content_template() {}
-
 }

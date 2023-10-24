@@ -86,10 +86,12 @@ class Eac_Post_Acf_Values extends Data_Tag {
 		}
 
 		if ( empty( $key ) ) {
-			return ''; } elseif ( is_array( $key ) ) {
-			return implode( '|', $key ); } else {
-				return $key;
-			}
+			return '';
+		} elseif ( is_array( $key ) ) {
+			return implode( '|', $key );
+		} else {
+			return $key;
+		}
 	}
 
 	private function get_custom_keys_array( $type = 'post' ) {
@@ -101,9 +103,11 @@ class Eac_Post_Acf_Values extends Data_Tag {
 			foreach ( $metadatas as $metadata ) {
 				$pcontent = (array) unserialize( $metadata->post_content );
 				// Le champ est dans la liste des champs ACF supportés
-				if ( is_array( $acf_supported_field_types ) && in_array( $pcontent['type'], $acf_supported_field_types ) ) {
+				if ( is_array( $acf_supported_field_types ) && in_array( $pcontent['type'], $acf_supported_field_types, true ) ) {
 					if ( ! is_serialized( $metadata->meta_value ) ) {
-						$value = $cut_value = $metadata->meta_value;
+						$value     = $metadata->meta_value;
+						$cut_value = $metadata->meta_value;
+
 						// On n'affiche pas tous les caractères
 						if ( mb_strlen( $value, 'UTF-8' ) > self::FIELD_LENGTH ) {
 							$cut_value = mb_substr( $value, 0, self::FIELD_LENGTH, 'UTF-8' ) . '...';

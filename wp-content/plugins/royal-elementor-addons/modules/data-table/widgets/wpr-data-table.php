@@ -289,7 +289,7 @@ class Wpr_Data_Table extends Widget_Base {
 		// 			'enable_custom_links' => 'yes',
 		// 		]
 		// 	]
-		// ); //goback
+		// );
 
 		// $repeater = new \Elementor\Repeater();
 

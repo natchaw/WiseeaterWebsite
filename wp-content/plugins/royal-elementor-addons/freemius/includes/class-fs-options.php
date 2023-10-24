@@ -278,12 +278,12 @@
                                 $network_option[ $key ] = $value;
 
                                 $option_updated = true;
-                            } elseif ( is_array( $network_option[ $key ] ) && is_array( $value ) ) {
+                            } else if ( is_array( $network_option[ $key ] ) && is_array( $value ) ) {
                                 if ( empty( $network_option[ $key ] ) ) {
                                     $network_option[ $key ] = $value;
 
                                     $option_updated = true;
-                                } elseif ( empty( $value ) ) {
+                                } else if ( empty( $value ) ) {
                                     // Do nothing.
                                 } else {
                                     reset($value);

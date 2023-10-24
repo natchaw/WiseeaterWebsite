@@ -70,6 +70,7 @@ trait Button_Read_More_Trait {
 					),
 				),
 				'default'   => 'before',
+				'toggle'    => false,
 				'condition' => array( 'button_add_more_picto' => 'yes' ),
 			)
 		);
@@ -93,7 +94,9 @@ trait Button_Read_More_Trait {
 						'step' => 1,
 					),
 				),
-				'selectors'          => array( '{{WRAPPER}} .shop-product__button-readmore i' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};' ),
+				'selectors'          => array(
+					'{{WRAPPER}} .shop-product__button-readmore i, {{WRAPPER}} .button-readmore i' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+				),
 				'condition'          => array( 'button_add_more_picto' => 'yes' ),
 			)
 		);
@@ -108,7 +111,7 @@ trait Button_Read_More_Trait {
 				'label'     => esc_html__( 'Couleur', 'eac-components' ),
 				'type'      => Controls_Manager::COLOR,
 				'global'    => array( 'default' => Global_Colors::COLOR_PRIMARY ),
-				'selectors' => array( '{{WRAPPER}} .shop-product__button-readmore' => 'color: {{VALUE}}' ),
+				'selectors' => array( '{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore' => 'color: {{VALUE}}' ),
 			)
 		);
 
@@ -118,7 +121,7 @@ trait Button_Read_More_Trait {
 				'name'     => 'button_more_typo',
 				'label'    => esc_html__( 'Typographie', 'eac-components' ),
 				'global'   => array( 'default' => Global_Typography::TYPOGRAPHY_SECONDARY ),
-				'selector' => '{{WRAPPER}} .shop-product__button-readmore',
+				'selector' => '{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore',
 			)
 		);
 
@@ -128,7 +131,9 @@ trait Button_Read_More_Trait {
 				'label'     => esc_html__( 'Couleur du fond', 'eac-components' ),
 				'type'      => Controls_Manager::COLOR,
 				'global'    => array( 'default' => Global_Colors::COLOR_SECONDARY ),
-				'selectors' => array( '{{WRAPPER}} .shop-product__button-readmore' => 'background-color: {{VALUE}};' ),
+				'selectors' => array(
+					'{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore' => 'background-color: {{VALUE}};',
+				),
 			)
 		);
 
@@ -138,18 +143,9 @@ trait Button_Read_More_Trait {
 				'label'     => esc_html__( 'Marges internes', 'eac-components' ),
 				'type'      => Controls_Manager::DIMENSIONS,
 				'selectors' => array(
-					'{{WRAPPER}} .shop-product__button-readmore' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
 				'separator' => 'before',
-			)
-		);
-
-		$this->add_group_control(
-			Group_Control_Box_Shadow::get_type(),
-			array(
-				'name'     => 'button_more_shadow',
-				'label'    => esc_html__( 'Ombre', 'eac-components' ),
-				'selector' => '{{WRAPPER}} .shop-product__button-readmore',
 			)
 		);
 
@@ -157,7 +153,7 @@ trait Button_Read_More_Trait {
 			Group_Control_Border::get_type(),
 			array(
 				'name'     => 'button_more_border',
-				'selector' => '{{WRAPPER}} .shop-product__button-readmore',
+				'selector' => '{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore',
 			)
 		);
 
@@ -169,8 +165,17 @@ trait Button_Read_More_Trait {
 				'size_units'         => array( 'px', '%' ),
 				'allowed_dimensions' => array( 'top', 'right', 'bottom', 'left' ),
 				'selectors'          => array(
-					'{{WRAPPER}} .shop-product__button-readmore' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+					'{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 				),
+			)
+		);
+
+		$this->add_group_control(
+			Group_Control_Box_Shadow::get_type(),
+			array(
+				'name'     => 'button_more_shadow',
+				'label'    => esc_html__( 'Ombre', 'eac-components' ),
+				'selector' => '{{WRAPPER}} .shop-product__button-readmore, {{WRAPPER}} .button-readmore',
 			)
 		);
 	}

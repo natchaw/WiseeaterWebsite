@@ -47,6 +47,10 @@ class WPR_Conditions_Manager {
         	}
         }
 
+        if ( !current_user_can('administrator') && ('maintenance' == get_option('elementor_maintenance_mode_mode') || 'coming_soon' == get_option('elementor_maintenance_mode_mode')) ) {
+            $template = NULL;
+        }
+
 	    return $template;
     }
 

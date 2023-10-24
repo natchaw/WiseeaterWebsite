@@ -118,16 +118,19 @@ class Eac_Helpers_Util {
 		$query_args['ignore_sticky_posts'] = 1;
 
 		// Récupère le nombre de page pour la pagination
-		if ( $settings['al_content_pagging_display'] === 'yes' ) {
+		if ( 'yes' === $settings['al_content_pagging_display'] ) {
 			if ( get_query_var( 'paged' ) ) {
-				$query_args['paged'] = get_query_var( 'paged' ); } elseif ( get_query_var( 'page' ) ) {
-				$query_args['paged'] = get_query_var( 'page' ); } else {
-					$query_args['paged'] = 1; }
+				$query_args['paged'] = get_query_var( 'paged' );
+			} elseif ( get_query_var( 'page' ) ) {
+				$query_args['paged'] = get_query_var( 'page' );
+			} else {
+					$query_args['paged'] = 1;
+			}
 
-				// Calcul de l'offset si ce n'est pas la première page
-				if ( $query_args['paged'] > 1 ) {
-					$query_args['offset'] = $query_args['posts_per_page'] * ( $query_args['paged'] - 1 );
-				}
+			// Calcul de l'offset si ce n'est pas la première page
+			if ( $query_args['paged'] > 1 ) {
+				$query_args['offset'] = $query_args['posts_per_page'] * ( $query_args['paged'] - 1 );
+			}
 		} else {
 			// 'no_found_rows' à true s'il n'y a pas de pagination et si on n'a pas besoin du nombre total d'articles
 			$query_args['no_found_rows'] = true;
@@ -149,7 +152,7 @@ class Eac_Helpers_Util {
 		}
 
 		// Inclure les enfants
-		if ( $settings['al_article_include'] !== 'yes' ) {
+		if ( 'yes' !== $settings['al_article_include'] ) {
 			$query_args['post_parent'] = 0;
 		}
 
@@ -185,7 +188,7 @@ class Eac_Helpers_Util {
 					foreach ( $custom_terms as $custom_term ) {
 						// Le term de la taxo est dans le tableau de slug des terms sélectionnés dans la liste
 						if ( ! empty( $terms_slug ) ) {
-							if ( in_array( $custom_term->slug, $terms_slug ) ) {
+							if ( in_array( $custom_term->slug, $terms_slug, true ) ) {
 								$customtaxo[] = $custom_term->slug;
 							}
 						} else {
@@ -249,7 +252,7 @@ class Eac_Helpers_Util {
 						$value = strpos( $metadatavalue, '::' ) !== false ? explode( '::', $metadatavalue )[1] : $metadatavalue;
 
 						// Check le format de la date pour éviter les erreurs de requête SQL dans la BDD
-						if ( $type === 'DATE' ) {
+						if ( 'DATE' === $type ) {
 							// Constantes date du jour, -+1 mois, -+1 trimestre, -+1 an
 							$value = Eac_Tools_Util::get_formated_date_value( $value );
 
@@ -258,14 +261,14 @@ class Eac_Helpers_Util {
 								// Vérifie si c'est une date avec décalage du mois: 2021-06-31 => 2021-07-01
 								array_push( $values, date_i18n( 'Y-m-d', strtotime( $result[0] ) ) );
 							}
-						} elseif ( $type === 'NUMERIC' ) {
+						} elseif ( 'NUMERIC' === $type ) {
 							array_push( $values, (int) $value );
-						} elseif ( $type === 'DECIMAL(10,2)' ) {
+						} elseif ( 'DECIMAL(10,2)' === $type ) {
 							array_push( $values, (float) $value );
-						} elseif ( $type === 'CHAR' ) {
+						} elseif ( 'CHAR' === $type ) {
 							array_push( $values, $value );
 							/** @since 1.9.8 Traitement du type TIMESTAMP pour les produits */
-						} elseif ( $type === 'TIMESTAMP' ) {
+						} elseif ( 'TIMESTAMP' === $type ) {
 							$value = Eac_Tools_Util::get_formated_date_value( $value );
 							if ( Eac_Tools_Util::is_timestamp( $value ) ) {
 								array_push( $values, $value );
@@ -278,18 +281,18 @@ class Eac_Helpers_Util {
 
 					// Il y a des valeurs
 					if ( ! empty( $values ) ) {
-						if ( in_array( $compare, array( 'BETWEEN', 'NOT BETWEEN' ) ) && count( $values ) > 2 ) {         // Deux valeurs pour ces opérateurs
+						if ( in_array( $compare, array( 'BETWEEN', 'NOT BETWEEN' ), true ) && count( $values ) > 2 ) {         // Deux valeurs pour ces opérateurs
 							$values = array_slice( $values, 0, 2 );
-						} elseif ( in_array( $compare, array( 'BETWEEN', 'NOT BETWEEN' ) ) && count( $values ) != 2 ) {  // Pas différent de deux
+						} elseif ( in_array( $compare, array( 'BETWEEN', 'NOT BETWEEN' ), true ) && count( $values ) !== 2 ) {  // Pas différent de deux
 							$values = array();
-						} elseif ( in_array( $compare, array( '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE' ) ) && count( $values ) > 1 ) { // Une seule valeur pour ces opérateurs
+						} elseif ( in_array( $compare, array( '<', '>', '<=', '>=', '!=', 'LIKE', 'NOT LIKE' ), true ) && count( $values ) > 1 ) { // Une seule valeur pour ces opérateurs
 							$values = array_slice( $values, 0, 1 );
 						}
 
 						// Met en forme $values comme un tableau, une expression régulière ou une valeur isolée
-						if ( in_array( $compare, array( 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ) ) ) {                       // Toutes les valeurs dans un tableau
+						if ( in_array( $compare, array( 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN' ), true ) ) {                       // Toutes les valeurs dans un tableau
 							$query_args['meta_query'][ $index_key ]['value'] = $values;
-						} elseif ( in_array( $compare, array( 'REGEXP', 'NOT REGEXP' ) ) ) {                                   // @since 1.7.3 Expression régulière
+						} elseif ( in_array( $compare, array( 'REGEXP', 'NOT REGEXP' ), true ) ) {                                   // @since 1.7.3 Expression régulière
 							$query_args['meta_query'][ $index_key ]['value'] = '(' . implode( '|', $values ) . ')+';
 						} else {
 							$query_args['meta_query'][ $index_key ]['value'] = $values[0];                            // On ne prend que la première valeur par défaut
@@ -300,14 +303,14 @@ class Eac_Helpers_Util {
 					}
 				} else {
 					/** @since 1.9.8 Pas de valeur on supprime le type 'TIMESTAMP' si c'est le cas */
-					if ( $query_args['meta_query'][ $index_key ]['type'] === 'TIMESTAMP' ) {
+					if ( 'TIMESTAMP' === $query_args['meta_query'][ $index_key ]['type'] ) {
 						unset( $query_args['meta_query'][ $index_key ]['type'] );
 					}
 				}
 
 				// Relation entre les clés
 				if ( $index_key > 0 ) {
-					$query_args['meta_query']['relation'] = $settings['al_content_metadata_keys_relation'] === 'yes' ? 'AND' : 'OR';
+					$query_args['meta_query']['relation'] = 'yes' === $settings['al_content_metadata_keys_relation'] ? 'AND' : 'OR';
 				}
 			}
 		}
@@ -372,7 +375,7 @@ class Eac_Helpers_Util {
 			$html .= "<div class='al-filters__item al-active'><a href='#' data-filter='*'>" . esc_html__( 'Tous', 'eac-components' ) . '</a></div>';
 		foreach ( $which_users as $id_user ) {
 			$disp_user = get_user_by( 'id', trim( $id_user ) );
-			if ( $disp_user != false ) {
+			if ( false !== $disp_user ) {
 				$html .= "<div class='al-filters__item'><a href='#' data-filter='." . sanitize_title( $disp_user->display_name ) . "'>" . ucfirst( $disp_user->display_name ) . '</a></div>';
 			}
 		}
@@ -384,7 +387,7 @@ class Eac_Helpers_Util {
 				$html .= "<option value='*' selected>" . esc_html__( 'Tous', 'eac-components' ) . '</option>';
 		foreach ( $which_users as $id_user ) {
 			$disp_user = get_user_by( 'id', trim( $id_user ) );
-			if ( $disp_user != false ) {
+			if ( false !== $disp_user ) {
 				$html .= "<option value='." . sanitize_title( $disp_user->display_name ) . "'>" . ucfirst( $disp_user->display_name ) . '</option>';
 			}
 		}
@@ -504,7 +507,6 @@ class Eac_Helpers_Util {
 				'parent'     => 0,
 			)
 		);
-		// error_log(json_encode($terms));
 
 		if ( ! is_wp_error( $terms ) && count( $terms ) > 0 ) {
 			foreach ( $terms as $term ) {
@@ -514,19 +516,19 @@ class Eac_Helpers_Util {
 
 					if ( $cat_parent && ! empty( $children ) && ! is_wp_error( $children ) ) {
 						if ( ! empty( $terms_filters ) ) {
-							if ( in_array( $term->slug, $terms_filters ) ) {
-								$unique_terms[ $term->slug ] = $term->slug . ':' . esc_attr( $term->name );
+							if ( in_array( $term->slug, $terms_filters, true ) ) {
+								$unique_terms[ $term->slug ] = $term->slug . ':' . $term->name;
 							}
 						} else {
-							$unique_terms[ $term->slug ] = $term->slug . ':' . esc_attr( $term->name );
+							$unique_terms[ $term->slug ] = $term->slug . ':' . $term->name;
 						}
 					} else {
 						if ( ! empty( $terms_filters ) ) {
-							if ( in_array( $term->slug, $terms_filters ) ) {
-								$unique_terms[ $term->slug ] = $term->slug . ':' . esc_attr( $term->name );
+							if ( in_array( $term->slug, $terms_filters, true ) ) {
+								$unique_terms[ $term->slug ] = $term->slug . ':' . $term->name;
 							}
 						} else {
-							$unique_terms[ $term->slug ] = $term->slug . ':' . esc_attr( $term->name );
+							$unique_terms[ $term->slug ] = $term->slug . ':' . $term->name;
 						}
 					}
 				}
@@ -592,7 +594,7 @@ class Eac_Helpers_Util {
 		// Boucle sur toutes les occurrences des meta
 		foreach ( $array_post_meta_values as $post_meta_value ) {
 			/** @since 1.7.2 */
-			if ( $meta_query['type'] === 'DATE' && ! empty( $meta_query['value'] ) ) {
+			if ( 'DATE' === $meta_query['type'] && ! empty( $meta_query['value'] ) ) {
 				if ( is_array( $meta_query['value'] ) ) {
 					$field_meta_value = array();
 					foreach ( $meta_query['value'] as $idx => $mqv ) {
@@ -621,58 +623,58 @@ class Eac_Helpers_Util {
 			if ( empty( $fmv_value ) ) {                                // Le champ des valeurs n'est pas renseigné
 				$term_data[ $post_meta_value ] = $post_meta_value;
 			} else {                                            // Le champ des valeurs est renseigné
-				if ( $meta_query['compare'] === 'IN' ) {
-					if ( in_array( $pmv_value, $fmv_value ) ) {     // La meta_value est dans le tableau des valeurs
+				if ( 'IN' === $meta_query['compare'] ) {
+					if ( in_array( $pmv_value, $fmv_value, true ) ) {     // La meta_value est dans le tableau des valeurs
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === 'NOT IN' ) {
-					if ( ! in_array( $pmv_value, $fmv_value ) ) {
+				} elseif ( 'NOT IN' === $meta_query['compare'] ) {
+					if ( ! in_array( $pmv_value, $fmv_value, true ) ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === 'BETWEEN' ) {
-					if ( is_array( $fmv_value ) && count( $fmv_value ) == 2 ) { // C'est un tableau et il y a 2 valeurs
+				} elseif ( 'BETWEEN' === $meta_query['compare'] ) {
+					if ( is_array( $fmv_value ) && count( $fmv_value ) === 2 ) { // C'est un tableau et il y a 2 valeurs
 						if ( $pmv_value >= $fmv_value[0] && $pmv_value <= $fmv_value[1] ) {
 							$term_data[ $post_meta_value ] = $post_meta_value;
 						}
 					}
-				} elseif ( $meta_query['compare'] === 'NOT BETWEEN' ) {
-					if ( is_array( $fmv_value ) && count( $fmv_value ) == 2 ) { // C'est un tableau et il y a 2 valeurs
+				} elseif ( 'NOT BETWEEN' === $meta_query['compare'] ) {
+					if ( is_array( $fmv_value ) && count( $fmv_value ) === 2 ) { // C'est un tableau et il y a 2 valeurs
 						if ( $pmv_value <= $fmv_value[0] || $pmv_value >= $fmv_value[1] ) {
 							$term_data[ $post_meta_value ] = $post_meta_value;
 						}
 					}
-				} elseif ( in_array( $meta_query['compare'], array( 'LIKE', 'REGEXP' ) ) ) {
+				} elseif ( in_array( $meta_query['compare'], array( 'LIKE', 'REGEXP' ), true ) ) {
 					// $val = iconv('ISO-8859-1','ASCII//TRANSLIT//IGNORE',$val);
 					// $val = iconv('UTF-8','ASCII//TRANSLIT//IGNORE',$val);
 
 					if ( preg_match( "/$fmv_value/", $pmv_value ) ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( in_array( $meta_query['compare'], array( 'NOT LIKE', 'NOT REGEXP' ) ) ) {
+				} elseif ( in_array( $meta_query['compare'], array( 'NOT LIKE', 'NOT REGEXP' ), true ) ) {
 					if ( ! preg_match( "/$fmv_value/", $pmv_value ) ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '=' ) {
-					if ( $pmv_value == $fmv_value ) {
+				} elseif ( '=' === $meta_query['compare'] ) {
+					if ( $pmv_value === $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '!=' ) {
-					if ( $pmv_value != $fmv_value ) {
+				} elseif ( '!=' === $meta_query['compare'] ) {
+					if ( $pmv_value !== $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '>=' ) {
+				} elseif ( '>=' === $meta_query['compare'] ) {
 					if ( $pmv_value >= $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '<=' ) {
+				} elseif ( '<=' === $meta_query['compare'] ) {
 					if ( $pmv_value <= $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '>' ) {
+				} elseif ( '>' === $meta_query['compare'] ) {
 					if ( $pmv_value > $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
-				} elseif ( $meta_query['compare'] === '<' ) {
+				} elseif ( '>' === $meta_query['compare'] ) {
 					if ( $pmv_value < $fmv_value ) {
 						$term_data[ $post_meta_value ] = $post_meta_value;
 					}
@@ -684,7 +686,7 @@ class Eac_Helpers_Util {
 			 *
 			 * @since 1.9.8 le type TIMESTAMP n'existe pas. $meta_query['type'] est vide
 			 */
-			if ( ! empty( $term_data ) && isset( $term_data[ $post_meta_value ] ) && ( $meta_query['type'] === 'DATE' || empty( $meta_query['type'] ) ) ) {
+			if ( ! empty( $term_data ) && isset( $term_data[ $post_meta_value ] ) && ( 'DATE' === $meta_query['type'] || empty( $meta_query['type'] ) ) ) {
 				$meta_value                    = Eac_Tools_Util::set_wp_format_date( $post_meta_value );
 				$term_data[ $post_meta_value ] = $meta_value;
 			}

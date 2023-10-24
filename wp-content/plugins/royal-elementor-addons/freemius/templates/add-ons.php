@@ -161,7 +161,7 @@
 
                                         if ( $pricing->has_annual() ) {
 											$min_price = min( $min_price, $pricing->annual_price );
-										} elseif ( $pricing->has_monthly() ) {
+										} else if ( $pricing->has_monthly() ) {
 											$min_price = min( $min_price, 12 * $pricing->monthly_price );
 										}
 									}
@@ -266,7 +266,7 @@
 
                                         if ( ! in_array( $addon->id, $account_addon_ids ) ) {
                                             $show_premium_activation_or_installation_action = false;
-                                        } elseif ( $is_addon_installed ) {
+                                        } else if ( $is_addon_installed ) {
                                             /**
                                              * If any add-on's version (free or premium) is installed, check if the
                                              * premium version can be activated and show the relevant action. Otherwise,
